@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Clockify</title>
+</head>
+<body>
+  <header class="topbar">
+    <span class="logo">my clockify</span>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <a href="#" class="nav-item active">Time Tracker</a>
+      <a href="#" class="nav-item">Reports</a>
+      <a href="#" class="nav-item">Projects</a>
+    </nav>
+
+    <main class="content">
+      <section class="timer-bar">
+        <input type="text" id="description" placeholder="What are you working on?">
+        <span id="clock" class="clock">00:00:00</span>
+        <button id="start-stop" class="start-button">START</button>
+      </section>
+
+      <section class="entries">
+        <h2>This week</h2>
+        <p class="empty">No time entries yet. Start the timer to track your first one.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
