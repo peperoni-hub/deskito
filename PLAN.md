@@ -1,6 +1,8 @@
-# My Clockify App: Plan
+# Deskito: Plan
 
 A time-tracking app inspired by Clockify, built to learn git. First for me, later for other people too.
+
+**Slogan:** Every minute in its place.
 
 ## Tech stack
 - **Phase A:** HTML, CSS, JavaScript. Runs in the browser, works fully offline, data saved in the browser.
