@@ -6,7 +6,19 @@ const emptyMessage = document.getElementById("empty-message");
 
 let startTime = null;
 let tickInterval = null;
-let entries = [];
+let entries = loadEntries();
+
+function loadEntries() {
+  try {
+    return JSON.parse(localStorage.getItem("entries")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveEntries() {
+  localStorage.setItem("entries", JSON.stringify(entries));
+}
 
 function formatDuration(milliseconds) {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -70,6 +82,7 @@ function stopTimer() {
     start: startTime,
     end: Date.now(),
   });
+  saveEntries();
   renderEntries();
 
   startTime = null;
@@ -86,3 +99,5 @@ startStopButton.addEventListener("click", () => {
     stopTimer();
   }
 });
+
+renderEntries();
