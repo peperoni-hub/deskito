@@ -2087,3 +2087,93 @@ body {
   text-align: left;
   margin: 8px 0 0;
 }
+
+/* Language picker on the welcome screen */
+.welcome-card {
+  position: relative;
+}
+
+.welcome-language {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  max-width: 130px;
+}
+
+.language-select {
+  min-width: 160px;
+}
+
+/* Right-to-left layout (Arabic) */
+[dir="rtl"] .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+[dir="rtl"] .nav-item {
+  border-left: none;
+  border-right: 3px solid transparent;
+}
+
+[dir="rtl"] .nav-item.active {
+  border-right-color: var(--accent);
+}
+
+[dir="rtl"] .welcome-language {
+  right: auto;
+  left: 14px;
+}
+
+[dir="rtl"] .toasts {
+  right: auto;
+  left: 16px;
+}
+
+[dir="rtl"] .toast {
+  border-left: 1px solid var(--border);
+  border-right: 4px solid var(--accent);
+}
+
+[dir="rtl"] .mini-plan,
+[dir="rtl"] .month-chip {
+  border-left: none;
+  border-right: 3px solid var(--plan-color);
+  text-align: right;
+}
+
+[dir="rtl"] .report-table th,
+[dir="rtl"] .bar-value,
+[dir="rtl"] .bar-percent {
+  text-align: right;
+}
+
+[dir="rtl"] .report-table .num {
+  text-align: left;
+}
+
+[dir="rtl"] .dot {
+  margin-right: 0;
+  margin-left: 5px;
+}
+
+[dir="rtl"] .clock,
+[dir="rtl"] .entry-duration {
+  text-align: left;
+}
+
+[dir="rtl"] .hour-label {
+  text-align: left;
+  padding-right: 0;
+  padding-left: 8px;
+}
+
+[dir="rtl"] .bar-fill {
+  border-radius: 4px 0 0 4px;
+}
+
+[dir="rtl"] #mini-prev,
+[dir="rtl"] #mini-next,
+[dir="rtl"] #cal-prev,
+[dir="rtl"] #cal-next {
+  transform: scaleX(-1);
+}

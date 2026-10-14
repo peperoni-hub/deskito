@@ -113,7 +113,7 @@ function formatDuration(milliseconds) {
 }
 
 function formatTimeOfDay(timestamp) {
-  return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return new Date(timestamp).toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" });
 }
 
 function pad(number) {
@@ -137,9 +137,9 @@ function fromDateAndTime(dateValue, timeValue) {
 function dayLabel(key) {
   const today = dayKey(Date.now());
   const yesterday = dayKey(Date.now() - 86400000);
-  if (key === today) return "Today";
-  if (key === yesterday) return "Yesterday";
-  return new Date(`${key}T00:00`).toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" });
+  if (key === today) return t("Today");
+  if (key === yesterday) return t("Yesterday");
+  return new Date(`${key}T00:00`).toLocaleDateString(locale(), { weekday: "short", day: "numeric", month: "short" });
 }
 
 function startOfWeek(timestamp) {
@@ -164,7 +164,7 @@ function parseProjectValue(value) {
 
 function fillProjectSelect(select, value = "") {
   const keepId = parseProjectValue(value).projectId;
-  select.replaceChildren(el("option", { value: "" }, "No project"));
+  select.replaceChildren(el("option", { value: "" }, t("No project")));
   for (const project of store.projects) {
     if (project.archived && project.id !== keepId) continue;
     select.append(el("option", { value: project.id }, project.name));
@@ -177,7 +177,7 @@ function fillProjectSelect(select, value = "") {
 
 function fillTypeSelect(select, value = "task") {
   select.replaceChildren(
-    ...Object.entries(ENTRY_TYPES).map(([key, label]) => el("option", { value: key }, label))
+    ...Object.entries(ENTRY_TYPES).map(([key, label]) => el("option", { value: key }, t(label)))
   );
   select.value = value;
 }
@@ -185,7 +185,7 @@ function fillTypeSelect(select, value = "task") {
 function fillTagPicker(picker, selectedIds = []) {
   const menu = el("div", { class: "tag-menu" });
   if (store.tags.length === 0) {
-    menu.append(el("p", { class: "tag-menu-empty" }, "No tags yet. Add them on the Projects page."));
+    menu.append(el("p", { class: "tag-menu-empty" }, t("No tags yet. Add them on the Projects page.")));
   }
   for (const tag of store.tags) {
     menu.append(
@@ -206,7 +206,7 @@ function readTagPicker(picker) {
 
 function updateTagSummary(picker) {
   const names = readTagPicker(picker).map((id) => findTag(id)?.name).filter(Boolean);
-  picker.querySelector("summary").textContent = names.length ? names.join(", ") : "Tags";
+  picker.querySelector("summary").textContent = names.length ? names.join(", ") : t("Tags");
 }
 
 function savePlans() {
@@ -215,7 +215,7 @@ function savePlans() {
 
 /* Our own "are you sure?" window and messages (browsers can block their built-in pop-ups) */
 
-function askConfirm(message, confirmLabel = "Delete") {
+function askConfirm(message, confirmLabel = t("Delete")) {
   return new Promise((resolve) => {
     const dialog = document.getElementById("confirm-dialog");
     dialog.querySelector(".confirm-message").textContent = message;

@@ -79,7 +79,7 @@ restoreInput.addEventListener("change", async () => {
   try {
     const backup = JSON.parse(await file.text());
     if (backup.app !== "deskito" || !backup.data) throw new Error("not a Deskito backup");
-    if (!await askConfirm("Replace everything in this browser with the backup? This cannot be undone.", "Restore")) return;
+    if (!await askConfirm(t("Replace everything in this browser with the backup? This cannot be undone."), t("Restore"))) return;
     for (const key of BACKUP_KEYS) {
       if (backup.data[key] == null) {
         localStorage.removeItem(key);
@@ -89,21 +89,21 @@ restoreInput.addEventListener("change", async () => {
     }
     location.reload();
   } catch {
-    notify("That file isn't a Deskito backup.");
+    notify(t("That file isn't a Deskito backup."));
   }
 });
 
 /* Start fresh */
 
 document.getElementById("clear-entries").addEventListener("click", async () => {
-  if (!await askConfirm(`Delete all ${store.entries.length} time entries? This cannot be undone.`)) return;
+  if (!await askConfirm(t("Delete all {count} time entries? This cannot be undone.", { count: store.entries.length }))) return;
   store.entries = [];
   saveEntries();
   renderEntries();
 });
 
 document.getElementById("clear-plans").addEventListener("click", async () => {
-  if (!await askConfirm(`Delete all ${store.plans.length} calendar plans? This cannot be undone.`)) return;
+  if (!await askConfirm(t("Delete all {count} calendar plans? This cannot be undone.", { count: store.plans.length }))) return;
   store.plans = [];
   plansChanged();
 });
@@ -134,8 +134,8 @@ const deviceModeHint = document.getElementById("device-mode");
 
 function showDeviceMode() {
   deviceModeHint.textContent = darkQuery.matches
-    ? "Your device is currently in dark mode."
-    : "Your device is currently in light mode. (Browsers follow Windows' \"app mode\" and their own appearance setting.)";
+    ? t("Your device is currently in dark mode.")
+    : t("Your device is currently in light mode. (Browsers follow Windows' \"app mode\" and their own appearance setting.)");
 }
 
 darkQuery.addEventListener("change", showDeviceMode);

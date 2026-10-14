@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="theme.js"></script>
+  <script src="i18n.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -210,6 +211,8 @@
       <div class="view" data-view="settings" hidden>
         <h2 class="page-title">Settings</h2>
         <div class="panel">
+          <label class="field-label" for="settings-language">Language</label>
+          <select id="settings-language" class="picker language-select"></select>
           <label class="field-label" for="settings-name">Your name</label>
           <input id="settings-name" class="text-input" type="text">
 
@@ -263,8 +266,8 @@
           <label class="checkbox-row"><input type="checkbox" data-pref="breakAlarm"> Remind me to take a break automatically</label>
           <label class="setting-row">
             After working for
-            <input class="picker tiny" type="number" min="5" max="480" data-pref="breakAfterMin"> minutes,
-            take a
+            <input class="picker tiny" type="number" min="5" max="480" data-pref="breakAfterMin"> <span>minutes,</span>
+            <span>take a</span>
             <input class="picker tiny" type="number" min="1" max="120" data-pref="breakLengthMin"> minute break
           </label>
         </div>
@@ -274,8 +277,8 @@
           <label class="checkbox-row"><input type="checkbox" data-pref="remindTrack"> Remind me when I'm not tracking</label>
           <label class="setting-row">
             Every
-            <input class="picker tiny" type="number" min="5" max="240" data-pref="remindEveryMin"> minutes,
-            on weekdays between
+            <input class="picker tiny" type="number" min="5" max="240" data-pref="remindEveryMin"> <span>minutes,</span>
+            <span>on weekdays between</span>
             <input class="picker" type="time" data-pref="workStart"> and
             <input class="picker" type="time" data-pref="workEnd">
           </label>
@@ -293,6 +296,7 @@
 
   <div id="welcome" class="welcome" hidden>
     <form id="welcome-form" class="welcome-card">
+      <select id="welcome-language" class="picker language-select welcome-language" title="Language"></select>
       <h1 class="welcome-logo">deskito</h1>
       <p class="slogan">Every minute in its place.</p>
 
@@ -439,6 +443,21 @@
     </form>
   </dialog>
 
+  <script src="lang/bs.js"></script>
+  <script src="lang/hr.js"></script>
+  <script src="lang/sr.js"></script>
+  <script src="lang/tr.js"></script>
+  <script src="lang/de.js"></script>
+  <script src="lang/fr.js"></script>
+  <script src="lang/it.js"></script>
+  <script src="lang/zh.js"></script>
+  <script src="lang/ja.js"></script>
+  <script src="lang/ko.js"></script>
+  <script src="lang/ar.js"></script>
+  <script>
+    translatePage();
+    fillLanguageSelects();
+  </script>
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="projects.js"></script>

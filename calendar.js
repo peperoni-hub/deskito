@@ -82,13 +82,13 @@ function monthGridDays(timestamp) {
 }
 
 function weekdayNames(style) {
-  return Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i).toLocaleDateString([], { weekday: style }));
+  return Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale(), { weekday: style }));
 }
 
 function formatHours(milliseconds) {
   const minutes = Math.round(milliseconds / 60000);
   const hours = Math.floor(minutes / 60);
-  return hours ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
+  return hours ? t("{hours}h {minutes}m", { hours, minutes: minutes % 60 }) : t("{minutes}m", { minutes });
 }
 
 function plansOn(key) {
@@ -150,7 +150,7 @@ function dayColumn(key, isToday) {
       column.append(el("div", {
         class: "tracked-strip",
         style: `top:${top}px;height:${Math.max(3, topFor(entry.end, key) - top)}px`,
-        title: `Tracked: ${entry.description || "(no description)"} · ${formatDuration(entry.end - entry.start)}`,
+        title: t("Tracked: {description} · {time}", { description: entry.description || t("(no description)"), time: formatDuration(entry.end - entry.start) }),
       }));
     }
   }
@@ -181,7 +181,7 @@ function renderWeek() {
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const todayKey = dayKey(Date.now());
   const short = { day: "numeric", month: "short" };
-  calTitle.textContent = `${new Date(days[0]).toLocaleDateString([], short)} – ${new Date(days[6]).toLocaleDateString([], { ...short, year: "numeric" })}`;
+  calTitle.textContent = `${new Date(days[0]).toLocaleDateString(locale(), short)} – ${new Date(days[6]).toLocaleDateString(locale(), { ...short, year: "numeric" })}`;
 
   const names = weekdayNames("short");
   const head = el("div", { class: "week-head" },
@@ -192,7 +192,7 @@ function renderWeek() {
       return el("div", { class: `week-day-head${key === todayKey ? " today" : ""}` },
         el("span", { class: "week-day-name" }, names[i]),
         el("span", { class: "week-day-number" }, new Date(day).getDate()),
-        el("span", { class: "week-day-planned" }, planned ? `${formatHours(planned)} planned` : " ")
+        el("span", { class: "week-day-planned" }, planned ? t("{time} planned", { time: formatHours(planned) }) : " ")
       );
     })
   );
@@ -220,7 +220,7 @@ function renderWeek() {
 function renderMonth() {
   const month = new Date(calAnchor).getMonth();
   const todayKey = dayKey(Date.now());
-  calTitle.textContent = new Date(calAnchor).toLocaleDateString([], { month: "long", year: "numeric" });
+  calTitle.textContent = new Date(calAnchor).toLocaleDateString(locale(), { month: "long", year: "numeric" });
 
   const cells = monthGridDays(calAnchor).map((day) => {
     const key = dayKey(day);
@@ -240,7 +240,7 @@ function renderMonth() {
           `${formatTimeOfDay(plan.start)} ${plan.title}`
         )
       ),
-      plans.length > 3 && el("span", { class: "month-more" }, `+${plans.length - 3} more`),
+      plans.length > 3 && el("span", { class: "month-more" }, t("+{count} more", { count: plans.length - 3 })),
       entriesOn(key).length > 0 && el("span", { class: "mini-line" })
     );
   });
@@ -299,7 +299,7 @@ calAdd.addEventListener("click", () => {
 function renderMini() {
   const month = new Date(miniAnchor).getMonth();
   const todayKey = dayKey(Date.now());
-  miniMonth.textContent = new Date(miniAnchor).toLocaleDateString([], { month: "long", year: "numeric" });
+  miniMonth.textContent = new Date(miniAnchor).toLocaleDateString(locale(), { month: "long", year: "numeric" });
 
   miniGrid.replaceChildren(
     ...weekdayNames("narrow").map((name) => el("span", { class: "mini-weekday" }, name)),
@@ -325,7 +325,7 @@ function renderMini() {
 
   const plans = plansOn(miniSelected);
   const planned = plannedMs(plans, miniSelected);
-  miniDayTitle.textContent = dayLabel(miniSelected) + (planned ? ` · ${formatHours(planned)} planned` : "");
+  miniDayTitle.textContent = dayLabel(miniSelected) + (planned ? ` · ${t("{time} planned", { time: formatHours(planned) })}` : "");
   miniDayList.replaceChildren(
     ...(plans.length
       ? plans.map((plan) =>
@@ -334,7 +334,7 @@ function renderMini() {
             el("span", { class: "mini-plan-title" }, plan.type === "other" && plan.otherLabel ? `${plan.title} · ${plan.otherLabel}` : plan.title)
           )
         )
-      : [el("li", { class: "mini-empty" }, "Nothing planned.")])
+      : [el("li", { class: "mini-empty" }, t("Nothing planned."))])
   );
 }
 
@@ -369,9 +369,9 @@ miniOpen.addEventListener("click", () => {
 
 function openPlanDialog(plan) {
   editingPlanId = plan.id || null;
-  planDialogTitle.textContent = plan.id ? "Edit plan" : "New plan";
+  planDialogTitle.textContent = plan.id ? t("Edit plan") : t("New plan");
   planTitle.value = plan.title || "";
-  planType.replaceChildren(...Object.entries(PLAN_TYPES).map(([key, label]) => el("option", { value: key }, label)));
+  planType.replaceChildren(...Object.entries(PLAN_TYPES).map(([key, label]) => el("option", { value: key }, t(label))));
   planType.value = plan.type || "task";
   planOtherLabel.value = plan.otherLabel || "";
   showOtherField();
@@ -397,7 +397,7 @@ planForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const { start, end } = timeRange(planDate.value, planStart.value, planEnd.value);
   if (end === start) {
-    notify("The start and end time can't be the same.");
+    notify(t("The start and end time can't be the same."));
     return;
   }
   const fields = {
@@ -422,7 +422,7 @@ planForm.addEventListener("submit", (event) => {
 });
 
 planDeleteButton.addEventListener("click", async () => {
-  if (!await askConfirm("Delete this plan?")) return;
+  if (!await askConfirm(t("Delete this plan?"))) return;
   store.plans = store.plans.filter((plan) => plan.id !== editingPlanId);
   plansChanged();
   planDialog.close();

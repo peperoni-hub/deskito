@@ -31,12 +31,12 @@ function budgetBar(project) {
     el("div", { class: "budget-bar" },
       el("div", { class: `budget-fill${used > project.budgetHours ? " over" : ""}`, style: `width:${percent}%` })
     ),
-    el("span", { class: "budget-label" }, `${used.toFixed(1)} of ${project.budgetHours} h budget`)
+    el("span", { class: "budget-label" }, t("{used} of {budget} h budget", { used: used.toLocaleString(locale(), { maximumFractionDigits: 1 }), budget: project.budgetHours }))
   );
 }
 
 function taskSection(project) {
-  const input = el("input", { class: "text-input small", type: "text", placeholder: "New task" });
+  const input = el("input", { class: "text-input small", type: "text", placeholder: t("New task") });
   const addTask = () => {
     const name = input.value.trim();
     if (!name) return;
@@ -54,7 +54,7 @@ function taskSection(project) {
           task.name,
           el("button", {
             class: "chip-remove",
-            title: "Remove task",
+            title: t("Remove task"),
             onclick: () => {
               project.tasks = project.tasks.filter((item) => item.id !== task.id);
               projectsChanged();
@@ -65,7 +65,7 @@ function taskSection(project) {
     ),
     el("div", { class: "inline-row" },
       input,
-      el("button", { class: "secondary-button small", onclick: addTask }, "Add task")
+      el("button", { class: "secondary-button small", onclick: addTask }, t("Add task"))
     )
   );
 }
@@ -75,9 +75,9 @@ function projectCard(project) {
     el("div", { class: "project-header" },
       el("span", { class: "dot big", style: `background:${project.color}` }),
       el("span", { class: "project-name" }, project.name),
-      el("span", { class: "badge" }, project.private ? "Private" : "Public"),
-      project.archived && el("span", { class: "badge" }, "Archived"),
-      el("span", { class: "project-tracked" }, `${formatDuration(trackedMs(project.id))} tracked`)
+      el("span", { class: "badge" }, project.private ? t("Private") : t("Public")),
+      project.archived && el("span", { class: "badge" }, t("Archived")),
+      el("span", { class: "project-tracked" }, t("{time} tracked", { time: formatDuration(trackedMs(project.id)) }))
     ),
     budgetBar(project),
     taskSection(project),
@@ -88,18 +88,18 @@ function projectCard(project) {
           project.private = !project.private;
           projectsChanged();
         },
-      }, project.private ? "Make public" : "Make private"),
+      }, project.private ? t("Make public") : t("Make private")),
       el("button", {
         class: "secondary-button small",
         onclick: () => {
           project.archived = !project.archived;
           projectsChanged();
         },
-      }, project.archived ? "Unarchive" : "Archive"),
+      }, project.archived ? t("Unarchive") : t("Archive")),
       el("button", {
         class: "secondary-button small danger",
         onclick: async () => {
-          if (!await askConfirm(`Delete "${project.name}"? Its time entries are kept, without a project.`)) return;
+          if (!await askConfirm(t("Delete \"{name}\"? Its time entries are kept, without a project.", { name: project.name }))) return;
           store.projects = store.projects.filter((item) => item.id !== project.id);
           for (const entry of store.entries) {
             if (entry.projectId === project.id) {
@@ -110,7 +110,7 @@ function projectCard(project) {
           saveEntries();
           projectsChanged();
         },
-      }, "Delete")
+      }, t("Delete"))
     )
   );
 }
@@ -120,7 +120,7 @@ function renderProjects() {
   projectList.replaceChildren(
     ...(visible.length
       ? visible.map(projectCard)
-      : [el("p", { class: "empty" }, "No projects yet. Add your first one above.")])
+      : [el("p", { class: "empty" }, t("No projects yet. Add your first one above."))])
   );
 
   tagList.replaceChildren(
@@ -129,7 +129,7 @@ function renderProjects() {
         tag.name,
         el("button", {
           class: "chip-remove",
-          title: "Delete tag",
+          title: t("Delete tag"),
           onclick: () => {
             store.tags = store.tags.filter((item) => item.id !== tag.id);
             for (const entry of store.entries) {

@@ -86,7 +86,7 @@ function reportCard(title, ...content) {
 }
 
 function emptyReport() {
-  return el("p", { class: "empty" }, "No time entries match this period and these filters.");
+  return el("p", { class: "empty" }, t("No time entries match this period and these filters."));
 }
 
 // Horizontal bars on one shared scale, with the value written beside each bar
@@ -131,8 +131,8 @@ function timeChart(entries) {
   return el("div", { class: "column-chart" },
     values.map((bucket, i) => {
       const label = byMonth
-        ? new Date(bucket.day).toLocaleDateString([], { month: "short" })
-        : new Date(bucket.day).toLocaleDateString([], values.length > 7 ? { day: "numeric" } : { weekday: "short", day: "numeric" });
+        ? new Date(bucket.day).toLocaleDateString(locale(), { month: "short" })
+        : new Date(bucket.day).toLocaleDateString(locale(), values.length > 7 ? { day: "numeric" } : { weekday: "short", day: "numeric" });
       return el("div", { class: "column", "data-tip": `${label}: ${formatDuration(bucket.ms)}` },
         el("span", { class: "column-value" }, bucket.ms && values.length <= 14 ? hoursLabel(bucket.ms) : ""),
         el("span", { class: "column-bar-area" },
@@ -153,15 +153,15 @@ function groupEntries(entries, by) {
   for (const entry of entries) {
     if (by === "project") {
       const project = findProject(entry.projectId);
-      add(entry.projectId || "none", project ? project.name : "No project", project?.color || "var(--text-muted)", entry);
+      add(entry.projectId || "none", project ? project.name : t("No project"), project?.color || "var(--text-muted)", entry);
     } else if (by === "type") {
-      add(entry.type, ENTRY_TYPES[entry.type] || entry.type, "", entry);
+      add(entry.type, t(t(ENTRY_TYPES[entry.type] || entry.type)), "", entry);
     } else if (by === "tag") {
       const tags = entry.tagIds.map(findTag).filter(Boolean);
-      if (tags.length === 0) add("none", "No tag", "", entry);
+      if (tags.length === 0) add("none", t("No tag"), "", entry);
       for (const tag of tags) add(tag.id, tag.name, "", entry);
     } else {
-      add(entry.description || "(no description)", entry.description || "(no description)", "", entry);
+      add(entry.description || "(no description)", entry.description || t("(no description)"), "", entry);
     }
   }
   return [...groups.values()].sort((a, b) => b.ms - a.ms);
@@ -175,10 +175,10 @@ function renderSummary(entries) {
   const activeDays = new Set(working.map((entry) => dayKey(entry.start))).size;
 
   const groupSelect = el("select", { class: "picker" },
-    el("option", { value: "project" }, "Project"),
-    el("option", { value: "type" }, "Type"),
-    el("option", { value: "tag" }, "Tag"),
-    el("option", { value: "description" }, "Description")
+    el("option", { value: "project" }, t("Project")),
+    el("option", { value: "type" }, t("Type")),
+    el("option", { value: "tag" }, t("Tag")),
+    el("option", { value: "description" }, t("Description"))
   );
   groupSelect.value = summaryGroup;
   groupSelect.addEventListener("change", () => {
@@ -188,15 +188,15 @@ function renderSummary(entries) {
 
   return [
     el("div", { class: "stat-row" },
-      statTile("Total time", formatDuration(sumMs(entries))),
-      statTile("Working time", formatDuration(sumMs(working))),
-      statTile("Breaks", formatDuration(sumMs(breaks))),
-      statTile("Average per working day", formatDuration(activeDays ? sumMs(working) / activeDays : 0)),
-      statTile("Entries", String(entries.length))
+      statTile(t("Total time"), formatDuration(sumMs(entries))),
+      statTile(t("Working time"), formatDuration(sumMs(working))),
+      statTile(t("Breaks"), formatDuration(sumMs(breaks))),
+      statTile(t("Average per working day"), formatDuration(activeDays ? sumMs(working) / activeDays : 0)),
+      statTile(t("Entries"), String(entries.length))
     ),
-    reportCard("Time per day", timeChart(entries)),
-    reportCard("Breakdown",
-      el("label", { class: "setting-row" }, "Group by", groupSelect),
+    reportCard(t("Time per day"), timeChart(entries)),
+    reportCard(t("Breakdown"),
+      el("label", { class: "setting-row" }, t("Group by"), groupSelect),
       barList(groupEntries(entries, summaryGroup))
     ),
   ];
@@ -206,24 +206,24 @@ function renderDetailed(entries) {
   const rows = [...entries].reverse().map((entry) => {
     const project = findProject(entry.projectId);
     const task = findTask(project, entry.taskId);
-    return el("tr", { class: "clickable", onclick: () => openEditor(entry), title: "Click to edit" },
-      el("td", {}, new Date(entry.start).toLocaleDateString()),
-      el("td", {}, entry.description || "(no description)"),
+    return el("tr", { class: "clickable", onclick: () => openEditor(entry), title: t("Click to edit") },
+      el("td", {}, new Date(entry.start).toLocaleDateString(locale())),
+      el("td", {}, entry.description || t("(no description)")),
       el("td", {}, project ? el("span", { class: "project-chip", style: `color:${project.color}` },
         el("span", { class: "dot", style: `background:${project.color}` }), task ? `${project.name} › ${task.name}` : project.name) : "–"),
-      el("td", {}, ENTRY_TYPES[entry.type] || entry.type),
+      el("td", {}, t(ENTRY_TYPES[entry.type] || entry.type)),
       el("td", {}, entry.tagIds.map((id) => findTag(id)?.name).filter(Boolean).join(", ") || "–"),
       el("td", {}, `${formatTimeOfDay(entry.start)} – ${formatTimeOfDay(entry.end)}`),
       el("td", { class: "num" }, formatDuration(msOf(entry)))
     );
   });
   return [
-    reportCard(`All entries (${entries.length})`,
+    reportCard(t("All entries ({count})", { count: entries.length }),
       el("div", { class: "table-wrap" },
         el("table", { class: "report-table" },
-          el("thead", {}, el("tr", {}, ["Date", "Description", "Project", "Type", "Tags", "Time", "Duration"].map((h, i) => el("th", { class: i === 6 ? "num" : "" }, h)))),
+          el("thead", {}, el("tr", {}, ["Date", "Description", "Project", "Type", "Tags", "Time", "Duration"].map((h, i) => el("th", { class: i === 6 ? "num" : "" }, t(h))))),
           el("tbody", {}, rows),
-          el("tfoot", {}, el("tr", {}, el("td", { colspan: "6" }, "Total"), el("td", { class: "num" }, formatDuration(sumMs(entries)))))
+          el("tfoot", {}, el("tr", {}, el("td", { colspan: "6" }, t("Total")), el("td", { class: "num" }, formatDuration(sumMs(entries)))))
         )
       )
     ),
@@ -231,13 +231,13 @@ function renderDetailed(entries) {
 }
 
 function renderWeekly(entries) {
-  let columns = daysInPeriod().map((day) => ({ from: day, to: addDays(day, 1), label: new Date(day).toLocaleDateString([], { weekday: "short", day: "numeric" }) }));
+  let columns = daysInPeriod().map((day) => ({ from: day, to: addDays(day, 1), label: new Date(day).toLocaleDateString(locale(), { weekday: "short", day: "numeric" }) }));
   if (columns.length > 14) {
     // Long periods: one column per week instead of per day
     const weeks = new Map();
     for (const column of columns) {
       const week = startOfWeek(column.from);
-      if (!weeks.has(week)) weeks.set(week, { from: column.from, to: column.to, label: `Week of ${new Date(week).toLocaleDateString([], { day: "numeric", month: "short" })}` });
+      if (!weeks.has(week)) weeks.set(week, { from: column.from, to: column.to, label: t("Week of {date}", { date: new Date(week).toLocaleDateString(locale(), { day: "numeric", month: "short" }) }) });
       weeks.get(week).to = column.to;
     }
     columns = [...weeks.values()];
@@ -245,13 +245,13 @@ function renderWeekly(entries) {
 
   const projects = groupEntries(entries, "project");
   const cell = (list, column) => sumMs(list.filter((entry) => entry.start >= column.from && entry.start < column.to));
-  const forProject = (label) => entries.filter((entry) => (findProject(entry.projectId)?.name || "No project") === label);
+  const forProject = (label) => entries.filter((entry) => (findProject(entry.projectId)?.name || t("No project")) === label);
 
   return [
-    reportCard("Hours per project",
+    reportCard(t("Hours per project"),
       el("div", { class: "table-wrap" },
         el("table", { class: "report-table grid" },
-          el("thead", {}, el("tr", {}, el("th", {}, "Project"), columns.map((column) => el("th", { class: "num" }, column.label)), el("th", { class: "num" }, "Total"))),
+          el("thead", {}, el("tr", {}, el("th", {}, t("Project")), columns.map((column) => el("th", { class: "num" }, column.label)), el("th", { class: "num" }, t("Total")))),
           el("tbody", {}, projects.map((group) => {
             const list = forProject(group.label);
             return el("tr", {},
@@ -263,7 +263,7 @@ function renderWeekly(entries) {
               el("td", { class: "num strong" }, hoursLabel(group.ms))
             );
           })),
-          el("tfoot", {}, el("tr", {}, el("td", {}, "Total"),
+          el("tfoot", {}, el("tr", {}, el("td", {}, t("Total")),
             columns.map((column) => el("td", { class: "num" }, hoursLabel(cell(entries, column)))),
             el("td", { class: "num" }, hoursLabel(sumMs(entries)))
           ))
@@ -300,10 +300,10 @@ function renderAttendance(entries) {
   });
 
   return [
-    reportCard(`Attendance (work day: ${prefs.workStart}–${prefs.workEnd}, change it in Settings → Reminders)`,
+    reportCard(t("Attendance (work day: {start}–{end}, change it in Settings → Reminders)", { start: prefs.workStart, end: prefs.workEnd }),
       el("div", { class: "table-wrap" },
         el("table", { class: "report-table" },
-          el("thead", {}, el("tr", {}, ["Day", "First in", "Last out", "Worked", "Breaks", "Overtime"].map((h, i) => el("th", { class: i >= 3 ? "num" : "" }, h)))),
+          el("thead", {}, el("tr", {}, ["Day", "First in", "Last out", "Worked", "Breaks", "Overtime"].map((h, i) => el("th", { class: i >= 3 ? "num" : "" }, t(h))))),
           el("tbody", {}, rows)
         )
       )
@@ -320,7 +320,7 @@ function renderAssignments(entries) {
   const rows = [...projectIds].map((id) => {
     const project = findProject(id);
     return {
-      label: project ? project.name : "No project",
+      label: project ? project.name : t("No project"),
       color: project?.color || "",
       planned: plans.filter((plan) => (plan.projectId || "none") === id).reduce((sum, plan) => sum + plan.end - plan.start, 0),
       actual: sumMs(working.filter((entry) => (entry.projectId || "none") === id)),
@@ -330,17 +330,17 @@ function renderAssignments(entries) {
   const max = Math.max(...rows.flatMap((row) => [row.planned, row.actual]), 1);
   return [
     el("div", { class: "stat-row" },
-      statTile("Planned", formatDuration(rows.reduce((sum, row) => sum + row.planned, 0))),
-      statTile("Tracked", formatDuration(sumMs(working)))
+      statTile(t("Planned"), formatDuration(rows.reduce((sum, row) => sum + row.planned, 0))),
+      statTile(t("Tracked"), formatDuration(sumMs(working)))
     ),
-    reportCard("Planned vs tracked, per project",
+    reportCard(t("Planned vs tracked, per project"),
       el("div", { class: "legend-row" },
-        el("span", {}, el("i", { class: "legend-swatch planned" }), "Planned (calendar)"),
-        el("span", {}, el("i", { class: "legend-swatch" }), "Tracked (timer)")
+        el("span", {}, el("i", { class: "legend-swatch planned" }), t("Planned (calendar)")),
+        el("span", {}, el("i", { class: "legend-swatch" }), t("Tracked (timer)"))
       ),
-      rows.length === 0 ? el("p", { class: "mini-empty" }, "Nothing planned or tracked in this period.") : el("div", { class: "bar-list" },
+      rows.length === 0 ? el("p", { class: "mini-empty" }, t("Nothing planned or tracked in this period.")) : el("div", { class: "bar-list" },
         rows.map((row) =>
-          el("div", { class: "bar-row double", "data-tip": `${row.label}: planned ${formatDuration(row.planned)}, tracked ${formatDuration(row.actual)}` },
+          el("div", { class: "bar-row double", "data-tip": t("{label}: planned {planned}, tracked {tracked}", { label: row.label, planned: formatDuration(row.planned), tracked: formatDuration(row.actual) }) },
             el("span", { class: "bar-label" }, row.color && el("span", { class: "dot", style: `background:${row.color}` }), row.label),
             el("span", { class: "bar-pair" },
               el("span", { class: "bar-track" }, el("span", { class: "bar-fill planned", style: `width:${(row.planned / max) * 100}%` })),
@@ -382,12 +382,12 @@ function renderReports() {
 function fillReportFilters() {
   const keep = [reportProject.value, reportTag.value, reportType.value];
   reportProject.replaceChildren(
-    el("option", { value: "" }, "All projects"),
-    el("option", { value: "none" }, "No project"),
+    el("option", { value: "" }, t("All projects")),
+    el("option", { value: "none" }, t("No project")),
     ...store.projects.map((project) => el("option", { value: project.id }, project.name))
   );
-  reportTag.replaceChildren(el("option", { value: "" }, "All tags"), ...store.tags.map((tag) => el("option", { value: tag.id }, tag.name)));
-  reportType.replaceChildren(el("option", { value: "" }, "All types"), ...Object.entries(ENTRY_TYPES).map(([key, label]) => el("option", { value: key }, label)));
+  reportTag.replaceChildren(el("option", { value: "" }, t("All tags")), ...store.tags.map((tag) => el("option", { value: tag.id }, tag.name)));
+  reportType.replaceChildren(el("option", { value: "" }, t("All types")), ...Object.entries(ENTRY_TYPES).map(([key, label]) => el("option", { value: key }, t(label))));
   [reportProject.value, reportTag.value, reportType.value] = keep;
 }
 
@@ -443,7 +443,7 @@ function csvCell(value) {
 }
 
 exportCsvButton.addEventListener("click", () => {
-  const header = ["Date", "Start", "End", "Duration", "Duration (hours)", "Description", "Project", "Task", "Type", "Tags"];
+  const header = ["Date", "Start", "End", "Duration", "Duration (hours)", "Description", "Project", "Task", "Type", "Tags"].map((name) => t(name));
   const lines = reportEntries().map((entry) => {
     const project = findProject(entry.projectId);
     return [
@@ -455,7 +455,7 @@ exportCsvButton.addEventListener("click", () => {
       entry.description,
       project?.name || "",
       findTask(project, entry.taskId)?.name || "",
-      ENTRY_TYPES[entry.type] || entry.type,
+      t(ENTRY_TYPES[entry.type] || entry.type),
       entry.tagIds.map((id) => findTag(id)?.name).filter(Boolean).join(", "),
     ].map(csvCell).join(",");
   });

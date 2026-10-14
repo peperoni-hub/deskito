@@ -63,7 +63,7 @@ function updateClock() {
 }
 
 function showRunningState() {
-  startStopButton.textContent = "STOP";
+  startStopButton.textContent = t("STOP");
   startStopButton.classList.add("running");
   discardButton.hidden = false;
   frameRequest = requestAnimationFrame(updateClock);
@@ -76,14 +76,14 @@ function resetTimer() {
   clockMain.textContent = "00:00:00";
   clockFraction.textContent = ".00";
   setTimerFields({});
-  startStopButton.textContent = "START";
+  startStopButton.textContent = t("START");
   startStopButton.classList.remove("running");
   discardButton.hidden = true;
 }
 
 // Throw away the running timer without saving it
 discardButton.addEventListener("click", async () => {
-  if (await askConfirm("Discard the running timer? This time won't be saved.", "Discard")) {
+  if (await askConfirm(t("Discard the running timer? This time won't be saved."), t("Discard"))) {
     resetTimer();
   }
 });
@@ -146,12 +146,12 @@ for (const button of modeButtons) {
 
 manualAddButton.addEventListener("click", () => {
   if (!manualDate.value || !manualStart.value || !manualEnd.value) {
-    notify("Please fill in the date, start time and end time.");
+    notify(t("Please fill in the date, start time and end time."));
     return;
   }
   const { start, end } = timeRange(manualDate.value, manualStart.value, manualEnd.value);
   if (end === start) {
-    notify("The start and end time can't be the same.");
+    notify(t("The start and end time can't be the same."));
     return;
   }
   addEntry({ ...currentFields(), start, end });
@@ -175,7 +175,7 @@ function deleteEntries(ids, message) {
   saveEntries();
   renderEntries();
   showToast(message, [{
-    label: "Undo",
+    label: t("Undo"),
     primary: true,
     run: () => {
       store.entries.push(...removed);
@@ -186,13 +186,13 @@ function deleteEntries(ids, message) {
 }
 
 function deleteEntry(id) {
-  deleteEntries(new Set([id]), "Time entry deleted.");
+  deleteEntries(new Set([id]), t("Time entry deleted."));
   return true;
 }
 
 async function deleteDay(key, dayEntries) {
-  if (!await askConfirm(`Delete all ${dayEntries.length} entries from ${dayLabel(key)}?`)) return;
-  deleteEntries(new Set(dayEntries.map((entry) => entry.id)), `${dayLabel(key)} deleted.`);
+  if (!await askConfirm(t("Delete all {count} entries from {day}?", { count: dayEntries.length, day: dayLabel(key) }))) return;
+  deleteEntries(new Set(dayEntries.map((entry) => entry.id)), t("{day} deleted.", { day: dayLabel(key) }));
 }
 
 function entryMeta(entry) {
@@ -207,7 +207,7 @@ function entryMeta(entry) {
       )
     );
   }
-  meta.append(el("span", { class: `type-chip type-${entry.type}` }, ENTRY_TYPES[entry.type] || entry.type));
+  meta.append(el("span", { class: `type-chip type-${entry.type}` }, t(ENTRY_TYPES[entry.type] || entry.type)));
   for (const tagId of entry.tagIds) {
     const tag = findTag(tagId);
     if (tag) meta.append(el("span", { class: "tag-chip" }, tag.name));
@@ -219,16 +219,16 @@ function entryRow(entry) {
   return el("li", { class: `entry${entry.type === "break" ? " is-break" : ""}` },
     el("span", { class: "entry-main" },
       el("span", { class: `entry-description${entry.description ? "" : " no-description"}` },
-        entry.description || "(no description)"
+        entry.description || t("(no description)")
       ),
       entryMeta(entry)
     ),
     el("span", { class: "entry-times" }, `${formatTimeOfDay(entry.start)} – ${formatTimeOfDay(entry.end)}`),
     el("span", { class: "entry-duration" }, formatDuration(entry.end - entry.start)),
     el("span", { class: "entry-actions" },
-      el("button", { class: "icon-button", title: "Continue this entry", onclick: () => continueEntry(entry) }, "▶"),
-      el("button", { class: "icon-button", title: "Edit", onclick: () => openEditor(entry) }, "✎"),
-      el("button", { class: "icon-button", title: "Delete", onclick: () => deleteEntry(entry.id) }, "✕")
+      el("button", { class: "icon-button", title: t("Continue this entry"), onclick: () => continueEntry(entry) }, "▶"),
+      el("button", { class: "icon-button", title: t("Edit"), onclick: () => openEditor(entry) }, "✎"),
+      el("button", { class: "icon-button", title: t("Delete"), onclick: () => deleteEntry(entry.id) }, "✕")
     )
   );
 }
@@ -241,7 +241,7 @@ function renderEntries() {
   const weekMs = sorted
     .filter((entry) => entry.start >= weekStart)
     .reduce((sum, entry) => sum + (entry.end - entry.start), 0);
-  weekTotal.textContent = sorted.length ? `Week total ${formatDuration(weekMs)}` : "";
+  weekTotal.textContent = sorted.length ? t("Week total {time}", { time: formatDuration(weekMs) }) : "";
 
   const days = new Map();
   for (const entry of sorted) {
@@ -257,8 +257,8 @@ function renderEntries() {
         el("div", { class: "day-header" },
           el("span", {}, dayLabel(key)),
           el("span", { class: "day-tools" },
-            el("button", { class: "link-button", onclick: () => deleteDay(key, dayEntries) }, "Delete day"),
-            el("span", { class: "day-total" }, `Total ${formatDuration(total)}`)
+            el("button", { class: "link-button", onclick: () => deleteDay(key, dayEntries) }, t("Delete day")),
+            el("span", { class: "day-total" }, t("Total {time}", { time: formatDuration(total) }))
           )
         ),
         el("ul", { class: "entry-list" }, dayEntries.map(entryRow))
@@ -285,7 +285,7 @@ entryForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const { start, end } = timeRange(editDate.value, editStart.value, editEnd.value);
   if (end === start) {
-    notify("The start and end time can't be the same.");
+    notify(t("The start and end time can't be the same."));
     return;
   }
   const entry = store.entries.find((item) => item.id === editingId);

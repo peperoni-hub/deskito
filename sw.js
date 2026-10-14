@@ -2,12 +2,24 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v2";
+const CACHE = "deskito-v3";
 const FILES = [
   "./",
   "index.html",
   "styles.css",
   "theme.js",
+  "i18n.js",
+  "lang/bs.js",
+  "lang/hr.js",
+  "lang/sr.js",
+  "lang/tr.js",
+  "lang/de.js",
+  "lang/fr.js",
+  "lang/it.js",
+  "lang/zh.js",
+  "lang/ja.js",
+  "lang/ko.js",
+  "lang/ar.js",
   "data.js",
   "app.js",
   "projects.js",

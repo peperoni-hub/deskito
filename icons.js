@@ -287,8 +287,8 @@ function iconUrl(name, palette = iconPalette()) {
 const ACTIVITY_WORDS = [
   ["date", /\b(date|dating|romantic)\b/i],
   ["birthday", /\b(birthday|bday|b-day)\b/i],
-  ["party", /\b(party|celebration|celebrate)\b/i],
   ["concert", /\b(concert|gig|festival)\b/i],
+  ["party", /\b(party|celebration|celebrate)\b/i],
   ["nightout", /\b(night out|drinks|bar|club|clubbing|pub)\b/i],
   ["shopping", /\b(shopping|shop|groceries|grocery|mall)\b/i],
   ["exam", /\b(exams?|tests?|quiz|midterms?|finals?)\b/i],
@@ -300,9 +300,34 @@ const ACTIVITY_WORDS = [
 // These moments beat whatever type the timer is set to
 const FREE_TIME = ["date", "birthday", "party", "concert", "nightout", "shopping", "exam", "classes", "gym"];
 
+// Trigger words from every language file (lang/xx.js → words), so "rođendan", "生日" or
+// "Geburtstag" work just like "birthday", whatever language the app is set to
+// Chinese, Japanese and Korean have no spaces, and Arabic joins little words onto the front
+// ("الامتحان" = "the exam"), so in those scripts we look for the word anywhere
+const NO_SPACES_SCRIPT = /[؀-ۿ぀-ヿ㐀-鿿가-힯]/;
+
+function wordMatcher(word) {
+  if (NO_SPACES_SCRIPT.test(word)) {
+    return (text) => text.includes(word);
+  }
+  // Match at the start of a word, so endings still count (rođendanu, Geburtstags...)
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`(?<![\\p{L}\\p{N}])${escaped}`, "iu");
+  return (text) => pattern.test(text);
+}
+
+const TRANSLATED_WORDS = {};
+for (const language of Object.values(TRANSLATIONS)) {
+  for (const [mood, words] of Object.entries(language.words || {})) {
+    TRANSLATED_WORDS[mood] = (TRANSLATED_WORDS[mood] || []).concat(words.map(wordMatcher));
+  }
+}
+
 function moodFromText(...texts) {
   const text = texts.filter(Boolean).join(" ");
-  const match = ACTIVITY_WORDS.find(([, words]) => words.test(text));
+  const match = ACTIVITY_WORDS.find(([mood, words]) =>
+    words.test(text) || (TRANSLATED_WORDS[mood] || []).some((matches) => matches(text))
+  );
   return match ? match[0] : null;
 }
 
@@ -344,8 +369,8 @@ function updateMoodIcon() {
   const url = iconUrl(mood);
   favicon.href = url;
   moodIcon.src = url;
-  moodIcon.title = ICONS[mood].label;
-  moodIcon.alt = ICONS[mood].label;
+  moodIcon.title = t(ICONS[mood].label);
+  moodIcon.alt = t(ICONS[mood].label);
 }
 
 updateMoodIcon();
