@@ -452,6 +452,11 @@
   <script>
     // Works offline once installed (only on the website, not when opened as a file)
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      // When a newer version takes over, reload once so the page uses the new files
+      const hadOlderVersion = Boolean(navigator.serviceWorker.controller);
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (hadOlderVersion) location.reload();
+      });
       navigator.serviceWorker.register("sw.js");
     }
   </script>

@@ -1,7 +1,8 @@
 // Keeps a copy of Deskito's files so the app opens without internet.
-// It shows the saved copy straight away and quietly fetches updates for next time.
+// Online, it always asks the website for the newest files first (so updates never mix
+// old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v1";
+const CACHE = "deskito-v2";
 const FILES = [
   "./",
   "index.html",
@@ -24,7 +25,10 @@ const FILES = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES)));
+  // "reload" skips the browser's short-term store, so we never save an outdated copy
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => cache.addAll(FILES.map((file) => new Request(file, { cache: "reload" }))))
+  );
   self.skipWaiting();
 });
 
@@ -38,17 +42,15 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(
-    caches.open(CACHE).then(async (cache) => {
-      const saved = await cache.match(event.request, { ignoreSearch: true });
-      const fresh = fetch(event.request)
-        .then((response) => {
-          if (response.ok || response.type === "opaque") {
-            cache.put(event.request, response.clone());
-          }
-          return response;
-        })
-        .catch(() => saved);
-      return saved || fresh;
-    })
+    // "no-cache" = always check with the website whether the file changed
+    fetch(event.request, { cache: "no-cache" })
+      .then((response) => {
+        if (response.ok || response.type === "opaque") {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request, { ignoreSearch: true }))
   );
 });
