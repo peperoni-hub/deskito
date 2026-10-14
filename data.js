@@ -37,6 +37,7 @@ const store = {
   })),
   projects: readStore("projects", []),
   tags: readStore("tags", []),
+  plans: readStore("plans", []),
 };
 
 const prefs = {
@@ -59,6 +60,7 @@ function savePrefs() {
 }
 
 function saveEntries() {
+  document.dispatchEvent(new Event("entries-changed"));
   writeStore("entries", store.entries);
 }
 
@@ -204,4 +206,8 @@ function readTagPicker(picker) {
 function updateTagSummary(picker) {
   const names = readTagPicker(picker).map((id) => findTag(id)?.name).filter(Boolean);
   picker.querySelector("summary").textContent = names.length ? names.join(", ") : "Tags";
+}
+
+function savePlans() {
+  writeStore("plans", store.plans);
 }

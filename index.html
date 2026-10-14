@@ -25,7 +25,8 @@
     </nav>
 
     <main class="content">
-      <div class="view" data-view="tracker">
+      <div class="view tracker-layout" data-view="tracker">
+        <div class="tracker-main">
         <section class="timer-bar">
           <input type="text" id="description" placeholder="What are you working on?">
           <select id="entry-type" class="picker" title="Type"></select>
@@ -85,11 +86,53 @@
           <p id="empty-message" class="empty">No time entries yet. Start the timer to track your first one.</p>
           <div id="entry-days"></div>
         </section>
+        </div>
+
+        <aside class="tracker-side">
+          <div class="mini-cal">
+            <div class="mini-header">
+              <button id="mini-prev" class="icon-button" title="Previous month">‹</button>
+              <span id="mini-month" class="mini-month"></span>
+              <button id="mini-next" class="icon-button" title="Next month">›</button>
+            </div>
+            <div id="mini-grid" class="mini-grid"></div>
+            <div class="mini-legend">
+              <span><i class="plan-dot plan-task"></i>Task</span>
+              <span><i class="plan-dot plan-meeting"></i>Meeting</span>
+              <span><i class="plan-dot plan-plan"></i>Plan</span>
+              <span><i class="plan-dot plan-other"></i>Other</span>
+              <span><i class="mini-line legend"></i>Tracked</span>
+            </div>
+            <div class="mini-agenda">
+              <div id="mini-day-title" class="mini-day-title"></div>
+              <ul id="mini-day-list" class="mini-day-list"></ul>
+              <div class="mini-actions">
+                <button id="mini-add" class="secondary-button small">+ Add plan</button>
+                <button id="mini-open" class="secondary-button small">Open in calendar</button>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
 
       <div class="view" data-view="calendar" hidden>
-        <h2 class="page-title">Calendar</h2>
-        <p class="empty">Coming soon.</p>
+        <div class="cal-toolbar">
+          <h2 id="cal-title" class="page-title cal-title"></h2>
+          <div class="cal-nav">
+            <button id="cal-prev" class="secondary-button small" title="Previous">‹</button>
+            <button id="cal-today" class="secondary-button small">Today</button>
+            <button id="cal-next" class="secondary-button small" title="Next">›</button>
+          </div>
+          <div class="cal-views">
+            <button class="cal-view-button pomo-preset" data-cal-view="week">Week</button>
+            <button class="cal-view-button pomo-preset" data-cal-view="month">Month</button>
+          </div>
+          <label class="checkbox-row"><input type="checkbox" id="cal-show-tracked" checked> Show tracked time</label>
+          <span class="spacer"></span>
+          <button id="cal-add" class="start-button">+ ADD PLAN</button>
+        </div>
+        <p class="cal-hint">Click an empty spot in the week to plan something at that time.</p>
+        <div id="cal-body" class="cal-body"></div>
       </div>
 
       <div class="view" data-view="reports" hidden>
@@ -202,6 +245,71 @@
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
 
+  <dialog id="plan-dialog" class="dialog">
+    <form id="plan-form">
+      <h2 id="plan-dialog-title" class="page-title">New plan</h2>
+      <label class="field-label" for="plan-title">What</label>
+      <input id="plan-title" class="text-input" type="text" placeholder="e.g. Team meeting" required>
+
+      <div class="dialog-row">
+        <div>
+          <label class="field-label" for="plan-type">Type</label>
+          <select id="plan-type" class="picker"></select>
+        </div>
+        <div>
+          <label class="field-label" for="plan-project">Project</label>
+          <select id="plan-project" class="picker"></select>
+        </div>
+        <div>
+          <label class="field-label" for="plan-color">Colour</label>
+          <div class="plan-color-field">
+            <input id="plan-color" type="color" class="color-input">
+            <button type="button" id="plan-color-reset" class="link-button" hidden>Use type colour</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="plan-other-row" hidden>
+        <label class="field-label" for="plan-other-label">What kind of thing is it?</label>
+        <input id="plan-other-label" class="text-input" type="text" placeholder="e.g. Date, Trip, Dentist, Birthday" list="other-suggestions">
+        <datalist id="other-suggestions">
+          <option value="Date">
+          <option value="Trip">
+          <option value="Appointment">
+          <option value="Birthday">
+          <option value="Sport">
+          <option value="Personal">
+        </datalist>
+      </div>
+
+      <div class="dialog-row">
+        <div>
+          <label class="field-label" for="plan-date">Date</label>
+          <input id="plan-date" type="date" class="picker" required>
+        </div>
+        <div>
+          <label class="field-label" for="plan-start">From</label>
+          <input id="plan-start" type="time" class="picker" required>
+        </div>
+        <div>
+          <label class="field-label" for="plan-end">To</label>
+          <input id="plan-end" type="time" class="picker" required>
+        </div>
+      </div>
+
+      <label class="field-label" for="plan-notes">Notes</label>
+      <textarea id="plan-notes" class="text-input notes" rows="3"></textarea>
+
+      <div class="dialog-actions">
+        <button type="button" id="plan-delete" class="secondary-button danger">Delete</button>
+        <button type="button" id="plan-timer" class="secondary-button">▶ Start timer</button>
+        <span class="spacer"></span>
+        <button type="button" id="plan-cancel" class="secondary-button">Cancel</button>
+        <button type="submit" class="start-button">SAVE</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="entry-dialog" class="dialog">
     <form id="entry-form">
       <h2 class="page-title">Edit entry</h2>
@@ -253,5 +361,6 @@
   <script src="nav.js"></script>
   <script src="settings.js"></script>
   <script src="pomodoro.js"></script>
+  <script src="calendar.js"></script>
 </body>
 </html>
