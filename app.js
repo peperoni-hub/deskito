@@ -7,6 +7,7 @@ const tagPicker = document.getElementById("entry-tags");
 const clockMain = document.getElementById("clock-main");
 const clockFraction = document.getElementById("clock-fraction");
 const startStopButton = document.getElementById("start-stop");
+const discardButton = document.getElementById("discard-timer");
 const modeButtons = document.querySelectorAll(".mode-button");
 const timerFields = document.getElementById("timer-fields");
 const manualFields = document.getElementById("manual-fields");
@@ -64,19 +65,12 @@ function updateClock() {
 function showRunningState() {
   startStopButton.textContent = "STOP";
   startStopButton.classList.add("running");
+  discardButton.hidden = false;
   frameRequest = requestAnimationFrame(updateClock);
 }
 
-function startTimer() {
-  running = { start: Date.now() };
-  saveRunning();
-  showRunningState();
-}
-
-function stopTimer() {
+function resetTimer() {
   cancelAnimationFrame(frameRequest);
-  addEntry({ ...currentFields(), start: running.start, end: Date.now() });
-
   running = null;
   saveRunning();
   clockMain.textContent = "00:00:00";
@@ -84,6 +78,25 @@ function stopTimer() {
   setTimerFields({});
   startStopButton.textContent = "START";
   startStopButton.classList.remove("running");
+  discardButton.hidden = true;
+}
+
+// Throw away the running timer without saving it
+discardButton.addEventListener("click", async () => {
+  if (await askConfirm("Discard the running timer? This time won't be saved.", "Discard")) {
+    resetTimer();
+  }
+});
+
+function startTimer(planId = "") {
+  running = { start: Date.now(), planId };
+  saveRunning();
+  showRunningState();
+}
+
+function stopTimer() {
+  addEntry({ ...currentFields(), planId: running.planId || "", start: running.start, end: Date.now() });
+  resetTimer();
 }
 
 function setTimerFields(entry) {
@@ -99,7 +112,7 @@ function continueEntry(entry) {
   }
   setMode("timer");
   setTimerFields(entry);
-  startTimer();
+  startTimer(entry.planId || "");
 }
 
 startStopButton.addEventListener("click", () => {
@@ -133,13 +146,12 @@ for (const button of modeButtons) {
 
 manualAddButton.addEventListener("click", () => {
   if (!manualDate.value || !manualStart.value || !manualEnd.value) {
-    alert("Please fill in the date, start time and end time.");
+    notify("Please fill in the date, start time and end time.");
     return;
   }
-  const start = fromDateAndTime(manualDate.value, manualStart.value);
-  const end = fromDateAndTime(manualDate.value, manualEnd.value);
-  if (end <= start) {
-    alert("The end time must be after the start time.");
+  const { start, end } = timeRange(manualDate.value, manualStart.value, manualEnd.value);
+  if (end === start) {
+    notify("The start and end time can't be the same.");
     return;
   }
   addEntry({ ...currentFields(), start, end });
@@ -156,12 +168,31 @@ function addEntry(fields) {
   renderEntries();
 }
 
-function deleteEntry(id) {
-  if (!confirm("Delete this time entry?")) return false;
-  store.entries = store.entries.filter((entry) => entry.id !== id);
+// Deleting happens straight away, with an Undo button in case it was a mistake
+function deleteEntries(ids, message) {
+  const removed = store.entries.filter((entry) => ids.has(entry.id));
+  store.entries = store.entries.filter((entry) => !ids.has(entry.id));
   saveEntries();
   renderEntries();
+  showToast(message, [{
+    label: "Undo",
+    primary: true,
+    run: () => {
+      store.entries.push(...removed);
+      saveEntries();
+      renderEntries();
+    },
+  }]);
+}
+
+function deleteEntry(id) {
+  deleteEntries(new Set([id]), "Time entry deleted.");
   return true;
+}
+
+async function deleteDay(key, dayEntries) {
+  if (!await askConfirm(`Delete all ${dayEntries.length} entries from ${dayLabel(key)}?`)) return;
+  deleteEntries(new Set(dayEntries.map((entry) => entry.id)), `${dayLabel(key)} deleted.`);
 }
 
 function entryMeta(entry) {
@@ -225,7 +256,10 @@ function renderEntries() {
       return el("div", { class: "day-group" },
         el("div", { class: "day-header" },
           el("span", {}, dayLabel(key)),
-          el("span", { class: "day-total" }, `Total ${formatDuration(total)}`)
+          el("span", { class: "day-tools" },
+            el("button", { class: "link-button", onclick: () => deleteDay(key, dayEntries) }, "Delete day"),
+            el("span", { class: "day-total" }, `Total ${formatDuration(total)}`)
+          )
         ),
         el("ul", { class: "entry-list" }, dayEntries.map(entryRow))
       );
@@ -249,10 +283,9 @@ function openEditor(entry) {
 
 entryForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const start = fromDateAndTime(editDate.value, editStart.value);
-  const end = fromDateAndTime(editDate.value, editEnd.value);
-  if (end <= start) {
-    alert("The end time must be after the start time.");
+  const { start, end } = timeRange(editDate.value, editStart.value, editEnd.value);
+  if (end === start) {
+    notify("The start and end time can't be the same.");
     return;
   }
   const entry = store.entries.find((item) => item.id === editingId);

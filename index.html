@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deskito</title>
+  <link id="favicon" rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&display=swap">
   <link rel="stylesheet" href="styles.css">
@@ -11,7 +12,10 @@
 </head>
 <body>
   <header class="topbar">
-    <span class="logo">deskito</span>
+    <span class="brand">
+      <img id="mood-icon" class="mood-icon" src="icon.svg" alt="" width="34" height="34">
+      <span class="logo">deskito</span>
+    </span>
     <span id="user-name" class="user-name"></span>
   </header>
 
@@ -36,6 +40,7 @@
           <div id="timer-fields" class="mode-fields">
             <span class="clock"><span id="clock-main">00:00:00</span><span id="clock-fraction" class="clock-fraction">.00</span></span>
             <button id="start-stop" class="start-button">START</button>
+            <button id="discard-timer" class="icon-button" title="Discard this timer without saving" hidden>✕</button>
           </div>
 
           <div id="manual-fields" class="mode-fields" hidden>
@@ -233,6 +238,11 @@
               <input id="backup-restore" type="file" accept=".json,application/json" hidden>
             </label>
           </div>
+          <p class="setting-row">Start fresh (download a backup first if you might want it back):</p>
+          <div class="project-actions">
+            <button type="button" id="clear-entries" class="secondary-button small danger">Delete all time entries</button>
+            <button type="button" id="clear-plans" class="secondary-button small danger">Delete all calendar plans</button>
+          </div>
         </div>
 
         <h2 class="page-title section-title">Breaks</h2>
@@ -288,6 +298,15 @@
     </form>
   </div>
 
+  <dialog id="confirm-dialog" class="dialog confirm-dialog">
+    <p class="confirm-message"></p>
+    <div class="dialog-actions">
+      <span class="spacer"></span>
+      <button type="button" class="secondary-button confirm-no">Cancel</button>
+      <button type="button" class="start-button confirm-yes">Delete</button>
+    </div>
+  </dialog>
+
   <div id="toasts" class="toasts" aria-live="polite"></div>
   <div id="chart-tip" class="chart-tip" hidden></div>
 
@@ -325,6 +344,13 @@
           <option value="Birthday">
           <option value="Sport">
           <option value="Personal">
+          <option value="Shopping">
+          <option value="Concert">
+          <option value="Night out">
+          <option value="Party">
+          <option value="Exam">
+          <option value="Class">
+          <option value="Gym">
         </datalist>
       </div>
 
@@ -409,5 +435,6 @@
   <script src="pomodoro.js"></script>
   <script src="calendar.js"></script>
   <script src="reports.js"></script>
+  <script src="icons.js"></script>
 </body>
 </html>

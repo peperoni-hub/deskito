@@ -775,7 +775,7 @@ body {
 .entry-actions {
   display: flex;
   gap: 2px;
-  opacity: 0.35;
+  opacity: 0.6;
   transition: opacity 0.2s;
 }
 
@@ -1929,4 +1929,52 @@ body {
     box-shadow: none;
     break-inside: avoid;
   }
+}
+
+/* Logo with the changing hourglass */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mood-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  animation: card-in 0.5s ease both;
+}
+
+.day-tools {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.day-tools .link-button {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.day-group:hover .day-tools .link-button,
+.day-tools .link-button:focus-visible {
+  opacity: 1;
+}
+
+#discard-timer[hidden] {
+  display: none;
+}
+
+/* Our own confirmation window */
+.confirm-dialog {
+  width: min(420px, calc(100% - 32px));
+}
+
+.confirm-message {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.confirm-dialog .dialog-actions {
+  margin-top: 20px;
 }

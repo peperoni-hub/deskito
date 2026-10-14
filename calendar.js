@@ -92,15 +92,21 @@ function formatHours(milliseconds) {
 }
 
 function plansOn(key) {
-  return store.plans.filter((plan) => dayKey(plan.start) === key).sort((a, b) => a.start - b.start);
+  // Includes plans that cross midnight into (or out of) this day
+  const from = dayStart(key);
+  const to = addDays(from, 1);
+  return store.plans.filter((plan) => plan.start < to && plan.end > from).sort((a, b) => a.start - b.start);
 }
 
 function entriesOn(key) {
   return store.entries.filter((entry) => dayKey(entry.start) === key);
 }
 
-function plannedMs(plans) {
-  return plans.reduce((sum, plan) => sum + (plan.end - plan.start), 0);
+// Only the part of each plan that falls on this day counts
+function plannedMs(plans, key) {
+  const from = dayStart(key);
+  const to = addDays(from, 1);
+  return plans.reduce((sum, plan) => sum + Math.min(plan.end, to) - Math.max(plan.start, from), 0);
 }
 
 /* Week view */
@@ -110,8 +116,7 @@ function topFor(timestamp, key) {
   return Math.max(0, Math.min(24 * HOUR_HEIGHT, top));
 }
 
-function planBlock(plan, lane, lanes) {
-  const key = dayKey(plan.start);
+function planBlock(plan, lane, lanes, key) {
   const top = topFor(plan.start, key);
   const height = Math.max(20, topFor(plan.end, key) - top);
   const project = findProject(plan.projectId);
@@ -162,7 +167,7 @@ function dayColumn(key, isToday) {
     return { plan, lane };
   });
   for (const { plan, lane } of placed) {
-    column.append(planBlock(plan, lane, Math.max(1, laneEnds.length)));
+    column.append(planBlock(plan, lane, Math.max(1, laneEnds.length), key));
   }
 
   if (isToday) {
@@ -183,7 +188,7 @@ function renderWeek() {
     el("div", { class: "gutter" }),
     days.map((day, i) => {
       const key = dayKey(day);
-      const planned = plannedMs(plansOn(key));
+      const planned = plannedMs(plansOn(key), key);
       return el("div", { class: `week-day-head${key === todayKey ? " today" : ""}` },
         el("span", { class: "week-day-name" }, names[i]),
         el("span", { class: "week-day-number" }, new Date(day).getDate()),
@@ -319,7 +324,7 @@ function renderMini() {
   );
 
   const plans = plansOn(miniSelected);
-  const planned = plannedMs(plans);
+  const planned = plannedMs(plans, miniSelected);
   miniDayTitle.textContent = dayLabel(miniSelected) + (planned ? ` · ${formatHours(planned)} planned` : "");
   miniDayList.replaceChildren(
     ...(plans.length
@@ -344,7 +349,13 @@ miniNext.addEventListener("click", () => {
 });
 
 miniAdd.addEventListener("click", () => {
-  const start = dayStart(miniSelected) + 9 * 3600000;
+  // Today: start at the next half hour. Other days: 9:00
+  let start = dayStart(miniSelected) + 9 * 3600000;
+  if (miniSelected === dayKey(Date.now())) {
+    const next = new Date();
+    next.setMinutes(next.getMinutes() < 30 ? 30 : 60, 0, 0);
+    start = next.getTime();
+  }
   openPlanDialog({ start, end: start + 3600000 });
 });
 
@@ -384,10 +395,9 @@ function plansChanged() {
 
 planForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const start = fromDateAndTime(planDate.value, planStart.value);
-  const end = fromDateAndTime(planDate.value, planEnd.value);
-  if (end <= start) {
-    alert("The end time must be after the start time.");
+  const { start, end } = timeRange(planDate.value, planStart.value, planEnd.value);
+  if (end === start) {
+    notify("The start and end time can't be the same.");
     return;
   }
   const fields = {
@@ -411,8 +421,8 @@ planForm.addEventListener("submit", (event) => {
   planDialog.close();
 });
 
-planDeleteButton.addEventListener("click", () => {
-  if (!confirm("Delete this plan?")) return;
+planDeleteButton.addEventListener("click", async () => {
+  if (!await askConfirm("Delete this plan?")) return;
   store.plans = store.plans.filter((plan) => plan.id !== editingPlanId);
   plansChanged();
   planDialog.close();
@@ -428,6 +438,7 @@ planTimerButton.addEventListener("click", () => {
     projectId: plan.projectId,
     taskId: plan.taskId,
     tagIds: [],
+    planId: plan.id,
   });
 });
 

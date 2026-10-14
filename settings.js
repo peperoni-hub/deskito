@@ -79,7 +79,7 @@ restoreInput.addEventListener("change", async () => {
   try {
     const backup = JSON.parse(await file.text());
     if (backup.app !== "deskito" || !backup.data) throw new Error("not a Deskito backup");
-    if (!confirm("Replace everything in this browser with the backup? This cannot be undone.")) return;
+    if (!await askConfirm("Replace everything in this browser with the backup? This cannot be undone.", "Restore")) return;
     for (const key of BACKUP_KEYS) {
       if (backup.data[key] == null) {
         localStorage.removeItem(key);
@@ -89,6 +89,21 @@ restoreInput.addEventListener("change", async () => {
     }
     location.reload();
   } catch {
-    alert("That file isn't a Deskito backup.");
+    notify("That file isn't a Deskito backup.");
   }
+});
+
+/* Start fresh */
+
+document.getElementById("clear-entries").addEventListener("click", async () => {
+  if (!await askConfirm(`Delete all ${store.entries.length} time entries? This cannot be undone.`)) return;
+  store.entries = [];
+  saveEntries();
+  renderEntries();
+});
+
+document.getElementById("clear-plans").addEventListener("click", async () => {
+  if (!await askConfirm(`Delete all ${store.plans.length} calendar plans? This cannot be undone.`)) return;
+  store.plans = [];
+  plansChanged();
 });

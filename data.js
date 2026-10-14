@@ -32,6 +32,7 @@ const store = {
     taskId: entry.taskId || "",
     tagIds: entry.tagIds || [],
     type: entry.type || "task",
+    planId: entry.planId || "",
     start: entry.start,
     end: entry.end,
   })),
@@ -210,4 +211,39 @@ function updateTagSummary(picker) {
 
 function savePlans() {
   writeStore("plans", store.plans);
+}
+
+/* Our own "are you sure?" window and messages (browsers can block their built-in pop-ups) */
+
+function askConfirm(message, confirmLabel = "Delete") {
+  return new Promise((resolve) => {
+    const dialog = document.getElementById("confirm-dialog");
+    dialog.querySelector(".confirm-message").textContent = message;
+    const yes = dialog.querySelector(".confirm-yes");
+    yes.textContent = confirmLabel;
+    const finish = (answer) => {
+      dialog.close();
+      resolve(answer);
+    };
+    yes.onclick = () => finish(true);
+    dialog.querySelector(".confirm-no").onclick = () => finish(false);
+    dialog.oncancel = () => resolve(false);
+    dialog.showModal();
+  });
+}
+
+function notify(message) {
+  showToast(message);
+}
+
+// An end time earlier than the start time means the next day, e.g. 22:00 – 01:00
+function timeRange(dateValue, startValue, endValue) {
+  const start = fromDateAndTime(dateValue, startValue);
+  let end = fromDateAndTime(dateValue, endValue);
+  if (end < start) {
+    const nextDay = new Date(end);
+    nextDay.setDate(nextDay.getDate() + 1);
+    end = nextDay.getTime();
+  }
+  return { start, end };
 }

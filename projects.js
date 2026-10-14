@@ -98,8 +98,8 @@ function projectCard(project) {
       }, project.archived ? "Unarchive" : "Archive"),
       el("button", {
         class: "secondary-button small danger",
-        onclick: () => {
-          if (!confirm(`Delete "${project.name}"? Its time entries are kept, without a project.`)) return;
+        onclick: async () => {
+          if (!await askConfirm(`Delete "${project.name}"? Its time entries are kept, without a project.`)) return;
           store.projects = store.projects.filter((item) => item.id !== project.id);
           for (const entry of store.entries) {
             if (entry.projectId === project.id) {

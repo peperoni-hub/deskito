@@ -274,7 +274,8 @@ function renderWeekly(entries) {
 }
 
 function renderAttendance(entries) {
-  const workDayMs = fromDateAndTime("2000-01-01", prefs.workEnd) - fromDateAndTime("2000-01-01", prefs.workStart);
+  const workDay = timeRange("2000-01-01", prefs.workStart, prefs.workEnd);
+  const workDayMs = workDay.end - workDay.start;
   const days = new Map();
   for (const entry of entries) {
     const key = dayKey(entry.start);
