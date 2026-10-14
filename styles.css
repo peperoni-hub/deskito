@@ -414,3 +414,68 @@ body {
 .welcome-card .start-button {
   width: 100%;
 }
+
+/* Animations */
+.theme-changing,
+.theme-changing * {
+  transition:
+    background-color 0.8s ease,
+    color 0.8s ease,
+    border-color 0.8s ease,
+    border-radius 0.8s ease,
+    box-shadow 0.8s ease !important;
+}
+
+.welcome:not([hidden]) .welcome-card {
+  animation: card-in 1.4s ease both;
+}
+
+.welcome.leaving {
+  animation: fade-out 1.2s ease forwards;
+}
+
+.welcome.leaving .welcome-card {
+  animation: card-out 1.2s ease forwards;
+}
+
+.app-entering .topbar,
+.app-entering .layout {
+  animation: app-in 1.4s ease 0.6s both;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes card-out {
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.97);
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes app-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* People who turn off animations in their system settings get none */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

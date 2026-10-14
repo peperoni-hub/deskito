@@ -3,6 +3,8 @@ const welcomeForm = document.getElementById("welcome-form");
 const welcomeNameInput = document.getElementById("welcome-name");
 const userName = document.getElementById("user-name");
 
+const WELCOME_EXIT_MS = 1200;
+
 function loadProfile() {
   try {
     return JSON.parse(localStorage.getItem("profile"));
@@ -18,7 +20,7 @@ function showUserName(profile) {
 // Preview the theme as soon as an answer is picked
 welcomeForm.addEventListener("change", (event) => {
   if (event.target.name === "answer") {
-    applyTheme(THEME_FOR_ANSWER[event.target.value]);
+    applyTheme(THEME_FOR_ANSWER[event.target.value], { animate: true });
   }
 });
 
@@ -32,7 +34,14 @@ welcomeForm.addEventListener("submit", (event) => {
   localStorage.setItem("theme", theme);
   applyTheme(theme);
   showUserName(profile);
-  welcome.hidden = true;
+
+  // Fade the welcome screen out while the app slides in underneath
+  welcome.classList.add("leaving");
+  document.body.classList.add("app-entering");
+  setTimeout(() => {
+    welcome.hidden = true;
+    welcome.classList.remove("leaving");
+  }, WELCOME_EXIT_MS);
 });
 
 const profile = loadProfile();

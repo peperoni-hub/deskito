@@ -4,8 +4,17 @@ const THEME_FOR_ANSWER = {
   other: "neutral",
 };
 
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
+const THEME_FADE_MS = 800;
+let themeFadeTimer = null;
+
+function applyTheme(theme, { animate = false } = {}) {
+  const root = document.documentElement;
+  if (animate) {
+    root.classList.add("theme-changing");
+    clearTimeout(themeFadeTimer);
+    themeFadeTimer = setTimeout(() => root.classList.remove("theme-changing"), THEME_FADE_MS);
+  }
+  root.dataset.theme = theme;
 }
 
 function loadSavedTheme() {
