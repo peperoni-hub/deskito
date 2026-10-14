@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="feminine">
+<html lang="en" data-theme="neutral">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&display=swap">
   <link rel="stylesheet" href="styles.css">
+  <script src="theme.js"></script>
 </head>
 <body>
   <header class="topbar">
     <span class="logo">deskito</span>
+    <span id="user-name" class="user-name"></span>
   </header>
 
   <div class="layout">
@@ -35,6 +37,27 @@
     </main>
   </div>
 
+  <div id="welcome" class="welcome" hidden>
+    <form id="welcome-form" class="welcome-card">
+      <h1 class="welcome-logo">deskito</h1>
+      <p class="slogan">Every minute in its place.</p>
+
+      <label class="field-label" for="welcome-name">What should we call you?</label>
+      <input id="welcome-name" class="text-input" type="text" required autocomplete="given-name">
+
+      <p class="field-label">I am a</p>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="answer" value="woman" required><span>Woman</span></label>
+        <label class="choice"><input type="radio" name="answer" value="man"><span>Man</span></label>
+        <label class="choice"><input type="radio" name="answer" value="other"><span>Other</span></label>
+      </div>
+      <p class="hint">This picks your starting theme. You can change it any time in Settings.</p>
+
+      <button type="submit" class="start-button">GET STARTED</button>
+    </form>
+  </div>
+
   <script src="app.js"></script>
+  <script src="welcome.js"></script>
 </body>
 </html>

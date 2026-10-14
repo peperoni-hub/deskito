@@ -15,6 +15,7 @@
   --topbar-bg: #fff;
   --topbar-border: #f3dfe0;
   --logo-color: #c06c84;
+  --heading-color: #c06c84;
   --logo-style: italic;
   --logo-case: none;
   --logo-spacing: 0;
@@ -48,6 +49,7 @@
   --topbar-bg: #14213a;
   --topbar-border: #b89b5e;
   --logo-color: #d4b876;
+  --heading-color: #14213a;
   --logo-style: normal;
   --logo-case: uppercase;
   --logo-spacing: 3px;
@@ -81,6 +83,7 @@
   --topbar-bg: #4b5a32;
   --topbar-border: #4b5a32;
   --logo-color: #eef0e2;
+  --heading-color: #4b5a32;
   --logo-style: normal;
   --logo-case: none;
   --logo-spacing: 0;
@@ -117,7 +120,14 @@ body {
   border-bottom: 2px solid var(--topbar-border);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 20px;
+}
+
+.user-name {
+  color: var(--logo-color);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .logo {
@@ -291,4 +301,116 @@ body {
   font-weight: var(--numbers-weight);
   font-size: 16px;
   font-variant-numeric: tabular-nums;
+}
+
+/* Welcome screen */
+.welcome {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.welcome[hidden] {
+  display: none;
+}
+
+.welcome-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.welcome-logo {
+  font-family: var(--font-heading);
+  font-size: 44px;
+  font-weight: 700;
+  font-style: var(--logo-style);
+  text-transform: var(--logo-case);
+  letter-spacing: var(--logo-spacing);
+  color: var(--heading-color);
+}
+
+.slogan {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  color: var(--text-muted);
+  margin: 6px 0 32px;
+}
+
+.field-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  text-align: center;
+}
+
+.text-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.choices {
+  display: flex;
+  gap: 8px;
+}
+
+.choice {
+  flex: 1;
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+}
+
+.choice span {
+  display: block;
+  padding: 10px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.choice input:checked + span {
+  background: var(--button-bg);
+  border-color: var(--button-border);
+  color: var(--button-text);
+  font-weight: 700;
+}
+
+.choice input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 12px 0 28px;
+}
+
+.welcome-card .start-button {
+  width: 100%;
 }
