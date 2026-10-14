@@ -51,6 +51,32 @@
           </div>
         </section>
 
+        <section class="pomodoro">
+          <div class="pomo-display">
+            <span id="pomo-phase" class="pomo-phase">Focus</span>
+            <span id="pomo-time" class="pomo-time">25:00</span>
+          </div>
+          <div class="pomo-settings">
+            <div class="pomo-presets">
+              <button class="pomo-preset" data-work="25" data-break="5">25 / 5</button>
+              <button class="pomo-preset" data-work="50" data-break="10">50 / 10</button>
+              <button class="pomo-preset" data-work="30" data-break="20">30 / 20</button>
+            </div>
+            <label class="pomo-custom">
+              Own:
+              <input id="pomo-work" class="picker tiny" type="number" min="1" max="180" data-pref="pomoWork" title="Focus minutes">
+              /
+              <input id="pomo-break" class="picker tiny" type="number" min="1" max="120" data-pref="pomoBreak" title="Break minutes">
+              min
+            </label>
+            <label class="checkbox-row"><input type="checkbox" data-pref="pomoTrack"> Track time while focusing</label>
+          </div>
+          <div class="pomo-controls">
+            <button id="pomo-start" class="start-button">START FOCUS</button>
+            <button id="pomo-reset" class="secondary-button">Reset</button>
+          </div>
+        </section>
+
         <section class="entries">
           <div class="week-header">
             <h2>Your time</h2>
@@ -120,6 +146,36 @@
           <p class="field-label">Welcome screen</p>
           <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
         </div>
+
+        <h2 class="page-title section-title">Breaks</h2>
+        <div class="panel settings-list">
+          <label class="checkbox-row"><input type="checkbox" data-pref="breakAlarm"> Remind me to take a break automatically</label>
+          <label class="setting-row">
+            After working for
+            <input class="picker tiny" type="number" min="5" max="480" data-pref="breakAfterMin"> minutes,
+            take a
+            <input class="picker tiny" type="number" min="1" max="120" data-pref="breakLengthMin"> minute break
+          </label>
+        </div>
+
+        <h2 class="page-title section-title">Reminders</h2>
+        <div class="panel settings-list">
+          <label class="checkbox-row"><input type="checkbox" data-pref="remindTrack"> Remind me when I'm not tracking</label>
+          <label class="setting-row">
+            Every
+            <input class="picker tiny" type="number" min="5" max="240" data-pref="remindEveryMin"> minutes,
+            on weekdays between
+            <input class="picker" type="time" data-pref="workStart"> and
+            <input class="picker" type="time" data-pref="workEnd">
+          </label>
+          <label class="setting-row">
+            Warn me if a timer runs longer than
+            <input class="picker tiny" type="number" min="1" max="24" data-pref="longTimerHours"> hours
+          </label>
+          <div>
+            <button type="button" id="allow-notifications" class="secondary-button small">Allow desktop notifications</button>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -143,6 +199,8 @@
       <button type="submit" class="start-button">GET STARTED</button>
     </form>
   </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
 
   <dialog id="entry-dialog" class="dialog">
     <form id="entry-form">
@@ -194,5 +252,6 @@
   <script src="welcome.js"></script>
   <script src="nav.js"></script>
   <script src="settings.js"></script>
+  <script src="pomodoro.js"></script>
 </body>
 </html>

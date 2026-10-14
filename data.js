@@ -39,6 +39,25 @@ const store = {
   tags: readStore("tags", []),
 };
 
+const prefs = {
+  pomoWork: 25,
+  pomoBreak: 5,
+  pomoTrack: true,
+  breakAlarm: true,
+  breakAfterMin: 60,
+  breakLengthMin: 10,
+  remindTrack: false,
+  remindEveryMin: 30,
+  workStart: "09:00",
+  workEnd: "17:00",
+  longTimerHours: 8,
+  ...readStore("prefs", {}),
+};
+
+function savePrefs() {
+  writeStore("prefs", prefs);
+}
+
 function saveEntries() {
   writeStore("entries", store.entries);
 }

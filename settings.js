@@ -36,3 +36,24 @@ showWelcomeButton.addEventListener("click", () => {
 });
 
 document.querySelector('.nav-item[data-view="settings"]').addEventListener("click", fillSettings);
+
+// Any input with data-pref="name" reads and saves that preference
+for (const input of document.querySelectorAll("[data-pref]")) {
+  const key = input.dataset.pref;
+  if (input.type === "checkbox") {
+    input.checked = prefs[key];
+  } else {
+    input.value = prefs[key];
+  }
+  input.addEventListener("change", () => {
+    if (input.type === "checkbox") {
+      prefs[key] = input.checked;
+    } else if (input.type === "number") {
+      prefs[key] = Math.max(Number(input.min) || 1, Number(input.value) || prefs[key]);
+      input.value = prefs[key];
+    } else {
+      prefs[key] = input.value;
+    }
+    savePrefs();
+  });
+}
