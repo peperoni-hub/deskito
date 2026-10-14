@@ -4,7 +4,8 @@ const pomoPhase = document.getElementById("pomo-phase");
 const pomoTime = document.getElementById("pomo-time");
 const pomoStartButton = document.getElementById("pomo-start");
 const pomoResetButton = document.getElementById("pomo-reset");
-const pomoPresets = document.querySelectorAll(".pomo-preset");
+// Only the Pomodoro presets (other buttons share the same look)
+const pomoPresets = document.querySelectorAll(".pomo-preset[data-work]");
 const pomoWorkInput = document.getElementById("pomo-work");
 const pomoBreakInput = document.getElementById("pomo-break");
 const toasts = document.getElementById("toasts");
