@@ -2177,3 +2177,382 @@ body {
 [dir="rtl"] #cal-next {
   transform: scaleX(-1);
 }
+
+/* Account and syncing */
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sync-badge {
+  font-size: 16px;
+  color: var(--logo-color);
+  opacity: 0.85;
+}
+
+.sync-badge[data-status="syncing"] {
+  animation: spin 1.2s linear infinite;
+}
+
+.sync-badge[data-status="offline"],
+.sync-badge[data-status="error"] {
+  color: var(--stop-bg);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#account-signed-out[hidden],
+#account-signed-in[hidden],
+#auth-email-row[hidden],
+#auth-password-row[hidden],
+#auth-intro[hidden],
+.auth-message[hidden],
+.auth-links .link-button[hidden] {
+  display: none;
+}
+
+.account-email {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.auth-dialog {
+  width: min(420px, calc(100% - 32px));
+}
+
+.auth-dialog .text-input {
+  text-align: left;
+}
+
+.auth-message {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.auth-message.error {
+  color: var(--stop-bg);
+}
+
+.auth-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.welcome-login {
+  display: block;
+  margin: 16px auto 0;
+}
+
+/* ---------- Phones and small screens ---------- */
+.nav-item::before {
+  display: none;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+.layout > *,
+.tracker-layout > *,
+.content {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .mood-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* The menu becomes a bar at the bottom of the screen */
+  .layout {
+    display: block;
+    min-height: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    width: auto;
+    display: flex;
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+    border-right: none;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    border-left: none;
+    border-top: 3px solid transparent;
+    border-radius: 8px;
+    font-size: 10.5px;
+    line-height: 1.2;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-item.active {
+    border-top-color: var(--accent);
+  }
+
+  .nav-item::before {
+    display: block;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .nav-item[data-view="tracker"]::before { content: "⏱"; }
+  .nav-item[data-view="calendar"]::before { content: "📅"; }
+  .nav-item[data-view="reports"]::before { content: "📊"; }
+  .nav-item[data-view="projects"]::before { content: "📁"; }
+  .nav-item[data-view="settings"]::before { content: "⚙"; }
+
+  [dir="rtl"] .sidebar {
+    border-left: none;
+  }
+
+  [dir="rtl"] .nav-item {
+    border-right: none;
+  }
+
+  .content {
+    padding: 16px 12px calc(84px + env(safe-area-inset-bottom));
+  }
+
+  .toasts {
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    right: 12px;
+    width: calc(100% - 24px);
+  }
+
+  /* Timer bar: description, then pickers, then clock and button */
+  .timer-bar {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  #description {
+    flex-basis: 100%;
+    font-size: 16px;
+    padding: 6px 4px;
+  }
+
+  .timer-bar > .picker,
+  .timer-bar > .tag-picker {
+    flex: 1 1 30%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .tag-picker summary {
+    max-width: none;
+  }
+
+  .mode-fields {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+  }
+
+  #timer-fields {
+    justify-content: space-between;
+  }
+
+  .clock {
+    min-width: 0;
+    text-align: left;
+    font-size: 24px;
+  }
+
+  #manual-fields .picker {
+    flex: 1 1 40%;
+  }
+
+  .mode-switch {
+    flex-direction: row;
+  }
+
+  /* Pomodoro */
+  .pomodoro {
+    gap: 12px;
+  }
+
+  .pomo-controls {
+    width: 100%;
+  }
+
+  .pomo-controls .start-button {
+    flex: 1;
+  }
+
+  /* Entries: description on top, times and duration underneath */
+  .entry {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 12px;
+  }
+
+  .entry-main {
+    flex-basis: 100%;
+  }
+
+  .entry-times {
+    flex: 1;
+    font-size: 12px;
+  }
+
+  .entry-duration {
+    min-width: 0;
+  }
+
+  .entry-actions {
+    opacity: 1;
+  }
+
+  .day-header {
+    padding: 8px 4px;
+  }
+
+  .day-tools .link-button {
+    opacity: 1;
+  }
+
+  .week-header {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  /* Calendar: the week scrolls sideways instead of squeezing seven days */
+  .cal-toolbar {
+    gap: 8px;
+  }
+
+  .cal-title {
+    min-width: 0;
+    flex-basis: 100%;
+    font-size: 20px;
+  }
+
+  .cal-toolbar .spacer {
+    display: none;
+  }
+
+  .cal-body {
+    overflow-x: auto;
+  }
+
+  .week-scroll {
+    min-width: 680px;
+    height: 70vh;
+  }
+
+  .month-head,
+  .month-grid {
+    min-width: 560px;
+  }
+
+  .month-cell {
+    min-height: 80px;
+  }
+
+  .mini-cal {
+    position: static;
+  }
+
+  /* Reports */
+  .bar-row {
+    grid-template-columns: minmax(80px, 1fr) 1.4fr 64px 36px;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .stat-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .report-card {
+    padding: 14px;
+  }
+
+  /* Projects and settings */
+  .inline-form .text-input,
+  .inline-form .picker,
+  .inline-form .start-button {
+    flex: 1 1 100%;
+  }
+
+  .panel {
+    padding: 8px 14px 16px;
+  }
+
+  .settings-list {
+    padding: 16px;
+  }
+
+  .panel .text-input {
+    max-width: none;
+  }
+
+  .theme-option {
+    flex: 1 1 30%;
+    min-width: 0;
+  }
+
+  /* Pop-up windows use the whole width */
+  .dialog {
+    width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+    padding: 18px;
+  }
+
+  .dialog-row > div {
+    flex: 1 1 45%;
+  }
+
+  .dialog-row .picker {
+    width: 100%;
+  }
+
+  .dialog-actions {
+    flex-wrap: wrap;
+  }
+
+  .welcome-card {
+    padding: 56px 20px 28px;
+  }
+}

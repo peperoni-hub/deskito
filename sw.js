@@ -2,7 +2,7 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v3";
+const CACHE = "deskito-v4";
 const FILES = [
   "./",
   "index.html",
@@ -20,6 +20,7 @@ const FILES = [
   "lang/ja.js",
   "lang/ko.js",
   "lang/ar.js",
+  "lang/accounts.js",
   "data.js",
   "app.js",
   "projects.js",
@@ -30,6 +31,8 @@ const FILES = [
   "calendar.js",
   "reports.js",
   "icons.js",
+  "sync.js",
+  "vendor/supabase.js",
   "icon.svg",
   "manifest.webmanifest",
   "icons/icon-192.png",
@@ -53,6 +56,8 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  // Account data always comes straight from Supabase, never from the offline copy
+  if (new URL(event.request.url).hostname.endsWith("supabase.co")) return;
   event.respondWith(
     // "no-cache" = always check with the website whether the file changed
     fetch(event.request, { cache: "no-cache" })

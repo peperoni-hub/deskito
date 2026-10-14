@@ -22,7 +22,10 @@
       <img id="mood-icon" class="mood-icon" src="icon.svg" alt="" width="34" height="34">
       <span class="logo">deskito</span>
     </span>
-    <span id="user-name" class="user-name"></span>
+    <span class="user-area">
+      <span id="sync-badge" class="sync-badge"></span>
+      <span id="user-name" class="user-name"></span>
+    </span>
   </header>
 
   <div class="layout">
@@ -244,6 +247,25 @@
           <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
         </div>
 
+        <h2 class="page-title section-title">Account</h2>
+        <div class="panel settings-list">
+          <div id="account-signed-out">
+            <p class="setting-row">Create a free account to keep your data safe and use Deskito on all your devices.</p>
+            <div class="project-actions">
+              <button type="button" id="account-signup" class="start-button small">CREATE ACCOUNT</button>
+              <button type="button" id="account-login" class="secondary-button small">Log in</button>
+            </div>
+          </div>
+          <div id="account-signed-in" hidden>
+            <p id="account-email" class="account-email"></p>
+            <p id="account-status" class="setting-row"></p>
+            <div class="project-actions">
+              <button type="button" id="account-sync" class="secondary-button small">Sync now</button>
+              <button type="button" id="account-logout" class="secondary-button small">Log out</button>
+            </div>
+          </div>
+        </div>
+
         <h2 class="page-title section-title">Backup</h2>
         <div class="panel settings-list">
           <p class="setting-row">Your data lives only in this browser. Download a backup now and then, and use it to move your data to another computer or browser.</p>
@@ -312,8 +334,34 @@
       <p class="hint">This picks your starting theme. You can change it any time in Settings.</p>
 
       <button type="submit" class="start-button">GET STARTED</button>
+      <button type="button" id="welcome-login" class="link-button welcome-login">Already have an account? Log in</button>
     </form>
   </div>
+
+  <dialog id="auth-dialog" class="dialog auth-dialog">
+    <form id="auth-form">
+      <h2 id="auth-title" class="page-title">Log in</h2>
+      <p id="auth-intro" class="setting-row" hidden></p>
+      <div id="auth-email-row">
+        <label class="field-label" for="auth-email">Email</label>
+        <input id="auth-email" class="text-input" type="email" autocomplete="email" required>
+      </div>
+      <div id="auth-password-row">
+        <label class="field-label" for="auth-password">Password</label>
+        <input id="auth-password" class="text-input" type="password" autocomplete="current-password" minlength="6" required>
+      </div>
+      <p id="auth-message" class="auth-message" hidden></p>
+      <div class="auth-links">
+        <button type="button" id="auth-switch" class="link-button"></button>
+        <button type="button" id="auth-forgot" class="link-button">Forgot password?</button>
+      </div>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="button" id="auth-cancel" class="secondary-button">Cancel</button>
+        <button type="submit" id="auth-submit" class="start-button">LOG IN</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="confirm-dialog" class="dialog confirm-dialog">
     <p class="confirm-message"></p>
@@ -454,6 +502,7 @@
   <script src="lang/ja.js"></script>
   <script src="lang/ko.js"></script>
   <script src="lang/ar.js"></script>
+  <script src="lang/accounts.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
@@ -468,6 +517,9 @@
   <script src="calendar.js"></script>
   <script src="reports.js"></script>
   <script src="icons.js"></script>
+  <!-- Supabase's official code (version 2.49.4), kept in the project so it works offline -->
+  <script src="vendor/supabase.js"></script>
+  <script src="sync.js"></script>
   <script>
     // Works offline once installed (only on the website, not when opened as a file)
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

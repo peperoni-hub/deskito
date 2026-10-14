@@ -10,7 +10,34 @@ function readStore(key, fallback) {
 }
 
 function writeStore(key, value) {
+  if (LIST_KEYS.includes(key)) stampChanges(key, value);
   localStorage.setItem(key, JSON.stringify(value));
+}
+
+// For syncing between devices: remember when each item last changed, and which items were
+// deleted, so two devices can be merged without losing or bringing back anything
+const LIST_KEYS = ["entries", "projects", "tags", "plans"];
+
+function withoutStamp(item) {
+  return JSON.stringify({ ...item, updatedAt: undefined });
+}
+
+function stampChanges(key, items) {
+  const before = new Map(readStore(key, []).map((item) => [item.id, withoutStamp(item)]));
+  const now = Date.now();
+  for (const item of items) {
+    if (before.get(item.id) !== withoutStamp(item)) item.updatedAt = now;
+  }
+
+  const ids = new Set(items.map((item) => item.id));
+  const deleted = readStore("deleted", {});
+  const gone = new Set(deleted[key] || []);
+  for (const id of before.keys()) {
+    if (!ids.has(id)) gone.add(id);
+  }
+  for (const id of ids) gone.delete(id); // brought back with Undo
+  deleted[key] = [...gone];
+  localStorage.setItem("deleted", JSON.stringify(deleted));
 }
 
 function uid() {
@@ -33,6 +60,7 @@ const store = {
     tagIds: entry.tagIds || [],
     type: entry.type || "task",
     planId: entry.planId || "",
+    updatedAt: entry.updatedAt || 0,
     start: entry.start,
     end: entry.end,
   })),
