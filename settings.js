@@ -60,7 +60,7 @@ for (const input of document.querySelectorAll("[data-pref]")) {
 
 /* Backup and restore everything (also used to move data to another browser) */
 
-const BACKUP_KEYS = ["entries", "projects", "tags", "plans", "prefs", "profile", "theme"];
+const BACKUP_KEYS = ["entries", "projects", "tags", "plans", "prefs", "profile", "theme", "appearance"];
 const backupButton = document.getElementById("backup-download");
 const restoreInput = document.getElementById("backup-restore");
 
@@ -107,3 +107,36 @@ document.getElementById("clear-plans").addEventListener("click", async () => {
   store.plans = [];
   plansChanged();
 });
+
+/* Light / dark / same as the device */
+
+const appearanceOptions = document.querySelectorAll(".appearance-option");
+
+function markAppearance() {
+  const current = savedAppearance();
+  for (const option of appearanceOptions) {
+    option.classList.toggle("selected", option.dataset.appearance === current);
+  }
+}
+
+for (const option of appearanceOptions) {
+  option.addEventListener("click", () => {
+    localStorage.setItem("appearance", option.dataset.appearance);
+    applyAppearance(option.dataset.appearance, { animate: true });
+    markAppearance();
+  });
+}
+
+markAppearance();
+
+// Show what the device is telling us, so "Same as my device" is easy to understand
+const deviceModeHint = document.getElementById("device-mode");
+
+function showDeviceMode() {
+  deviceModeHint.textContent = darkQuery.matches
+    ? "Your device is currently in dark mode."
+    : "Your device is currently in light mode. (Browsers follow Windows' \"app mode\" and their own appearance setting.)";
+}
+
+darkQuery.addEventListener("change", showDeviceMode);
+showDeviceMode();

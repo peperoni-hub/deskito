@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deskito</title>
   <link id="favicon" rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#241a4d">
+  <meta name="apple-mobile-web-app-title" content="Deskito">
+  <meta name="description" content="Every minute in its place.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&display=swap">
   <link rel="stylesheet" href="styles.css">
@@ -224,6 +229,14 @@
             </button>
           </div>
 
+          <p class="field-label">Appearance</p>
+          <div class="appearance-options">
+            <button type="button" class="pomo-preset appearance-option" data-appearance="light">☀ Light</button>
+            <button type="button" class="pomo-preset appearance-option" data-appearance="dark">🌙 Dark</button>
+            <button type="button" class="pomo-preset appearance-option" data-appearance="system">💻 Same as my device</button>
+          </div>
+          <p id="device-mode" class="hint left"></p>
+
           <p class="field-label">Welcome screen</p>
           <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
         </div>
@@ -436,5 +449,11 @@
   <script src="calendar.js"></script>
   <script src="reports.js"></script>
   <script src="icons.js"></script>
+  <script>
+    // Works offline once installed (only on the website, not when opened as a file)
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      navigator.serviceWorker.register("sw.js");
+    }
+  </script>
 </body>
 </html>

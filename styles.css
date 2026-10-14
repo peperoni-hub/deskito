@@ -119,6 +119,94 @@
   --numbers-weight: 700;
 }
 
+/* Dark versions: same themes, night colours */
+[data-mode="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="feminine"][data-mode="dark"] {
+  --bg: #1f1418;
+  --surface: #2a1c22;
+  --sidebar-bg: #241820;
+  --border: #3d2a32;
+  --text: #f3e4e8;
+  --text-muted: #b8939d;
+  --topbar-bg: #2a1c22;
+  --topbar-border: #3d2a32;
+  --logo-color: #e89aae;
+  --heading-color: #e89aae;
+  --plan-task: #e88aa3;
+  --plan-meeting: #b48ac9;
+  --plan-plan: #e8a87c;
+  --plan-other: #7fb7a4;
+  --nav-text: #c7a3ad;
+  --nav-hover-bg: #33222a;
+  --nav-active-bg: #40262f;
+  --nav-active-text: #f4b6c6;
+  --accent: #e88aa3;
+  --button-bg: #d77a93;
+  --button-hover: #e38ea5;
+  --button-text: #fff;
+  --stop-bg: #c75d7c;
+  --stop-hover: #d66f8d;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="old-money"][data-mode="dark"] {
+  --bg: #0d1424;
+  --surface: #141d31;
+  --sidebar-bg: #0f1729;
+  --border: #2a3550;
+  --text: #ece4d2;
+  --text-muted: #a39b86;
+  --topbar-bg: #0a1020;
+  --topbar-border: #b89b5e;
+  --logo-color: #d4b876;
+  --heading-color: #d4b876;
+  --plan-task: #c9ad6e;
+  --plan-meeting: #b04a5a;
+  --plan-plan: #4f8f7c;
+  --plan-other: #a39b86;
+  --nav-text: #9aa3b8;
+  --nav-hover-bg: #1a2540;
+  --nav-active-bg: #1e2a47;
+  --nav-active-text: #f6f1e6;
+  --accent: #c9ad6e;
+  --button-bg: #b89b5e;
+  --button-hover: #c9ad6e;
+  --button-text: #0d1424;
+  --button-border: #b89b5e;
+  --stop-bg: #8a2a38;
+  --stop-hover: #a03444;
+}
+
+[data-theme="neutral"][data-mode="dark"] {
+  --bg: #1a1d16;
+  --surface: #23271e;
+  --sidebar-bg: #1f2219;
+  --border: #363b2d;
+  --text: #e9ead9;
+  --text-muted: #a0a58e;
+  --topbar-bg: #2c3522;
+  --topbar-border: #2c3522;
+  --logo-color: #e9ead9;
+  --heading-color: #b7c49a;
+  --plan-task: #9aae6b;
+  --plan-meeting: #b07a52;
+  --plan-plan: #c9b285;
+  --plan-other: #6fa9bd;
+  --nav-text: #a9ae96;
+  --nav-hover-bg: #2b3024;
+  --nav-active-bg: #333b28;
+  --nav-active-text: #d6dcc4;
+  --accent: #9aae6b;
+  --button-bg: #7d9150;
+  --button-hover: #8ea25f;
+  --button-text: #fff;
+  --stop-bg: #a86b45;
+  --stop-hover: #b97b54;
+}
+
 body {
   font-family: var(--font-body);
   background: var(--bg);
@@ -1977,4 +2065,25 @@ body {
 
 .confirm-dialog .dialog-actions {
   margin-top: 20px;
+}
+
+.appearance-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.appearance-option {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* Project names use the normal text colour; the dot next to them shows the project colour */
+.project-chip {
+  color: var(--text) !important;
+}
+
+.hint.left {
+  text-align: left;
+  margin: 8px 0 0;
 }
