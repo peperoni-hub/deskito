@@ -136,8 +136,41 @@
       </div>
 
       <div class="view" data-view="reports" hidden>
-        <h2 class="page-title">Reports</h2>
-        <p class="empty">Coming soon.</p>
+        <div class="cal-toolbar">
+          <h2 class="page-title cal-title">Reports</h2>
+          <span class="spacer"></span>
+          <button id="export-csv" class="secondary-button small">⬇ Export to Excel (CSV)</button>
+          <button id="export-pdf" class="secondary-button small">🖨 Print / save as PDF</button>
+        </div>
+
+        <div class="panel report-filters">
+          <select id="report-range" class="picker" title="Period">
+            <option value="today">Today</option>
+            <option value="this-week" selected>This week</option>
+            <option value="last-week">Last week</option>
+            <option value="this-month">This month</option>
+            <option value="last-month">Last month</option>
+            <option value="this-year">This year</option>
+            <option value="custom">Custom…</option>
+          </select>
+          <span id="report-custom" class="report-custom" hidden>
+            <input id="report-from" type="date" class="picker"> – <input id="report-to" type="date" class="picker">
+          </span>
+          <select id="report-project" class="picker" title="Project"></select>
+          <select id="report-tag" class="picker" title="Tag"></select>
+          <select id="report-type" class="picker" title="Type"></select>
+          <input id="report-text" type="search" class="picker" placeholder="Description contains…">
+        </div>
+
+        <div class="report-tabs">
+          <button class="report-tab pomo-preset selected" data-report-tab="summary">Summary</button>
+          <button class="report-tab pomo-preset" data-report-tab="detailed">Detailed</button>
+          <button class="report-tab pomo-preset" data-report-tab="weekly">Weekly</button>
+          <button class="report-tab pomo-preset" data-report-tab="attendance">Attendance</button>
+          <button class="report-tab pomo-preset" data-report-tab="assignments">Planned vs tracked</button>
+        </div>
+
+        <div id="report-body" class="report-body"></div>
       </div>
 
       <div class="view" data-view="projects" hidden>
@@ -188,6 +221,18 @@
 
           <p class="field-label">Welcome screen</p>
           <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
+        </div>
+
+        <h2 class="page-title section-title">Backup</h2>
+        <div class="panel settings-list">
+          <p class="setting-row">Your data lives only in this browser. Download a backup now and then, and use it to move your data to another computer or browser.</p>
+          <div class="project-actions">
+            <button type="button" id="backup-download" class="secondary-button small">⬇ Download backup</button>
+            <label class="secondary-button small file-button">
+              ⬆ Restore from backup
+              <input id="backup-restore" type="file" accept=".json,application/json" hidden>
+            </label>
+          </div>
         </div>
 
         <h2 class="page-title section-title">Breaks</h2>
@@ -244,6 +289,7 @@
   </div>
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="chart-tip" class="chart-tip" hidden></div>
 
   <dialog id="plan-dialog" class="dialog">
     <form id="plan-form">
@@ -362,5 +408,6 @@
   <script src="settings.js"></script>
   <script src="pomodoro.js"></script>
   <script src="calendar.js"></script>
+  <script src="reports.js"></script>
 </body>
 </html>
