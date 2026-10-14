@@ -206,7 +206,7 @@ body {
   font-weight: var(--numbers-weight);
   font-size: 20px;
   font-variant-numeric: tabular-nums;
-  min-width: 100px;
+  min-width: 140px;
   text-align: right;
 }
 
@@ -478,4 +478,92 @@ body {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Pages */
+.view[hidden] {
+  display: none;
+}
+
+.page-title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin-bottom: 20px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px 24px 24px;
+  max-width: 560px;
+}
+
+.panel .text-input {
+  text-align: left;
+  max-width: 320px;
+}
+
+/* Settings */
+.theme-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  padding: 14px 12px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.theme-option.selected {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.swatches i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  padding: 9px 18px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  border-color: var(--accent);
+}
+
+.clock-fraction {
+  font-size: 0.7em;
+  opacity: 0.75;
+  margin-left: 1px;
 }

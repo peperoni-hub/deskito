@@ -17,6 +17,12 @@ function showUserName(profile) {
   userName.textContent = profile.name;
 }
 
+function showWelcome() {
+  welcomeForm.reset();
+  document.body.classList.remove("app-entering");
+  welcome.hidden = false;
+}
+
 // Preview the theme as soon as an answer is picked
 welcomeForm.addEventListener("change", (event) => {
   if (event.target.name === "answer") {
@@ -48,5 +54,5 @@ const profile = loadProfile();
 if (profile) {
   showUserName(profile);
 } else {
-  welcome.hidden = false;
+  showWelcome();
 }

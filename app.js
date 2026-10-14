@@ -1,11 +1,12 @@
 const descriptionInput = document.getElementById("description");
-const clock = document.getElementById("clock");
+const clockMain = document.getElementById("clock-main");
+const clockFraction = document.getElementById("clock-fraction");
 const startStopButton = document.getElementById("start-stop");
 const entryList = document.getElementById("entry-list");
 const emptyMessage = document.getElementById("empty-message");
 
 let startTime = null;
-let tickInterval = null;
+let frameRequest = null;
 let entries = loadEntries();
 
 function loadEntries() {
@@ -65,18 +66,21 @@ function renderEntries() {
 }
 
 function updateClock() {
-  clock.textContent = formatDuration(Date.now() - startTime);
+  const elapsed = Date.now() - startTime;
+  clockMain.textContent = formatDuration(elapsed);
+  clockFraction.textContent = "." + String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0");
+  frameRequest = requestAnimationFrame(updateClock);
 }
 
 function startTimer() {
   startTime = Date.now();
-  tickInterval = setInterval(updateClock, 1000);
+  frameRequest = requestAnimationFrame(updateClock);
   startStopButton.textContent = "STOP";
   startStopButton.classList.add("running");
 }
 
 function stopTimer() {
-  clearInterval(tickInterval);
+  cancelAnimationFrame(frameRequest);
   entries.unshift({
     description: descriptionInput.value.trim(),
     start: startTime,
@@ -86,7 +90,8 @@ function stopTimer() {
   renderEntries();
 
   startTime = null;
-  clock.textContent = "00:00:00";
+  clockMain.textContent = "00:00:00";
+  clockFraction.textContent = ".00";
   descriptionInput.value = "";
   startStopButton.textContent = "START";
   startStopButton.classList.remove("running");

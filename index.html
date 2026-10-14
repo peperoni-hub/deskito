@@ -17,23 +17,69 @@
 
   <div class="layout">
     <nav class="sidebar">
-      <a href="#" class="nav-item active">Time Tracker</a>
-      <a href="#" class="nav-item">Reports</a>
-      <a href="#" class="nav-item">Projects</a>
+      <a href="#" class="nav-item active" data-view="tracker">Time Tracker</a>
+      <a href="#" class="nav-item" data-view="calendar">Calendar</a>
+      <a href="#" class="nav-item" data-view="reports">Reports</a>
+      <a href="#" class="nav-item" data-view="projects">Projects</a>
+      <a href="#" class="nav-item" data-view="settings">Settings</a>
     </nav>
 
     <main class="content">
-      <section class="timer-bar">
-        <input type="text" id="description" placeholder="What are you working on?">
-        <span id="clock" class="clock">00:00:00</span>
-        <button id="start-stop" class="start-button">START</button>
-      </section>
+      <div class="view" data-view="tracker">
+        <section class="timer-bar">
+          <input type="text" id="description" placeholder="What are you working on?">
+          <span class="clock"><span id="clock-main">00:00:00</span><span id="clock-fraction" class="clock-fraction">.00</span></span>
+          <button id="start-stop" class="start-button">START</button>
+        </section>
 
-      <section class="entries">
-        <h2>This week</h2>
-        <p id="empty-message" class="empty">No time entries yet. Start the timer to track your first one.</p>
-        <ul id="entry-list" class="entry-list"></ul>
-      </section>
+        <section class="entries">
+          <h2>This week</h2>
+          <p id="empty-message" class="empty">No time entries yet. Start the timer to track your first one.</p>
+          <ul id="entry-list" class="entry-list"></ul>
+        </section>
+      </div>
+
+      <div class="view" data-view="calendar" hidden>
+        <h2 class="page-title">Calendar</h2>
+        <p class="empty">Coming soon.</p>
+      </div>
+
+      <div class="view" data-view="reports" hidden>
+        <h2 class="page-title">Reports</h2>
+        <p class="empty">Coming soon.</p>
+      </div>
+
+      <div class="view" data-view="projects" hidden>
+        <h2 class="page-title">Projects</h2>
+        <p class="empty">Coming soon.</p>
+      </div>
+
+      <div class="view" data-view="settings" hidden>
+        <h2 class="page-title">Settings</h2>
+        <div class="panel">
+          <label class="field-label" for="settings-name">Your name</label>
+          <input id="settings-name" class="text-input" type="text">
+
+          <p class="field-label">Theme</p>
+          <div class="theme-options">
+            <button type="button" class="theme-option" data-theme-choice="feminine">
+              <span class="swatches"><i style="background:#fdf6f4"></i><i style="background:#d77a93"></i><i style="background:#a14e67"></i></span>
+              Feminine
+            </button>
+            <button type="button" class="theme-option" data-theme-choice="old-money">
+              <span class="swatches"><i style="background:#14213a"></i><i style="background:#b89b5e"></i><i style="background:#6e1f2b"></i></span>
+              Old money
+            </button>
+            <button type="button" class="theme-option" data-theme-choice="neutral">
+              <span class="swatches"><i style="background:#f3f1ea"></i><i style="background:#6b7d47"></i><i style="background:#4b5a32"></i></span>
+              Neutral
+            </button>
+          </div>
+
+          <p class="field-label">Welcome screen</p>
+          <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -59,5 +105,7 @@
 
   <script src="app.js"></script>
   <script src="welcome.js"></script>
+  <script src="nav.js"></script>
+  <script src="settings.js"></script>
 </body>
 </html>
