@@ -2556,3 +2556,74 @@ body {
     padding: 56px 20px 28px;
   }
 }
+
+/* Sharing */
+#sharing-signed-out[hidden],
+#sharing-signed-in[hidden],
+#cal-shared-row[hidden] {
+  display: none;
+}
+
+.share-form {
+  margin: 4px 0 8px;
+}
+
+.share-form .text-input {
+  flex: 1;
+  text-align: left;
+}
+
+.share-lists .field-label {
+  margin-top: 14px;
+}
+
+.share-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.share-email {
+  flex: 1;
+  min-width: 160px;
+  overflow-wrap: anywhere;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.badge.accepted {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Plans from someone else's calendar: striped and labelled with their name, view only */
+.plan-block.shared,
+.month-chip.shared,
+.mini-plan.shared {
+  border-left-style: dashed;
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--plan-color) 10%, transparent) 6px 12px);
+  cursor: help;
+}
+
+.shared-name {
+  align-self: flex-start;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.plan-dot.shared {
+  background: transparent;
+  border: 1.5px solid var(--plan-color);
+  box-sizing: border-box;
+}

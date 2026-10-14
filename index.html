@@ -142,6 +142,7 @@
             <button class="cal-view-button pomo-preset" data-cal-view="month">Month</button>
           </div>
           <label class="checkbox-row"><input type="checkbox" id="cal-show-tracked" checked> Show tracked time</label>
+          <label id="cal-shared-row" class="checkbox-row" hidden><input type="checkbox" id="cal-show-shared" checked> Show shared calendars</label>
           <span class="spacer"></span>
           <button id="cal-add" class="start-button">+ ADD PLAN</button>
         </div>
@@ -263,6 +264,19 @@
               <button type="button" id="account-sync" class="secondary-button small">Sync now</button>
               <button type="button" id="account-logout" class="secondary-button small">Log out</button>
             </div>
+          </div>
+        </div>
+
+        <h2 class="page-title section-title">Sharing</h2>
+        <div class="panel settings-list">
+          <p id="sharing-signed-out" class="setting-row">Log in to share your calendar with someone.</p>
+          <div id="sharing-signed-in" hidden>
+            <p class="setting-row">Share your calendar with someone you choose. They can see your plans, but can't change them.</p>
+            <form id="share-form" class="inline-row share-form">
+              <input id="share-email" class="text-input" type="email" placeholder="Their email" required>
+              <button type="submit" class="start-button small">SEND REQUEST</button>
+            </form>
+            <div id="share-lists" class="share-lists"></div>
           </div>
         </div>
 
@@ -503,6 +517,7 @@
   <script src="lang/ko.js"></script>
   <script src="lang/ar.js"></script>
   <script src="lang/accounts.js"></script>
+  <script src="lang/sharing.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
@@ -520,6 +535,7 @@
   <!-- Supabase's official code (version 2.49.4), kept in the project so it works offline -->
   <script src="vendor/supabase.js"></script>
   <script src="sync.js"></script>
+  <script src="sharing.js"></script>
   <script>
     // Works offline once installed (only on the website, not when opened as a file)
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

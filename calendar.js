@@ -98,6 +98,21 @@ function plansOn(key) {
   return store.plans.filter((plan) => plan.start < to && plan.end > from).sort((a, b) => a.start - b.start);
 }
 
+// Your plans plus the plans of calendars shared with you (see sharing.js)
+function visiblePlansOn(key) {
+  const shared = typeof sharedPlansOn === "function" ? sharedPlansOn(key) : [];
+  return [...plansOn(key), ...shared].sort((a, b) => a.start - b.start);
+}
+
+// Shared plans can only be looked at, never edited
+function openPlan(plan) {
+  if (plan.shared) {
+    showSharedPlan(plan);
+  } else {
+    openPlanDialog(plan);
+  }
+}
+
 function entriesOn(key) {
   return store.entries.filter((entry) => dayKey(entry.start) === key);
 }
@@ -119,13 +134,14 @@ function topFor(timestamp, key) {
 function planBlock(plan, lane, lanes, key) {
   const top = topFor(plan.start, key);
   const height = Math.max(20, topFor(plan.end, key) - top);
-  const project = findProject(plan.projectId);
+  const project = plan.shared ? null : findProject(plan.projectId);
   return el("div", {
-    class: `plan-block plan-${plan.type}`,
+    class: `plan-block plan-${plan.type}${plan.shared ? " shared" : ""}`,
     style: `top:${top}px;height:${height}px;left:calc(${(lane * 100) / lanes}% + 8px);width:calc(${100 / lanes}% - 10px);${planColorStyle(plan)}`,
     title: plan.notes || "",
-    onclick: () => openPlanDialog(plan),
+    onclick: () => openPlan(plan),
   },
+    plan.shared && el("span", { class: "shared-name" }, plan.ownerName),
     el("span", { class: "plan-title" }, plan.title),
     plan.type === "other" && plan.otherLabel && el("span", { class: "plan-kind" }, plan.otherLabel),
     el("span", { class: "plan-time" }, `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`),
@@ -157,7 +173,7 @@ function dayColumn(key, isToday) {
 
   // Plans that overlap are placed side by side
   const laneEnds = [];
-  const placed = plansOn(key).map((plan) => {
+  const placed = visiblePlansOn(key).map((plan) => {
     let lane = laneEnds.findIndex((end) => end <= plan.start);
     if (lane === -1) {
       lane = laneEnds.length;
@@ -224,7 +240,7 @@ function renderMonth() {
 
   const cells = monthGridDays(calAnchor).map((day) => {
     const key = dayKey(day);
-    const plans = plansOn(key);
+    const plans = visiblePlansOn(key);
     const otherMonth = new Date(day).getMonth() !== month;
     return el("div", {
       class: `month-cell${otherMonth ? " other-month" : ""}${key === todayKey ? " today" : ""}`,
@@ -236,7 +252,7 @@ function renderMonth() {
     },
       el("span", { class: "month-date" }, new Date(day).getDate()),
       plans.slice(0, 3).map((plan) =>
-        el("button", { class: `month-chip plan-${plan.type}`, style: planColorStyle(plan), onclick: () => openPlanDialog(plan) },
+        el("button", { class: `month-chip plan-${plan.type}${plan.shared ? " shared" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
           `${formatTimeOfDay(plan.start)} ${plan.title}`
         )
       ),
@@ -317,21 +333,21 @@ function renderMini() {
         },
       },
         el("span", { class: "mini-number" }, new Date(day).getDate()),
-        el("span", { class: "mini-dots" }, plansOn(key).slice(0, 3).map((plan) => el("i", { class: `plan-dot plan-${plan.type}`, style: planColorStyle(plan) }))),
+        el("span", { class: "mini-dots" }, visiblePlansOn(key).slice(0, 3).map((plan) => el("i", { class: `plan-dot plan-${plan.type}${plan.shared ? " shared" : ""}`, style: planColorStyle(plan) }))),
         entriesOn(key).length > 0 && el("span", { class: "mini-line" })
       );
     })
   );
 
-  const plans = plansOn(miniSelected);
-  const planned = plannedMs(plans, miniSelected);
+  const plans = visiblePlansOn(miniSelected);
+  const planned = plannedMs(plansOn(miniSelected), miniSelected);
   miniDayTitle.textContent = dayLabel(miniSelected) + (planned ? ` · ${t("{time} planned", { time: formatHours(planned) })}` : "");
   miniDayList.replaceChildren(
     ...(plans.length
       ? plans.map((plan) =>
-          el("li", { class: `mini-plan plan-${plan.type}`, style: planColorStyle(plan), onclick: () => openPlanDialog(plan) },
+          el("li", { class: `mini-plan plan-${plan.type}${plan.shared ? " shared" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
             el("span", { class: "mini-plan-time" }, `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`),
-            el("span", { class: "mini-plan-title" }, plan.type === "other" && plan.otherLabel ? `${plan.title} · ${plan.otherLabel}` : plan.title)
+            el("span", { class: "mini-plan-title" }, (plan.shared ? `${plan.ownerName}: ` : "") + (plan.type === "other" && plan.otherLabel ? `${plan.title} · ${plan.otherLabel}` : plan.title))
           )
         )
       : [el("li", { class: "mini-empty" }, t("Nothing planned."))])

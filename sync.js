@@ -90,7 +90,8 @@ function mergeLists(local, remote, deletedIds) {
 const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
 async function pull() {
-  const { data, error } = await cloud.from("deskito_data").select("key, value, updated_at");
+  // Only your own rows (calendars shared with you are read separately, in sharing.js)
+  const { data, error } = await cloud.from("deskito_data").select("key, value, updated_at").eq("user_id", account.id);
   if (error) throw error;
 
   const meta = syncMeta();
@@ -177,6 +178,7 @@ async function syncNow() {
       await pull();
       await push();
       setSyncStatus("synced");
+      document.dispatchEvent(new Event("synced"));
     } catch (problem) {
       console.warn("Deskito sync:", problem);
       setSyncStatus(navigator.onLine ? "error" : "offline");
