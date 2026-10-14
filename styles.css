@@ -567,3 +567,420 @@ body {
   opacity: 0.75;
   margin-left: 1px;
 }
+
+/* Timer bar controls */
+.timer-bar {
+  flex-wrap: wrap;
+}
+
+.picker {
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  max-width: 200px;
+}
+
+.mode-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mode-fields[hidden] {
+  display: none;
+}
+
+.mode-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mode-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1;
+  padding: 3px 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.mode-button.selected {
+  color: var(--accent);
+  background: var(--bg);
+}
+
+/* Tag picker dropdown */
+.tag-picker {
+  position: relative;
+}
+
+.tag-picker summary {
+  list-style: none;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  background: var(--bg);
+  font-size: 13px;
+  cursor: pointer;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag-picker summary::-webkit-details-marker {
+  display: none;
+}
+
+.tag-menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 200px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+}
+
+.tag-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tag-menu-empty {
+  padding: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Entry list grouped by day */
+.week-header,
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.week-total {
+  font-family: var(--font-numbers);
+  font-weight: var(--numbers-weight);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.day-group {
+  margin-bottom: 18px;
+}
+
+.day-header {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.day-total {
+  font-family: var(--font-numbers);
+  font-weight: var(--numbers-weight);
+}
+
+.entry-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entry.is-break {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.project-chip {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.dot.big {
+  width: 14px;
+  height: 14px;
+}
+
+.type-chip,
+.tag-chip,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: var(--button-radius);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+
+.type-chip.type-meeting {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.entry-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+
+.entry:hover .entry-actions,
+.entry-actions:focus-within {
+  opacity: 1;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--bg);
+  color: var(--accent);
+}
+
+/* Projects page */
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  max-width: none;
+  margin-bottom: 16px;
+}
+
+.inline-form .text-input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.text-input.small {
+  flex: 0 1 150px;
+  min-width: 120px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+.color-input {
+  width: 42px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  background: var(--bg);
+  padding: 2px;
+  cursor: pointer;
+}
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.project-list {
+  display: grid;
+  gap: 12px;
+}
+
+.project-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.project-card.archived {
+  opacity: 0.6;
+}
+
+.project-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-name {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.project-tracked {
+  margin-left: auto;
+  font-family: var(--font-numbers);
+  font-weight: var(--numbers-weight);
+  font-size: 15px;
+}
+
+.budget {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.budget-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.budget-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.budget-fill.over {
+  background: var(--stop-bg);
+}
+
+.budget-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.chip-remove:hover {
+  color: var(--stop-bg);
+}
+
+.inline-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.secondary-button.small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.secondary-button.danger {
+  color: var(--stop-bg);
+}
+
+.section-title {
+  margin-top: 36px;
+}
+
+/* Edit dialog */
+.dialog {
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.dialog::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.dialog .text-input {
+  text-align: left;
+}
+
+.dialog-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dialog-row .picker {
+  max-width: none;
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.spacer {
+  flex: 1;
+}

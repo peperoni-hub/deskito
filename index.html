@@ -28,14 +28,36 @@
       <div class="view" data-view="tracker">
         <section class="timer-bar">
           <input type="text" id="description" placeholder="What are you working on?">
-          <span class="clock"><span id="clock-main">00:00:00</span><span id="clock-fraction" class="clock-fraction">.00</span></span>
-          <button id="start-stop" class="start-button">START</button>
+          <select id="entry-type" class="picker" title="Type"></select>
+          <select id="entry-project" class="picker" title="Project"></select>
+          <details id="entry-tags" class="tag-picker"></details>
+
+          <div id="timer-fields" class="mode-fields">
+            <span class="clock"><span id="clock-main">00:00:00</span><span id="clock-fraction" class="clock-fraction">.00</span></span>
+            <button id="start-stop" class="start-button">START</button>
+          </div>
+
+          <div id="manual-fields" class="mode-fields" hidden>
+            <input type="date" id="manual-date" class="picker">
+            <input type="time" id="manual-start" class="picker" title="Start">
+            <span>–</span>
+            <input type="time" id="manual-end" class="picker" title="End">
+            <button id="manual-add" class="start-button">ADD</button>
+          </div>
+
+          <div class="mode-switch">
+            <button class="mode-button selected" data-mode="timer" title="Timer mode">⏱</button>
+            <button class="mode-button" data-mode="manual" title="Manual mode">☰</button>
+          </div>
         </section>
 
         <section class="entries">
-          <h2>This week</h2>
+          <div class="week-header">
+            <h2>Your time</h2>
+            <span id="week-total" class="week-total"></span>
+          </div>
           <p id="empty-message" class="empty">No time entries yet. Start the timer to track your first one.</p>
-          <ul id="entry-list" class="entry-list"></ul>
+          <div id="entry-days"></div>
         </section>
       </div>
 
@@ -51,7 +73,26 @@
 
       <div class="view" data-view="projects" hidden>
         <h2 class="page-title">Projects</h2>
-        <p class="empty">Coming soon.</p>
+        <form id="project-form" class="panel inline-form">
+          <input id="project-name" class="text-input" type="text" placeholder="Project name" required>
+          <input id="project-color" type="color" class="color-input" title="Colour">
+          <input id="project-budget" class="text-input small" type="number" min="0" step="0.5" placeholder="Budget (hours)">
+          <select id="project-privacy" class="picker">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+          <button type="submit" class="start-button">ADD PROJECT</button>
+        </form>
+
+        <label class="checkbox-row"><input type="checkbox" id="show-archived"> Show archived projects</label>
+        <div id="project-list" class="project-list"></div>
+
+        <h2 class="page-title section-title">Tags</h2>
+        <form id="tag-form" class="panel inline-form">
+          <input id="tag-name" class="text-input" type="text" placeholder="Tag name, e.g. admin" required>
+          <button type="submit" class="start-button">ADD TAG</button>
+        </form>
+        <div id="tag-list" class="chip-list"></div>
       </div>
 
       <div class="view" data-view="settings" hidden>
@@ -103,7 +144,53 @@
     </form>
   </div>
 
+  <dialog id="entry-dialog" class="dialog">
+    <form id="entry-form">
+      <h2 class="page-title">Edit entry</h2>
+      <label class="field-label" for="edit-description">Description</label>
+      <input id="edit-description" class="text-input" type="text">
+
+      <div class="dialog-row">
+        <div>
+          <label class="field-label" for="edit-type">Type</label>
+          <select id="edit-type" class="picker"></select>
+        </div>
+        <div>
+          <label class="field-label" for="edit-project">Project</label>
+          <select id="edit-project" class="picker"></select>
+        </div>
+      </div>
+
+      <p class="field-label">Tags</p>
+      <details id="edit-tags" class="tag-picker"></details>
+
+      <div class="dialog-row">
+        <div>
+          <label class="field-label" for="edit-date">Date</label>
+          <input id="edit-date" type="date" class="picker" required>
+        </div>
+        <div>
+          <label class="field-label" for="edit-start">Start</label>
+          <input id="edit-start" type="time" class="picker" required>
+        </div>
+        <div>
+          <label class="field-label" for="edit-end">End</label>
+          <input id="edit-end" type="time" class="picker" required>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" id="edit-delete" class="secondary-button danger">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" id="edit-cancel" class="secondary-button">Cancel</button>
+        <button type="submit" class="start-button">SAVE</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="data.js"></script>
   <script src="app.js"></script>
+  <script src="projects.js"></script>
   <script src="welcome.js"></script>
   <script src="nav.js"></script>
   <script src="settings.js"></script>
