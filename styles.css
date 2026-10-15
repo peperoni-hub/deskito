@@ -2797,3 +2797,40 @@ body {
     padding: 12px;
   }
 }
+
+/* Tick-off circle in the mini calendar's day list */
+.mini-plan {
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  align-items: center;
+}
+
+.mini-plan.shared {
+  grid-template-columns: 1fr;
+}
+
+.mini-check {
+  grid-row: span 2;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--plan-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mini-check:hover {
+  background: color-mix(in srgb, var(--plan-color) 20%, transparent);
+}
+
+.mini-plan.done .mini-check {
+  background: var(--plan-color);
+}
+
+#plan-done[hidden] {
+  display: none;
+}

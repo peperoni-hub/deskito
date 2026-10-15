@@ -159,3 +159,11 @@ const EVENT_TEXTS = {
 for (const [code, texts] of Object.entries(EVENT_TEXTS)) {
   Object.assign(TRANSLATIONS[code].texts, texts);
 }
+
+// The same words with a tick in front, for the button in the plan window
+for (const texts of Object.values(EVENT_TEXTS)) {
+  texts["✓ Mark as done"] = `✓ ${texts["Mark as done"]}`;
+}
+for (const [code, texts] of Object.entries(EVENT_TEXTS)) {
+  TRANSLATIONS[code].texts["✓ Mark as done"] = texts["✓ Mark as done"];
+}

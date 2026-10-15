@@ -38,6 +38,7 @@ const planColorReset = document.getElementById("plan-color-reset");
 const planDeleteButton = document.getElementById("plan-delete");
 const planTimerButton = document.getElementById("plan-timer");
 const planCancelButton = document.getElementById("plan-cancel");
+const planDoneButton = document.getElementById("plan-done");
 
 let calView = "week";
 let calAnchor = Date.now();
@@ -346,6 +347,15 @@ function renderMini() {
     ...(plans.length
       ? plans.map((plan) =>
           el("li", { class: `mini-plan plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
+            !plan.shared && el("button", {
+              type: "button",
+              class: "mini-check",
+              title: plan.done ? t("Mark as not done") : t("Mark as done"),
+              onclick: (event) => {
+                event.stopPropagation();
+                setDone(plan, !plan.done);
+              },
+            }, plan.done ? "✓" : ""),
             el("span", { class: "mini-plan-time" }, `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`),
             el("span", { class: "mini-plan-title" }, (plan.shared ? `${plan.ownerName}: ` : "") + (plan.type === "other" && plan.otherLabel ? `${plan.title} · ${plan.otherLabel}` : plan.title))
           )
@@ -400,6 +410,8 @@ function openPlanDialog(plan) {
   planNotes.value = plan.notes || "";
   planDeleteButton.hidden = !plan.id;
   planTimerButton.hidden = !plan.id;
+  planDoneButton.hidden = !plan.id;
+  planDoneButton.textContent = plan.done ? t("Mark as not done") : t("✓ Mark as done");
   planDialog.showModal();
 }
 
@@ -512,4 +524,11 @@ planColorReset.addEventListener("click", () => {
 // Until you pick a colour yourself, the picker follows the type
 planType.addEventListener("change", () => {
   if (!planColorChosen) showPlanColor("");
+});
+
+// Tick a plan off straight from its window
+planDoneButton.addEventListener("click", () => {
+  const plan = store.plans.find((item) => item.id === editingPlanId);
+  planDialog.close();
+  if (plan) setDone(plan, !plan.done);
 });
