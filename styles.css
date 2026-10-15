@@ -2834,3 +2834,85 @@ body {
 #plan-done[hidden] {
   display: none;
 }
+
+/* Upcoming box on the home page */
+.upcoming {
+  margin-top: 26px;
+}
+
+.upcoming .week-header h2 {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.upcoming-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.upcoming-title {
+  flex: 1;
+  min-width: 160px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 8px;
+  outline: none;
+}
+
+.upcoming-empty {
+  padding: 4px 16px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.event-day-title {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.event-day.missed .event-day-title {
+  color: var(--stop-bg);
+}
+
+/* Finished events in "Your time": faded, with a tick */
+.entry.from-event .entry-main,
+.entry.from-event .entry-times,
+.entry.from-event .entry-duration {
+  opacity: 0.5;
+}
+
+.event-done-mark {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .upcoming-form {
+    padding: 12px;
+  }
+
+  .upcoming-title {
+    flex-basis: 100%;
+    font-size: 16px;
+  }
+
+  .upcoming-form .picker {
+    flex: 1 1 28%;
+  }
+}

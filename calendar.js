@@ -422,13 +422,14 @@ function plansChanged() {
   if (typeof renderEvents === "function") renderEvents();
 }
 
-planForm.addEventListener("submit", (event) => {
+planForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const { start, end } = timeRange(planDate.value, planStart.value, planEnd.value);
   if (end === start) {
     notify(t("The start and end time can't be the same."));
     return;
   }
+  if (!await timesLookRight(start, end)) return;
   const fields = {
     title: planTitle.value.trim(),
     type: planType.value,

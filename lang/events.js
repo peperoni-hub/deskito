@@ -167,3 +167,22 @@ for (const texts of Object.values(EVENT_TEXTS)) {
 for (const [code, texts] of Object.entries(EVENT_TEXTS)) {
   TRANSLATIONS[code].texts["✓ Mark as done"] = texts["✓ Mark as done"];
 }
+
+// Upcoming box on the home page
+const UPCOMING_TEXTS = {
+  bs: { "What's coming up?": "Šta te čeka?", "Done": "Urađeno", "Done! Added to your time.": "Gotovo! Dodano u tvoje vrijeme.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Ovo traje {time}. Je li to tačno? (12:00 PM je podne, 12:00 AM je ponoć.)", "Yes, save": "Da, spremi" },
+  hr: { "What's coming up?": "Što te čeka?", "Done": "Obavljeno", "Done! Added to your time.": "Gotovo! Dodano u tvoje vrijeme.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Ovo traje {time}. Je li to točno? (12:00 PM je podne, 12:00 AM je ponoć.)", "Yes, save": "Da, spremi" },
+  sr: { "What's coming up?": "Шта те чека?", "Done": "Урађено", "Done! Added to your time.": "Готово! Додато у твоје време.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Ово траје {time}. Да ли је то тачно? (12:00 PM је подне, 12:00 AM је поноћ.)", "Yes, save": "Да, сачувај" },
+  tr: { "What's coming up?": "Sırada ne var?", "Done": "Yapıldı", "Done! Added to your time.": "Tamam! Zamanına eklendi.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Bu {time} sürüyor. Doğru mu? (12:00 PM öğlen, 12:00 AM gece yarısıdır.)", "Yes, save": "Evet, kaydet" },
+  de: { "What's coming up?": "Was steht an?", "Done": "Erledigt", "Done! Added to your time.": "Erledigt! Zu deiner Zeit hinzugefügt.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Das dauert {time}. Stimmt das? (12:00 PM ist Mittag, 12:00 AM ist Mitternacht.)", "Yes, save": "Ja, speichern" },
+  fr: { "What's coming up?": "Qu'est-ce qui t'attend ?", "Done": "Fait", "Done! Added to your time.": "Fait ! Ajouté à ton temps.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Cela dure {time}. C'est bien ça ? (12:00 PM = midi, 12:00 AM = minuit.)", "Yes, save": "Oui, enregistrer" },
+  it: { "What's coming up?": "Cosa ti aspetta?", "Done": "Fatto", "Done! Added to your time.": "Fatto! Aggiunto al tuo tempo.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "Dura {time}. È giusto? (12:00 PM è mezzogiorno, 12:00 AM è mezzanotte.)", "Yes, save": "Sì, salva" },
+  zh: { "What's coming up?": "接下来有什么安排？", "Done": "已完成", "Done! Added to your time.": "完成！已添加到你的时间。", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "这将持续 {time}。确定吗？（12:00 PM 是中午，12:00 AM 是午夜。）", "Yes, save": "是，保存" },
+  ja: { "What's coming up?": "これからの予定は？", "Done": "完了", "Done! Added to your time.": "完了！あなたの時間に追加しました。", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "{time} になります。よろしいですか？（12:00 PM は正午、12:00 AM は深夜0時です。）", "Yes, save": "はい、保存" },
+  ko: { "What's coming up?": "다가오는 일정은?", "Done": "완료", "Done! Added to your time.": "완료! 내 시간에 추가했습니다.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "{time} 동안 이어집니다. 맞나요? (12:00 PM은 정오, 12:00 AM은 자정입니다.)", "Yes, save": "네, 저장" },
+  ar: { "What's coming up?": "ما القادم؟", "Done": "منجز", "Done! Added to your time.": "تم! أُضيف إلى وقتك.", "This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)": "يستمر هذا {time}. هل هذا صحيح؟ (12:00 PM هي الظهيرة و12:00 AM منتصف الليل.)", "Yes, save": "نعم، احفظ" },
+};
+
+for (const [code, texts] of Object.entries(UPCOMING_TEXTS)) {
+  Object.assign(TRANSLATIONS[code].texts, texts);
+}

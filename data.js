@@ -60,6 +60,7 @@ const store = {
     tagIds: entry.tagIds || [],
     type: entry.type || "task",
     planId: entry.planId || "",
+    fromEvent: Boolean(entry.fromEvent),
     updatedAt: entry.updatedAt || 0,
     start: entry.start,
     end: entry.end,

@@ -31,7 +31,6 @@
   <div class="layout">
     <nav class="sidebar">
       <a href="#" class="nav-item active" data-view="tracker">Time Tracker</a>
-      <a href="#" class="nav-item" data-view="events">Upcoming</a>
       <a href="#" class="nav-item" data-view="calendar">Calendar</a>
       <a href="#" class="nav-item" data-view="reports">Reports</a>
       <a href="#" class="nav-item" data-view="projects">Projects</a>
@@ -93,6 +92,21 @@
           </div>
         </section>
 
+        <section class="upcoming">
+          <div class="week-header">
+            <h2>Upcoming</h2>
+          </div>
+          <form id="upcoming-form" class="upcoming-form">
+            <input id="upcoming-title" class="upcoming-title" type="text" placeholder="What's coming up?" required>
+            <input id="upcoming-date" type="date" class="picker" title="Date" required>
+            <input id="upcoming-start" type="time" class="picker" title="From" required>
+            <span>–</span>
+            <input id="upcoming-end" type="time" class="picker" title="To" required>
+            <button type="submit" class="start-button">ADD</button>
+          </form>
+          <div id="upcoming-list"></div>
+        </section>
+
         <section class="entries">
           <div class="week-header">
             <h2>Your time</h2>
@@ -128,23 +142,6 @@
             </div>
           </div>
         </aside>
-      </div>
-
-      <div class="view" data-view="events" hidden>
-        <div class="cal-toolbar">
-          <h2 class="page-title cal-title">Upcoming</h2>
-          <span class="spacer"></span>
-          <button id="events-add" class="start-button">+ ADD EVENT</button>
-        </div>
-        <section class="events-section">
-          <h3 class="report-card-title">Upcoming events</h3>
-          <div id="upcoming-list"></div>
-        </section>
-        <section class="events-section">
-          <h3 class="report-card-title">Timeline</h3>
-          <p class="cal-hint">Events you've finished.</p>
-          <div id="timeline-list"></div>
-        </section>
       </div>
 
       <div class="view" data-view="calendar" hidden>

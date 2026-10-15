@@ -144,7 +144,7 @@ for (const button of modeButtons) {
   button.addEventListener("click", () => setMode(button.dataset.mode));
 }
 
-manualAddButton.addEventListener("click", () => {
+manualAddButton.addEventListener("click", async () => {
   if (!manualDate.value || !manualStart.value || !manualEnd.value) {
     notify(t("Please fill in the date, start time and end time."));
     return;
@@ -154,6 +154,7 @@ manualAddButton.addEventListener("click", () => {
     notify(t("The start and end time can't be the same."));
     return;
   }
+  if (!await timesLookRight(start, end)) return;
   addEntry({ ...currentFields(), start, end });
   manualStart.value = "";
   manualEnd.value = "";
@@ -216,9 +217,11 @@ function entryMeta(entry) {
 }
 
 function entryRow(entry) {
-  return el("li", { class: `entry${entry.type === "break" ? " is-break" : ""}` },
+  // Finished events from "Upcoming" are shown faded, with a tick
+  return el("li", { class: `entry${entry.type === "break" ? " is-break" : ""}${entry.fromEvent ? " from-event" : ""}` },
     el("span", { class: "entry-main" },
       el("span", { class: `entry-description${entry.description ? "" : " no-description"}` },
+        entry.fromEvent && el("span", { class: "event-done-mark", title: t("Done") }, "✓ "),
         entry.description || t("(no description)")
       ),
       entryMeta(entry)
@@ -281,13 +284,14 @@ function openEditor(entry) {
   entryDialog.showModal();
 }
 
-entryForm.addEventListener("submit", (event) => {
+entryForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const { start, end } = timeRange(editDate.value, editStart.value, editEnd.value);
   if (end === start) {
     notify(t("The start and end time can't be the same."));
     return;
   }
+  if (!await timesLookRight(start, end)) return;
   const entry = store.entries.find((item) => item.id === editingId);
   Object.assign(entry, {
     description: editDescription.value.trim(),

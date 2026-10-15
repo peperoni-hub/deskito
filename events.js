@@ -1,43 +1,34 @@
-// Upcoming page: calendar plans as a to-do list. Tick one off and it moves to the timeline,
-// faded and crossed out. (Events are plans, so they also show in the calendar.)
+// "Upcoming" on the home page: add an event with its time; it waits there until you tick it
+// off. Then it becomes a finished entry in "Your time", with that time record.
+// (Upcoming events are calendar plans, so they also show in the calendar.)
 
 const upcomingList = document.getElementById("upcoming-list");
-const timelineList = document.getElementById("timeline-list");
-const eventsAdd = document.getElementById("events-add");
+const upcomingForm = document.getElementById("upcoming-form");
+const upcomingTitle = document.getElementById("upcoming-title");
+const upcomingDate = document.getElementById("upcoming-date");
+const upcomingStart = document.getElementById("upcoming-start");
+const upcomingEnd = document.getElementById("upcoming-end");
 
 function eventTime(plan) {
   return `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`;
 }
 
-function eventRow(plan) {
-  const project = findProject(plan.projectId);
-  return el("li", { class: `event-row plan-${plan.type}${plan.done ? " done" : ""}`, style: planColorStyle(plan) },
+function eventRow(plan, showDay) {
+  return el("li", { class: `event-row plan-${plan.type}`, style: planColorStyle(plan) },
     el("button", {
       type: "button",
       class: "event-check",
-      title: plan.done ? t("Mark as not done") : t("Mark as done"),
-      "aria-pressed": String(Boolean(plan.done)),
-      onclick: () => setDone(plan, !plan.done),
-    }, plan.done ? "✓" : ""),
+      title: t("Mark as done"),
+      onclick: () => setDone(plan, true),
+    }),
     el("span", { class: "event-main", onclick: () => openPlanDialog(plan) },
       el("span", { class: "event-title" }, plan.title),
       el("span", { class: "event-meta" },
-        el("span", {}, plan.done && plan.doneAt
-          ? `${dayLabel(dayKey(plan.start))} · ${eventTime(plan)} · ${t("Done {time}", { time: formatTimeOfDay(plan.doneAt) })}`
-          : plan.end < dayStart(dayKey(Date.now()))
-            ? `${dayLabel(dayKey(plan.start))} · ${eventTime(plan)}`
-            : eventTime(plan)),
-        plan.type === "other" && plan.otherLabel && el("span", { class: "tag-chip" }, plan.otherLabel),
-        project && el("span", { class: "project-chip" }, el("span", { class: "dot", style: `background:${project.color}` }), project.name)
+        el("span", {}, showDay ? `${dayLabel(dayKey(plan.start))} · ${eventTime(plan)}` : eventTime(plan)),
+        plan.type === "other" && plan.otherLabel && el("span", { class: "tag-chip" }, plan.otherLabel)
       )
-    )
-  );
-}
-
-function dayGroup(title, plans, extraClass = "") {
-  return el("div", { class: `event-day ${extraClass}` },
-    el("div", { class: "day-header" }, el("span", {}, title)),
-    el("ul", { class: "event-list" }, plans.map(eventRow))
+    ),
+    el("span", { class: "entry-duration" }, formatDuration(plan.end - plan.start))
   );
 }
 
@@ -55,37 +46,81 @@ function renderEvents() {
   }
 
   upcomingList.replaceChildren(
-    ...(missed.length ? [dayGroup(t("Not done yet"), missed, "missed")] : []),
-    ...[...days].map(([key, plans]) => dayGroup(dayLabel(key), plans)),
-    ...(open.length ? [] : [el("p", { class: "empty" }, t("Nothing coming up. Add an event to plan ahead."))])
-  );
-
-  const done = store.plans.filter((plan) => plan.done).sort((a, b) => (b.doneAt || b.start) - (a.doneAt || a.start));
-  timelineList.replaceChildren(
-    done.length
-      ? el("ul", { class: "event-list timeline" }, done.map(eventRow))
-      : el("p", { class: "empty" }, t("No finished events yet. Tick off an event and it moves here."))
+    ...(missed.length ? [eventDay(t("Not done yet"), missed, true, "missed")] : []),
+    ...[...days].map(([key, plans]) => eventDay(dayLabel(key), plans, false)),
+    ...(open.length ? [] : [el("p", { class: "upcoming-empty" }, t("Nothing coming up. Add an event to plan ahead."))])
   );
 }
 
+function eventDay(title, plans, showDay, extraClass = "") {
+  return el("div", { class: `event-day ${extraClass}` },
+    el("div", { class: "event-day-title" }, title),
+    el("ul", { class: "event-list" }, plans.map((plan) => eventRow(plan, showDay)))
+  );
+}
+
+// Done: the event becomes a finished entry in "Your time"; not done: it comes back here
 function setDone(plan, done) {
-  plan.done = done;
   if (done) {
+    const entry = {
+      id: uid(),
+      description: plan.title,
+      type: plan.type === "meeting" ? "meeting" : "task",
+      projectId: plan.projectId || "",
+      taskId: plan.taskId || "",
+      tagIds: [],
+      start: plan.start,
+      end: plan.end,
+      planId: plan.id,
+      fromEvent: true,
+    };
+    store.entries.push(entry);
+    saveEntries();
+    renderEntries();
+    plan.done = true;
     plan.doneAt = Date.now();
+    plan.entryId = entry.id;
   } else {
+    if (plan.entryId) {
+      store.entries = store.entries.filter((entry) => entry.id !== plan.entryId);
+      saveEntries();
+      renderEntries();
+    }
+    plan.done = false;
     delete plan.doneAt;
+    delete plan.entryId;
   }
   plansChanged();
   if (done) {
-    showToast(t("Done! Moved to your timeline."), [{ label: t("Undo"), primary: true, run: () => setDone(plan, false) }]);
+    showToast(t("Done! Added to your time."), [{ label: t("Undo"), primary: true, run: () => setDone(plan, false) }]);
   }
 }
 
-eventsAdd.addEventListener("click", () => {
-  const start = new Date();
-  start.setMinutes(start.getMinutes() < 30 ? 30 : 60, 0, 0);
-  openPlanDialog({ start: start.getTime(), end: start.getTime() + 3600000 });
+// Long times across midnight are usually a 12:00 PM / 12:00 AM mix-up: ask first
+async function timesLookRight(start, end) {
+  if (end - start <= 12 * 3600000 || dayKey(start) === dayKey(end)) return true;
+  return askConfirm(
+    t("This lasts {time}. Is that right? (12:00 PM is noon, 12:00 AM is midnight.)", { time: formatHours(end - start) }),
+    t("Yes, save")
+  );
+}
+
+upcomingForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const { start, end } = timeRange(upcomingDate.value, upcomingStart.value, upcomingEnd.value);
+  if (end === start) {
+    notify(t("The start and end time can't be the same."));
+    return;
+  }
+  if (!await timesLookRight(start, end)) return;
+  const title = upcomingTitle.value.trim();
+  store.plans.push({ id: uid(), title, type: moodFromText(title) === "meeting" ? "meeting" : "task", projectId: "", taskId: "", start, end, notes: "", otherLabel: "", color: "" });
+  plansChanged();
+  upcomingTitle.value = "";
+  upcomingStart.value = "";
+  upcomingEnd.value = "";
+  upcomingTitle.focus();
 });
 
-document.querySelector('.nav-item[data-view="events"]').addEventListener("click", renderEvents);
+upcomingDate.value = dayKey(Date.now());
 renderEvents();
