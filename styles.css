@@ -2684,3 +2684,116 @@ body {
   margin-top: 10px;
   font-size: 12px;
 }
+
+/* Upcoming page: events to tick off, and the timeline of finished ones */
+.events-section {
+  margin-top: 22px;
+}
+
+.events-section .report-card-title {
+  margin-bottom: 6px;
+}
+
+.event-day {
+  margin-bottom: 14px;
+}
+
+.event-day.missed .day-header {
+  color: var(--stop-bg);
+}
+
+.event-list {
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--plan-color);
+}
+
+.event-row:last-child {
+  border-bottom: none;
+}
+
+.event-check {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--plan-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--surface);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.event-check:hover {
+  background: color-mix(in srgb, var(--plan-color) 20%, transparent);
+}
+
+.event-row.done .event-check {
+  background: var(--plan-color);
+}
+
+.event-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.event-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Finished events: faded and crossed out, here and in the calendar */
+.event-row.done .event-main {
+  opacity: 0.5;
+}
+
+.event-row.done .event-title,
+.plan-block.done .plan-title,
+.month-chip.done,
+.mini-plan.done .mini-plan-title {
+  text-decoration: line-through;
+}
+
+.plan-block.done,
+.month-chip.done,
+.mini-plan.done {
+  opacity: 0.5;
+}
+
+[dir="rtl"] .event-row {
+  border-left: none;
+  border-right: 4px solid var(--plan-color);
+}
+
+@media (max-width: 760px) {
+  .nav-item[data-view="events"]::before { content: "✅"; }
+
+  .event-row {
+    padding: 12px;
+  }
+}

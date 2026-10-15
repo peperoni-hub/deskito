@@ -31,6 +31,7 @@
   <div class="layout">
     <nav class="sidebar">
       <a href="#" class="nav-item active" data-view="tracker">Time Tracker</a>
+      <a href="#" class="nav-item" data-view="events">Upcoming</a>
       <a href="#" class="nav-item" data-view="calendar">Calendar</a>
       <a href="#" class="nav-item" data-view="reports">Reports</a>
       <a href="#" class="nav-item" data-view="projects">Projects</a>
@@ -127,6 +128,23 @@
             </div>
           </div>
         </aside>
+      </div>
+
+      <div class="view" data-view="events" hidden>
+        <div class="cal-toolbar">
+          <h2 class="page-title cal-title">Upcoming</h2>
+          <span class="spacer"></span>
+          <button id="events-add" class="start-button">+ ADD EVENT</button>
+        </div>
+        <section class="events-section">
+          <h3 class="report-card-title">Upcoming events</h3>
+          <div id="upcoming-list"></div>
+        </section>
+        <section class="events-section">
+          <h3 class="report-card-title">Timeline</h3>
+          <p class="cal-hint">Events you've finished.</p>
+          <div id="timeline-list"></div>
+        </section>
       </div>
 
       <div class="view" data-view="calendar" hidden>
@@ -568,6 +586,7 @@
   <script src="lang/accounts.js"></script>
   <script src="lang/sharing.js"></script>
   <script src="lang/privacy.js"></script>
+  <script src="lang/events.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
@@ -580,6 +599,7 @@
   <script src="settings.js"></script>
   <script src="pomodoro.js"></script>
   <script src="calendar.js"></script>
+  <script src="events.js"></script>
   <script src="reports.js"></script>
   <script src="icons.js"></script>
   <!-- Supabase's official code (version 2.49.4), kept in the project so it works offline -->

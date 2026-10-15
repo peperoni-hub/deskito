@@ -242,6 +242,7 @@ function showRemoteChanges(changed) {
     refreshPickers();
     renderCalendar();
     renderMini();
+    renderEvents();
   }
 
   if (changed.has("prefs")) {

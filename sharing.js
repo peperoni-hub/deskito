@@ -95,7 +95,7 @@ async function publishSharedCalendars() {
   if (!account || !cloud || !myKeyPair || !navigator.onLine) return;
   const mine = shares.filter((share) => share.owner_id === account.id && share.status === "accepted" && share.viewer_public_key);
   const name = readLocal("profile")?.name || account.email;
-  const plans = store.plans.map(({ id, title, type, otherLabel, start, end, notes, color }) => ({ id, title, type, otherLabel, start, end, notes, color }));
+  const plans = store.plans.map(({ id, title, type, otherLabel, start, end, notes, color, done }) => ({ id, title, type, otherLabel, start, end, notes, color, done }));
   const payload = JSON.stringify({ name, plans });
 
   for (const share of mine) {

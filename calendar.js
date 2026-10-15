@@ -136,7 +136,7 @@ function planBlock(plan, lane, lanes, key) {
   const height = Math.max(20, topFor(plan.end, key) - top);
   const project = plan.shared ? null : findProject(plan.projectId);
   return el("div", {
-    class: `plan-block plan-${plan.type}${plan.shared ? " shared" : ""}`,
+    class: `plan-block plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`,
     style: `top:${top}px;height:${height}px;left:calc(${(lane * 100) / lanes}% + 8px);width:calc(${100 / lanes}% - 10px);${planColorStyle(plan)}`,
     title: plan.notes || "",
     onclick: () => openPlan(plan),
@@ -252,7 +252,7 @@ function renderMonth() {
     },
       el("span", { class: "month-date" }, new Date(day).getDate()),
       plans.slice(0, 3).map((plan) =>
-        el("button", { class: `month-chip plan-${plan.type}${plan.shared ? " shared" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
+        el("button", { class: `month-chip plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
           `${formatTimeOfDay(plan.start)} ${plan.title}`
         )
       ),
@@ -345,7 +345,7 @@ function renderMini() {
   miniDayList.replaceChildren(
     ...(plans.length
       ? plans.map((plan) =>
-          el("li", { class: `mini-plan plan-${plan.type}${plan.shared ? " shared" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
+          el("li", { class: `mini-plan plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
             el("span", { class: "mini-plan-time" }, `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`),
             el("span", { class: "mini-plan-title" }, (plan.shared ? `${plan.ownerName}: ` : "") + (plan.type === "other" && plan.otherLabel ? `${plan.title} · ${plan.otherLabel}` : plan.title))
           )
@@ -407,6 +407,7 @@ function plansChanged() {
   savePlans();
   renderCalendar();
   renderMini();
+  if (typeof renderEvents === "function") renderEvents();
 }
 
 planForm.addEventListener("submit", (event) => {
