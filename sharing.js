@@ -53,33 +53,66 @@ async function refreshSharing(force = false) {
   renderShares();
   announceRequests();
   await loadSharedCalendars();
+  await publishSharedCalendars();
 }
 
+// Each shared calendar is a separate locked copy (row "share:<id>") that only the two
+// people involved can open: their key pairs make the same lock on both sides
 async function loadSharedCalendars() {
-  const accepted = shares.filter((share) => share.viewer_id === account.id && share.status === "accepted");
+  const accepted = shares.filter((share) => share.viewer_id === account.id && share.status === "accepted" && share.owner_public_key);
   sharedCalendars = [];
-  if (accepted.length > 0) {
+  if (accepted.length > 0 && myKeyPair) {
     const { data, error } = await cloud
       .from("deskito_data")
       .select("user_id, key, value")
-      .in("user_id", accepted.map((share) => share.owner_id))
-      .in("key", ["plans", "profile"]);
+      .in("key", accepted.map((share) => `share:${share.id}`));
     if (error) {
       console.warn("Deskito sharing:", error);
       return;
     }
-    sharedCalendars = accepted.map((share) => {
-      const rows = data.filter((row) => row.user_id === share.owner_id);
-      return {
-        ownerId: share.owner_id,
-        name: rows.find((row) => row.key === "profile")?.value?.name || share.owner_email,
-        plans: rows.find((row) => row.key === "plans")?.value || [],
-      };
-    });
+    for (const share of accepted) {
+      const row = data.find((item) => item.key === `share:${share.id}`);
+      let calendar = { name: share.owner_email, plans: [] };
+      if (row?.value?.locked) {
+        try {
+          calendar = await unlockJson(await sharedLock(myKeyPair.privateKey, share.owner_public_key), row.value.locked);
+        } catch (problem) {
+          console.warn("Deskito sharing: can't open a shared calendar", problem);
+        }
+      }
+      sharedCalendars.push({ ownerId: share.owner_id, name: calendar.name || share.owner_email, plans: calendar.plans || [] });
+    }
   }
   calSharedRow.hidden = sharedCalendars.length === 0;
   renderCalendar();
   renderMini();
+}
+
+// Put an up-to-date locked copy of your plans out for each person you share with
+const lastPublished = {};
+
+async function publishSharedCalendars() {
+  if (!account || !cloud || !myKeyPair || !navigator.onLine) return;
+  const mine = shares.filter((share) => share.owner_id === account.id && share.status === "accepted" && share.viewer_public_key);
+  const name = readLocal("profile")?.name || account.email;
+  const plans = store.plans.map(({ id, title, type, otherLabel, start, end, notes, color }) => ({ id, title, type, otherLabel, start, end, notes, color }));
+  const payload = JSON.stringify({ name, plans });
+
+  for (const share of mine) {
+    if (lastPublished[share.id] === payload) continue;
+    const lock = await sharedLock(myKeyPair.privateKey, share.viewer_public_key);
+    const { error } = await cloud.from("deskito_data").upsert(
+      { user_id: account.id, key: `share:${share.id}`, value: { locked: await lockJson(lock, { name, plans }) }, updated_at: new Date().toISOString() },
+      { onConflict: "user_id,key" }
+    );
+    if (!error) lastPublished[share.id] = payload;
+  }
+
+  // Remove copies for people you no longer share with
+  const { data } = await cloud.from("deskito_data").select("key").eq("user_id", account.id).like("key", "share:%");
+  const keep = new Set(mine.map((share) => `share:${share.id}`));
+  const stale = (data || []).map((row) => row.key).filter((key) => !keep.has(key));
+  if (stale.length) await cloud.from("deskito_data").delete().eq("user_id", account.id).in("key", stale);
 }
 
 /* The Sharing section in Settings */
@@ -131,7 +164,11 @@ shareForm.addEventListener("submit", async (event) => {
     notify(t("You can't share with yourself."));
     return;
   }
-  const { error } = await cloud.from("deskito_shares").insert({ owner_email: account.email, viewer_email: email });
+  if (!myKeyPair) {
+    notify(t("Locked – unlock your data to sync it"));
+    return;
+  }
+  const { error } = await cloud.from("deskito_shares").insert({ owner_email: account.email, viewer_email: email, owner_public_key: myKeyPair.publicKeyText });
   if (error) {
     notify(error.code === "23505" ? t("You already sent a request to this person.") : t("Something went wrong: {message}", { message: error.message }));
     return;
@@ -142,7 +179,11 @@ shareForm.addEventListener("submit", async (event) => {
 });
 
 async function acceptShare(share) {
-  const { error } = await cloud.from("deskito_shares").update({ status: "accepted", viewer_id: account.id }).eq("id", share.id);
+  if (!myKeyPair) {
+    notify(t("Locked – unlock your data to sync it"));
+    return;
+  }
+  const { error } = await cloud.from("deskito_shares").update({ status: "accepted", viewer_id: account.id, viewer_public_key: myKeyPair.publicKeyText }).eq("id", share.id);
   if (error) {
     notify(t("Something went wrong: {message}", { message: error.message }));
     return;
@@ -160,6 +201,7 @@ async function removeShare(share, ask = false) {
 
 async function stopSharing(share) {
   if (!await askConfirm(t("Stop sharing your calendar with {email}?", { email: share.viewer_email }), t("Stop sharing"))) return;
+  await cloud.from("deskito_data").delete().eq("user_id", account.id).eq("key", `share:${share.id}`);
   await cloud.from("deskito_shares").delete().eq("id", share.id);
   refreshSharing(true);
 }
@@ -189,7 +231,10 @@ function announceRequests() {
 
 /* Keep it fresh */
 
-document.addEventListener("synced", () => refreshSharing());
+document.addEventListener("synced", async () => {
+  await refreshSharing();
+  publishSharedCalendars();
+});
 document.querySelector('.nav-item[data-view="calendar"]').addEventListener("click", () => refreshSharing());
 document.querySelector('.nav-item[data-view="settings"]').addEventListener("click", () => refreshSharing(true));
 showSharingSection();

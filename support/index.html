@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Deskito Support Tool</title>
+  <style>
+    :root { --bg: #f3f1ea; --surface: #fff; --text: #2f3527; --muted: #6b705e; --accent: #4b5a32; --border: #dcdccd; --bad: #a14e3b; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #1a1d16; --surface: #23271e; --text: #e9ead9; --muted: #a0a58e; --accent: #b7c49a; --border: #363b2d; --bad: #e08a72; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px 64px; background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, Arial, sans-serif; line-height: 1.5; }
+    main { max-width: 980px; margin: 0 auto; }
+    h1 { color: var(--accent); margin: 0 0 6px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 16px 0; }
+    label { display: block; font-weight: 700; margin: 12px 0 6px; }
+    textarea { width: 100%; min-height: 110px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-family: Consolas, monospace; font-size: 12px; }
+    button { padding: 9px 18px; border: none; border-radius: 6px; background: var(--accent); color: var(--surface); font: inherit; font-weight: 700; cursor: pointer; margin-top: 12px; }
+    .hint { color: var(--muted); font-size: 14px; }
+    .error { color: var(--bad); font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); }
+    .stats { display: flex; flex-wrap: wrap; gap: 18px; }
+    .stats div { min-width: 120px; }
+    .stats strong { display: block; font-size: 22px; }
+    [hidden] { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Deskito support tool</h1>
+  <p class="hint">Opens a copy of a user's data that they chose to give to support. Only works with the private support key file. Nothing you load here leaves this page.</p>
+
+  <div class="card">
+    <label for="key-file">1. Your private support key file</label>
+    <input id="key-file" type="file" accept=".json,application/json">
+    <p class="hint">"Deskito support private key.json" from your Documents folder.</p>
+
+    <label for="copy">2. The support copy</label>
+    <textarea id="copy" placeholder='In Supabase: Table Editor → deskito_data → the row where key is "support" → click its value → copy everything, and paste it here.'></textarea>
+
+    <button type="button" id="open">Open the copy</button>
+    <p id="message" class="error" hidden></p>
+  </div>
+
+  <div id="result" hidden>
+    <div class="card">
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="card">
+      <h2>Time entries</h2>
+      <table id="entries"></table>
+    </div>
+    <div class="card">
+      <h2>Calendar plans</h2>
+      <table id="plans"></table>
+    </div>
+    <div class="card">
+      <h2>Projects</h2>
+      <table id="projects"></table>
+    </div>
+    <div class="card">
+      <button type="button" id="download">Download everything as a file</button>
+      <p class="hint">Delete downloaded copies once you've helped the user.</p>
+    </div>
+  </div>
+</main>
+
+<script src="../crypto.js"></script>
+<script>
+  const message = document.getElementById("message");
+  let opened = null;
+
+  function fail(text) {
+    message.textContent = text;
+    message.hidden = false;
+  }
+
+  function cell(text) {
+    const td = document.createElement("td");
+    td.textContent = text ?? "";
+    return td;
+  }
+
+  function fillTable(table, headers, rows) {
+    table.replaceChildren();
+    const head = document.createElement("tr");
+    for (const name of headers) {
+      const th = document.createElement("th");
+      th.textContent = name;
+      head.append(th);
+    }
+    table.append(head);
+    for (const values of rows) {
+      const tr = document.createElement("tr");
+      for (const value of values) tr.append(cell(value));
+      table.append(tr);
+    }
+    if (rows.length === 0) {
+      const tr = document.createElement("tr");
+      tr.append(cell("(none)"));
+      table.append(tr);
+    }
+  }
+
+  const when = (time) => (time ? new Date(time).toLocaleString() : "");
+  const hours = (ms) => (ms / 3600000).toFixed(2) + " h";
+
+  document.getElementById("open").addEventListener("click", async () => {
+    message.hidden = true;
+    try {
+      const file = document.getElementById("key-file").files[0];
+      if (!file) return fail("Choose your private support key file first.");
+      const keyFile = JSON.parse(await file.text());
+      let copy = JSON.parse(document.getElementById("copy").value.trim());
+      if (copy.value) copy = copy.value; // a whole row was pasted
+      if (!copy.locked || !copy.from) return fail("That doesn't look like a support copy.");
+
+      const privateKey = await privateKeyFromBytes(fromBase64(keyFile.privateKey));
+      opened = await unlockJson(await sharedLock(privateKey, copy.from), copy.locked);
+    } catch (problem) {
+      return fail("Couldn't open it. Check that you chose the right key file and pasted the whole value. (" + problem.message + ")");
+    }
+
+    const data = opened.data || {};
+    const entries = data.entries || [];
+    const plans = data.plans || [];
+    const projects = data.projects || [];
+    const projectName = (id) => projects.find((p) => p.id === id)?.name || "";
+
+    document.getElementById("stats").innerHTML = "";
+    for (const [label, value] of [
+      ["Account", opened.email],
+      ["Copy made", when(opened.madeAt)],
+      ["Entries", entries.length],
+      ["Plans", plans.length],
+      ["Projects", projects.length],
+      ["Language", opened.language],
+    ]) {
+      const div = document.createElement("div");
+      div.textContent = label;
+      const strong = document.createElement("strong");
+      strong.textContent = value;
+      div.prepend(strong);
+      document.getElementById("stats").append(div);
+    }
+
+    fillTable(document.getElementById("entries"), ["Start", "End", "Duration", "Description", "Type", "Project"],
+      [...entries].sort((a, b) => b.start - a.start).map((e) => [when(e.start), when(e.end), hours(e.end - e.start), e.description, e.type, projectName(e.projectId)]));
+    fillTable(document.getElementById("plans"), ["From", "To", "Title", "Type", "Notes"],
+      [...plans].sort((a, b) => b.start - a.start).map((p) => [when(p.start), when(p.end), p.title, p.otherLabel || p.type, p.notes]));
+    fillTable(document.getElementById("projects"), ["Name", "Budget", "Private", "Archived", "Tasks"],
+      projects.map((p) => [p.name, p.budgetHours ? p.budgetHours + " h" : "", p.private ? "yes" : "", p.archived ? "yes" : "", (p.tasks || []).map((t) => t.name).join(", ")]));
+    document.getElementById("result").hidden = false;
+  });
+
+  document.getElementById("download").addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(opened, null, 2)], { type: "application/json" }));
+    const link = Object.assign(document.createElement("a"), { href: url, download: "deskito-support-copy.json" });
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>

@@ -280,6 +280,21 @@
           </div>
         </div>
 
+        <h2 class="page-title section-title">Help from Deskito support</h2>
+        <div class="panel settings-list">
+          <p class="setting-row">Your synced data is locked on your device, so nobody else can read it – not even Deskito. If you need help, you can give support a copy of your data. You can take it back at any time.</p>
+          <p id="support-signed-out" class="setting-row">Log in first to use this.</p>
+          <div id="support-signed-in" hidden>
+            <p id="support-status" class="account-email"></p>
+            <div class="project-actions">
+              <button type="button" id="support-give" class="secondary-button small">Give support access</button>
+              <button type="button" id="support-update" class="secondary-button small" hidden>Update the copy</button>
+              <button type="button" id="support-take-back" class="secondary-button small danger" hidden>Take back access</button>
+            </div>
+          </div>
+          <p class="setting-row"><a class="privacy-link" href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
+        </div>
+
         <h2 class="page-title section-title">Backup</h2>
         <div class="panel settings-list">
           <p class="setting-row">Your data lives only in this browser. Download a backup now and then, and use it to move your data to another computer or browser.</p>
@@ -349,6 +364,7 @@
 
       <button type="submit" class="start-button">GET STARTED</button>
       <button type="button" id="welcome-login" class="link-button welcome-login">Already have an account? Log in</button>
+      <a class="privacy-link welcome-privacy" href="privacy.html" target="_blank" rel="noopener">Privacy policy</a>
     </form>
   </div>
 
@@ -373,6 +389,39 @@
         <span class="spacer"></span>
         <button type="button" id="auth-cancel" class="secondary-button">Cancel</button>
         <button type="submit" id="auth-submit" class="start-button">LOG IN</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="vault-dialog" class="dialog auth-dialog">
+    <form id="vault-form">
+      <h2 id="vault-title" class="page-title">Unlock your data</h2>
+      <p id="vault-text" class="setting-row"></p>
+      <div id="vault-recovery-row" hidden>
+        <label class="field-label" for="vault-recovery">Recovery key</label>
+        <input id="vault-recovery" class="text-input recovery-input" type="text" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX">
+      </div>
+      <div id="vault-password-row">
+        <label class="field-label" for="vault-password">Password</label>
+        <input id="vault-password" class="text-input" type="password" autocomplete="current-password">
+      </div>
+      <div id="vault-show-row" hidden>
+        <p id="vault-show-key" class="recovery-key"></p>
+        <div class="project-actions">
+          <button type="button" id="vault-copy" class="secondary-button small">Copy</button>
+          <button type="button" id="vault-download" class="secondary-button small">⬇ Download as a file</button>
+        </div>
+        <label class="checkbox-row saved-check"><input type="checkbox" id="vault-saved"> I've saved my recovery key</label>
+      </div>
+      <p id="vault-message" class="auth-message error" hidden></p>
+      <div class="auth-links">
+        <button type="button" id="vault-link-a" class="link-button" hidden></button>
+        <button type="button" id="vault-link-b" class="link-button" hidden></button>
+      </div>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="button" id="vault-cancel" class="secondary-button">Cancel</button>
+        <button type="submit" id="vault-submit" class="start-button">UNLOCK</button>
       </div>
     </form>
   </dialog>
@@ -518,6 +567,7 @@
   <script src="lang/ar.js"></script>
   <script src="lang/accounts.js"></script>
   <script src="lang/sharing.js"></script>
+  <script src="lang/privacy.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
@@ -534,8 +584,11 @@
   <script src="icons.js"></script>
   <!-- Supabase's official code (version 2.49.4), kept in the project so it works offline -->
   <script src="vendor/supabase.js"></script>
+  <script src="crypto.js"></script>
+  <script src="vault.js"></script>
   <script src="sync.js"></script>
   <script src="sharing.js"></script>
+  <script src="support.js"></script>
   <script>
     // Works offline once installed (only on the website, not when opened as a file)
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

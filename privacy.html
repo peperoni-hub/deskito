@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deskito Privacy Policy</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <style>
+    :root {
+      --bg: #f3f1ea;
+      --surface: #fff;
+      --text: #2f3527;
+      --muted: #6b705e;
+      --accent: #4b5a32;
+      --border: #dcdccd;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1d16;
+        --surface: #23271e;
+        --text: #e9ead9;
+        --muted: #a0a58e;
+        --accent: #b7c49a;
+        --border: #363b2d;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 16px 64px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 32px 28px;
+    }
+    h1 { margin: 0 0 4px; color: var(--accent); font-size: 28px; }
+    h2 { margin: 32px 0 8px; color: var(--accent); font-size: 19px; }
+    .updated { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
+    .switch { display: flex; gap: 8px; margin-bottom: 24px; }
+    .switch button {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .switch button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+    .summary {
+      background: var(--bg);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 12px 18px;
+    }
+    ul { padding-left: 22px; }
+    li { margin: 4px 0; }
+    a { color: var(--accent); }
+    [hidden] { display: none; }
+    @media (max-width: 600px) { main { padding: 22px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="switch">
+    <button type="button" data-show="en" aria-pressed="true">English</button>
+    <button type="button" data-show="bs" aria-pressed="false">Bosanski</button>
+  </div>
+
+  <!-- English -->
+  <article data-lang="en">
+    <h1>Privacy policy</h1>
+    <p class="updated">Last updated: 15 October 2026</p>
+
+    <div class="summary">
+      <strong>The short version</strong>
+      <ul>
+        <li>You can use Deskito without an account: then your data never leaves your device.</li>
+        <li>With an account, your entries, plans, projects and settings are <strong>locked on your device before they're synced</strong>. We can't read them.</li>
+        <li>We can see your email address, when you signed up and last logged in, and technical details like your IP address in short-lived server logs.</li>
+        <li>Support can only see your data if you give them a copy, and you can take it back any time.</li>
+        <li>No ads, no tracking, no selling of data.</li>
+      </ul>
+    </div>
+
+    <h2>Who runs Deskito</h2>
+    <p>Deskito is run by <strong>[your full name]</strong> as a private project. Contact: <strong>[your contact email]</strong>.</p>
+
+    <h2>Using Deskito without an account</h2>
+    <p>Everything you enter is saved only in your own browser, on your own device. Nothing is sent to us. If you clear your browser data, it's gone, so use <em>Settings → Backup</em> now and then.</p>
+
+    <h2>What we store when you have an account</h2>
+    <ul>
+      <li><strong>Your account:</strong> your email address, your password (stored scrambled, so nobody can read it, not even us), and when you signed up and last logged in.</li>
+      <li><strong>Your Deskito data:</strong> time entries, calendar plans, projects, tags, your name, your theme choice and your settings. These are <strong>locked (end-to-end encrypted) on your device</strong> with a key that only you have. We only ever receive unreadable text.</li>
+      <li><strong>What we can still see:</strong> that you have an account, roughly how much data you store, and when your devices last synced.</li>
+      <li><strong>Server logs:</strong> logins, failed logins and syncs, with time, IP address and browser type. They're kept for a short time for security and fixing problems.</li>
+    </ul>
+
+    <h2>Your lock, password and recovery key</h2>
+    <p>Your data key is unlocked with your password. When you create it, you get a <strong>recovery key</strong>. If you forget your password, the recovery key is the only way to unlock your data again. <strong>We cannot reset or recover it for you</strong>, because we never have your key.</p>
+
+    <h2>Sharing your calendar</h2>
+    <p>If you share your calendar with someone, we store your email, their email and whether they accepted. Your plans are given to them as a separate locked copy that only the two of you can open. They can see your plans and name, but can't change anything. You can stop sharing at any time.</p>
+
+    <h2>Help from support</h2>
+    <p>If you need help, you can choose <em>Settings → Help from Deskito support → Give support access</em>. This makes a copy of your data that only Deskito support can open. We only look at it to help you, and you can take it back at any time (<em>Take back access</em>), which deletes the copy.</p>
+
+    <h2>Services we use</h2>
+    <ul>
+      <li><strong>Supabase</strong> stores accounts and the locked data, on servers in the European Union.</li>
+      <li><strong>GitHub Pages</strong> delivers the Deskito app to your browser. Like any website host, it sees your IP address when you open the app.</li>
+      <li><strong>Google Fonts</strong> delivers the fonts Deskito uses. Google receives your IP address when the fonts are loaded.</li>
+    </ul>
+    <p>We don't use analytics, advertising or tracking cookies. Deskito saves your data and settings in your browser's own storage so the app works, also offline.</p>
+
+    <h2>Your rights</h2>
+    <ul>
+      <li><strong>Get a copy:</strong> <em>Settings → Backup → Download backup</em> gives you all your data at any time.</li>
+      <li><strong>Delete data:</strong> <em>Settings → Backup</em> lets you delete all entries or plans.</li>
+      <li><strong>Delete your account:</strong> write to the contact email above and we'll delete your account and everything stored with it.</li>
+      <li>You can also ask us what we store about you, ask for corrections, and complain to your data protection authority.</li>
+    </ul>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, we'll update the date at the top and mention important changes in the app.</p>
+  </article>
+
+  <!-- Bosanski -->
+  <article data-lang="bs" hidden>
+    <h1>Politika privatnosti</h1>
+    <p class="updated">Posljednja izmjena: 15. oktobar 2026.</p>
+
+    <div class="summary">
+      <strong>Ukratko</strong>
+      <ul>
+        <li>Deskito možeš koristiti bez računa: tada tvoji podaci nikad ne napuštaju tvoj uređaj.</li>
+        <li>S računom se tvoji unosi, planovi, projekti i postavke <strong>zaključavaju na tvom uređaju prije sinhronizacije</strong>. Mi ih ne možemo pročitati.</li>
+        <li>Vidimo tvoju e-mail adresu, kada si se registrovao/la i zadnji put prijavio/la, te tehničke podatke poput IP adrese u kratkotrajnim serverskim zapisima.</li>
+        <li>Podrška vidi tvoje podatke samo ako im ti daš kopiju, a možeš je povući bilo kada.</li>
+        <li>Bez reklama, bez praćenja, bez prodaje podataka.</li>
+      </ul>
+    </div>
+
+    <h2>Ko vodi Deskito</h2>
+    <p>Deskito vodi <strong>[tvoje puno ime]</strong> kao privatni projekat. Kontakt: <strong>[tvoj kontakt e-mail]</strong>.</p>
+
+    <h2>Korištenje bez računa</h2>
+    <p>Sve što uneseš sprema se samo u tvom pregledniku, na tvom uređaju. Ništa se ne šalje nama. Ako obrišeš podatke preglednika, nestaju, zato povremeno koristi <em>Postavke → Sigurnosna kopija</em>.</p>
+
+    <h2>Šta spremamo kada imaš račun</h2>
+    <ul>
+      <li><strong>Tvoj račun:</strong> e-mail adresa, lozinka (spremljena šifrovano, tako da je niko ne može pročitati, ni mi), te kada si se registrovao/la i zadnji put prijavio/la.</li>
+      <li><strong>Tvoji Deskito podaci:</strong> unosi vremena, planovi, projekti, oznake, tvoje ime, odabrana tema i postavke. Oni se <strong>zaključavaju (end-to-end šifrovanje) na tvom uređaju</strong> ključem koji imaš samo ti. Mi dobijamo samo nečitljiv tekst.</li>
+      <li><strong>Šta i dalje vidimo:</strong> da imaš račun, otprilike koliko podataka spremaš i kada su se tvoji uređaji zadnji put sinhronizovali.</li>
+      <li><strong>Serverski zapisi:</strong> prijave, neuspjele prijave i sinhronizacije, s vremenom, IP adresom i vrstom preglednika. Čuvaju se kratko, radi sigurnosti i rješavanja problema.</li>
+    </ul>
+
+    <h2>Tvoja brava, lozinka i ključ za oporavak</h2>
+    <p>Tvoj ključ za podatke otključava se tvojom lozinkom. Kad ga napraviš, dobiješ <strong>ključ za oporavak</strong>. Ako zaboraviš lozinku, ključ za oporavak je jedini način da ponovo otključaš podatke. <strong>Mi ga ne možemo resetovati niti vratiti</strong>, jer nikada nemamo tvoj ključ.</p>
+
+    <h2>Dijeljenje kalendara</h2>
+    <p>Ako podijeliš kalendar s nekim, spremamo tvoj e-mail, njegov/njen e-mail i da li je prihvatio/la. Tvoji planovi mu se daju kao posebna zaključana kopija koju možete otvoriti samo vas dvoje. Vidi tvoje planove i ime, ali ne može ništa mijenjati. Dijeljenje možeš prekinuti bilo kada.</p>
+
+    <h2>Pomoć podrške</h2>
+    <p>Ako trebaš pomoć, možeš odabrati <em>Postavke → Pomoć Deskito podrške → Daj pristup podršci</em>. Tako nastaje kopija tvojih podataka koju može otvoriti samo Deskito podrška. Gledamo je samo da ti pomognemo, a možeš je povući bilo kada (<em>Povuci pristup</em>), čime se kopija briše.</p>
+
+    <h2>Usluge koje koristimo</h2>
+    <ul>
+      <li><strong>Supabase</strong> čuva račune i zaključane podatke, na serverima u Evropskoj uniji.</li>
+      <li><strong>GitHub Pages</strong> dostavlja aplikaciju Deskito tvom pregledniku. Kao i svaki hosting, vidi tvoju IP adresu kad otvoriš aplikaciju.</li>
+      <li><strong>Google Fonts</strong> dostavlja fontove koje Deskito koristi. Google dobija tvoju IP adresu kada se fontovi učitaju.</li>
+    </ul>
+    <p>Ne koristimo analitiku, reklame niti kolačiće za praćenje. Deskito sprema tvoje podatke i postavke u pohranu tvog preglednika kako bi aplikacija radila, i bez interneta.</p>
+
+    <h2>Tvoja prava</h2>
+    <ul>
+      <li><strong>Kopija podataka:</strong> <em>Postavke → Sigurnosna kopija → Preuzmi sigurnosnu kopiju</em> daje ti sve podatke bilo kada.</li>
+      <li><strong>Brisanje podataka:</strong> u <em>Postavke → Sigurnosna kopija</em> možeš obrisati sve unose ili planove.</li>
+      <li><strong>Brisanje računa:</strong> piši na kontakt e-mail iznad i obrisat ćemo tvoj račun i sve što je uz njega spremljeno.</li>
+      <li>Možeš nas pitati i šta o tebi spremamo, tražiti ispravke i podnijeti žalbu nadležnoj agenciji za zaštitu podataka.</li>
+    </ul>
+
+    <h2>Izmjene</h2>
+    <p>Ako se ova politika promijeni, ažurirat ćemo datum na vrhu i važne izmjene najaviti u aplikaciji.</p>
+  </article>
+</main>
+<script>
+  const buttons = document.querySelectorAll("[data-show]");
+  function show(code) {
+    for (const article of document.querySelectorAll("article")) article.hidden = article.dataset.lang !== code;
+    for (const button of buttons) button.setAttribute("aria-pressed", String(button.dataset.show === code));
+    document.documentElement.lang = code;
+  }
+  for (const button of buttons) button.addEventListener("click", () => show(button.dataset.show));
+  // Bosnian, Croatian and Serbian speakers start with the Bosnian version
+  let language = "";
+  try { language = localStorage.getItem("language") || ""; } catch {}
+  if (["bs", "hr", "sr"].includes(language || (navigator.language || "").slice(0, 2))) show("bs");
+</script>
+</body>
+</html>

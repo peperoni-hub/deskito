@@ -2,7 +2,7 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v5";
+const CACHE = "deskito-v6";
 const FILES = [
   "./",
   "index.html",
@@ -22,6 +22,7 @@ const FILES = [
   "lang/ar.js",
   "lang/accounts.js",
   "lang/sharing.js",
+  "lang/privacy.js",
   "data.js",
   "app.js",
   "projects.js",
@@ -32,8 +33,12 @@ const FILES = [
   "calendar.js",
   "reports.js",
   "icons.js",
+  "crypto.js",
+  "vault.js",
   "sync.js",
   "sharing.js",
+  "support.js",
+  "privacy.html",
   "vendor/supabase.js",
   "icon.svg",
   "manifest.webmanifest",

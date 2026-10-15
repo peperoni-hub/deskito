@@ -19,6 +19,7 @@ let syncRunning = null;
 let syncAgain = false;
 let pushTimer = null;
 let applyingRemote = false;
+let recoveringPassword = false;
 
 /* Reading and writing this browser's copy */
 
@@ -95,8 +96,21 @@ async function pull() {
   if (error) throw error;
 
   const meta = syncMeta();
-  const remote = Object.fromEntries(data.map((row) => [row.key, row]));
   const changed = new Set();
+
+  // Unlock what came from the server. Anything stored before locking existed is
+  // read as it is, and locked on the next upload.
+  const remote = {};
+  const notLockedYet = [];
+  for (const row of data) {
+    if (!SYNC_KEYS.includes(row.key)) continue;
+    if (typeof row.value?.locked === "string") {
+      remote[row.key] = { ...row, value: await unlockJson(dataKey, row.value.locked) };
+    } else {
+      remote[row.key] = row;
+      notLockedYet.push(row.key);
+    }
+  }
 
   // Deleted items: everything deleted on any device stays deleted
   const localDeleted = readLocal("deleted") || {};
@@ -140,6 +154,7 @@ async function pull() {
     delete meta.dirty[key];
   }
 
+  for (const key of notLockedYet) meta.dirty[key] = true;
   saveSyncMeta(meta);
   showRemoteChanges(changed);
 }
@@ -150,7 +165,13 @@ async function push() {
   if (keys.length === 0) return;
 
   const now = new Date().toISOString();
-  const rows = keys.map((key) => ({ user_id: account.id, key, value: readLocal(key), updated_at: now }));
+  // Everything is locked on this device before it leaves
+  const rows = await Promise.all(keys.map(async (key) => ({
+    user_id: account.id,
+    key,
+    value: { locked: await lockJson(dataKey, readLocal(key)) },
+    updated_at: now,
+  })));
   const { error } = await cloud.from("deskito_data").upsert(rows, { onConflict: "user_id,key" });
   if (error) throw error;
 
@@ -166,6 +187,11 @@ async function syncNow() {
   if (!account || !cloud) return;
   if (!navigator.onLine) {
     setSyncStatus("offline");
+    return;
+  }
+  // Nothing is sent or read until this device has the unlocked key
+  if (!dataKey) {
+    setSyncStatus("locked");
     return;
   }
   if (syncRunning) {
@@ -289,7 +315,32 @@ async function useAccount(user) {
   account = { id: user.id, email: user.email };
   originalSetItem.call(localStorage, SIGNED_IN_BEFORE, "1");
   showAccount();
-  await syncNow();
+  if (recoveringPassword) {
+    setSyncStatus("locked");
+    return;
+  }
+  try {
+    if (await ensureUnlocked()) {
+      await syncNow();
+    } else {
+      setSyncStatus("locked");
+    }
+  } catch (problem) {
+    console.warn("Deskito vault:", problem);
+    setSyncStatus(navigator.onLine ? "error" : "offline");
+  }
+}
+
+// After starting over with a new lock: send everything on this device again
+function markEverythingForUpload() {
+  const meta = syncMeta();
+  for (const key of SYNC_KEYS) {
+    if (localStorage.getItem(key) != null) {
+      meta.dirty[key] = true;
+      meta.changedAt[key] = Date.now();
+    }
+  }
+  saveSyncMeta(meta);
 }
 
 function clearSyncedData() {
@@ -297,6 +348,7 @@ function clearSyncedData() {
   for (const key of SYNC_KEYS) localStorage.removeItem(key);
   originalRemoveItem.call(localStorage, "syncMeta");
   applyingRemote = false;
+  forgetDevice();
 }
 
 async function logOut() {
@@ -322,8 +374,9 @@ const STATUS_TEXT = {
   synced: "Synced",
   offline: "Offline – changes will sync when you're back online",
   error: "Sync problem – we'll keep trying",
+  locked: "Locked – unlock your data to sync it",
 };
-const STATUS_ICON = { off: "", syncing: "⟳", synced: "☁", offline: "⚠", error: "⚠" };
+const STATUS_ICON = { off: "", syncing: "⟳", synced: "☁", offline: "⚠", error: "⚠", locked: "🔒" };
 
 function setSyncStatus(status) {
   syncStatus = status;
@@ -340,7 +393,12 @@ function showAccount() {
   setSyncStatus(account ? syncStatus : "off");
 }
 
-document.getElementById("account-sync").addEventListener("click", syncNow);
+document.getElementById("account-sync").addEventListener("click", async () => {
+  if (!dataKey && account) {
+    await ensureUnlocked();
+  }
+  syncNow();
+});
 document.getElementById("account-logout").addEventListener("click", logOut);
 document.getElementById("account-signup").addEventListener("click", () => openAuth("signup"));
 document.getElementById("account-login").addEventListener("click", () => openAuth("login"));
@@ -412,6 +470,7 @@ authForm.addEventListener("submit", async (event) => {
   const password = authPassword.value;
   try {
     if (authMode === "login") {
+      pendingPassword = password; // used once to unlock your data
       const { error } = await cloud.auth.signInWithPassword({ email, password });
       if (error) throw error;
       authDialog.close();
@@ -434,6 +493,14 @@ authForm.addEventListener("submit", async (event) => {
       if (error) throw error;
       authDialog.close();
       notify(t("Your password has been changed."));
+      // Lock your data key with the new password too (or ask for the recovery key)
+      recoveringPassword = false;
+      if (dataKey) {
+        await relockWithPassword(password);
+      } else if (account) {
+        pendingPassword = password;
+        if (await ensureUnlocked()) syncNow();
+      }
     }
   } catch (problem) {
     const wrongLogin = /invalid login credentials/i.test(problem.message || "");
@@ -448,6 +515,8 @@ authForm.addEventListener("submit", async (event) => {
 if (cloud) {
   cloud.auth.onAuthStateChange((event, session) => {
     if (event === "PASSWORD_RECOVERY") {
+      // Choose the new password first; the lock is sorted out right after
+      recoveringPassword = true;
       setTimeout(() => openAuth("newPassword"), 0);
     }
     if (session?.user && (!account || account.id !== session.user.id)) {
