@@ -94,8 +94,9 @@ function startTimer(planId = "") {
   showRunningState();
 }
 
-function stopTimer() {
-  addEntry({ ...currentFields(), planId: running.planId || "", start: running.start, end: Date.now() });
+// end: when it stopped (earlier than now if the computer was off)
+function stopTimer(end = Date.now()) {
+  addEntry({ ...currentFields(), planId: running.planId || "", start: running.start, end: Math.max(end, running.start) });
   resetTimer();
 }
 

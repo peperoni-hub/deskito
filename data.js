@@ -84,6 +84,8 @@ const prefs = {
   workStart: "09:00",
   workEnd: "17:00",
   longTimerHours: 8,
+  stopWhenAway: true,
+  awayStopMin: 10,
   ...readStore("prefs", {}),
 };
 

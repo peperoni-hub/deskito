@@ -385,6 +385,12 @@
             Warn me if a timer runs longer than
             <input class="picker tiny" type="number" min="1" max="24" data-pref="longTimerHours"> hours
           </label>
+          <label class="checkbox-row"><input type="checkbox" data-pref="stopWhenAway"> Stop the timer when my computer turns off or goes to sleep</label>
+          <label class="setting-row">
+            When it was away for more than
+            <input class="picker tiny" type="number" min="2" max="240" data-pref="awayStopMin"> minutes
+          </label>
+          <p class="hint left">It stops at the moment the computer went away. Not on phones and tablets, since they pause apps all the time.</p>
           <div class="notify-test-row">
             <button type="button" id="allow-notifications" class="secondary-button small">Allow desktop notifications</button>
             <button type="button" id="test-notification" class="secondary-button small">Send a test in 10 seconds</button>
@@ -671,6 +677,7 @@
   <script src="calendar.js"></script>
   <script src="events.js"></script>
   <script src="reminders.js"></script>
+  <script src="away.js"></script>
   <script src="reports.js"></script>
   <script src="icons.js"></script>
   <!-- Supabase's official code (version 2.49.4), kept in the project so it works offline -->

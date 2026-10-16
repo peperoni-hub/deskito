@@ -161,3 +161,33 @@ for (const language of Object.values(TRANSLATIONS)) {
   const both = language.texts["{hours}h {minutes}m"];
   if (both && !language.texts["{hours}h"]) language.texts["{hours}h"] = both.split("{minutes}")[0].trim();
 }
+
+// Stopping the timer when the computer was off (away.js)
+const AWAY_KEYS = [
+  "Stop the timer when my computer turns off or goes to sleep",
+  "When it was away for more than",
+  "minutes",
+  "It stops at the moment the computer went away. Not on phones and tablets, since they pause apps all the time.",
+  "Your computer was off or asleep, so the timer stopped at {time}.",
+  "Keep counting",
+];
+
+const AWAY_TEXTS = {
+  bs: ["Zaustavi tajmer kad se računar ugasi ili ode u stanje mirovanja", "Kad je bio odsutan duže od", "minuta", "Zaustavlja se u trenutku kad je računar otišao. Ne na telefonima i tabletima, jer oni stalno pauziraju aplikacije.", "Računar je bio ugašen ili u mirovanju, pa je tajmer zaustavljen u {time}.", "Nastavi brojati"],
+  hr: ["Zaustavi mjerač kad se računalo ugasi ili ode u stanje mirovanja", "Kad je bilo odsutno dulje od", "minuta", "Zaustavlja se u trenutku kad je računalo otišlo. Ne na mobitelima i tabletima, jer oni stalno pauziraju aplikacije.", "Računalo je bilo ugašeno ili u mirovanju, pa je mjerač zaustavljen u {time}.", "Nastavi brojati"],
+  sr: ["Заустави тајмер кад се рачунар угаси или оде у стање мировања", "Кад је био одсутан дуже од", "минута", "Зауставља се у тренутку кад је рачунар отишао. Не на телефонима и таблетима, јер они стално паузирају апликације.", "Рачунар је био угашен или у мировању, па је тајмер заустављен у {time}.", "Настави бројати"],
+  tr: ["Bilgisayarım kapanınca veya uyku moduna geçince zamanlayıcıyı durdur", "Şu süreden uzun süre uzakta kaldıysa:", "dakika", "Bilgisayarın uzaklaştığı anda durur. Telefon ve tabletlerde değil, çünkü onlar uygulamaları sürekli duraklatır.", "Bilgisayarın kapalıydı veya uykudaydı, bu yüzden zamanlayıcı {time} saatinde durdu.", "Saymaya devam et"],
+  de: ["Timer stoppen, wenn mein Computer ausgeht oder in den Ruhezustand wechselt", "Wenn er länger weg war als", "Minuten", "Er stoppt in dem Moment, in dem der Computer weg war. Nicht auf Handys und Tablets, weil die Apps ständig pausieren.", "Dein Computer war aus oder im Ruhezustand, deshalb wurde der Timer um {time} gestoppt.", "Weiterzählen"],
+  fr: ["Arrêter le chronomètre quand mon ordinateur s'éteint ou se met en veille", "S'il a été absent plus de", "minutes", "Il s'arrête au moment où l'ordinateur s'est absenté. Pas sur les téléphones et tablettes, qui mettent sans cesse les apps en pause.", "Ton ordinateur était éteint ou en veille, le chronomètre s'est donc arrêté à {time}.", "Continuer à compter"],
+  it: ["Ferma il timer quando il computer si spegne o va in sospensione", "Se è rimasto assente per più di", "minuti", "Si ferma nel momento in cui il computer si è assentato. Non su telefoni e tablet, che mettono continuamente in pausa le app.", "Il computer era spento o in sospensione, quindi il timer si è fermato alle {time}.", "Continua a contare"],
+  zh: ["电脑关机或进入睡眠时停止计时", "离开超过", "分钟", "计时会停在电脑离开的那一刻。手机和平板不适用，因为它们经常暂停应用。", "你的电脑已关机或处于睡眠状态，所以计时在 {time} 停止了。", "继续计时"],
+  ja: ["パソコンの電源が切れたりスリープしたりしたらタイマーを止める", "離れていた時間がこれ以上なら：", "分", "パソコンが離れた時点で止まります。スマホやタブレットはアプリを頻繁に一時停止するため対象外です。", "パソコンが電源オフかスリープだったため、タイマーは {time} に止まりました。", "カウントを続ける"],
+  ko: ["컴퓨터가 꺼지거나 절전 모드가 되면 타이머 멈추기", "다음 시간보다 오래 떨어져 있었을 때:", "분", "컴퓨터가 떠난 순간에 멈춥니다. 휴대폰과 태블릿은 앱을 자주 일시 중지하므로 제외됩니다.", "컴퓨터가 꺼져 있었거나 절전 모드여서 타이머가 {time}에 멈췄습니다.", "계속 세기"],
+  ar: ["أوقف المؤقت عندما يُطفأ حاسوبي أو يدخل في وضع السكون", "إذا غاب أكثر من", "دقيقة", "يتوقف في اللحظة التي غاب فيها الحاسوب. لا ينطبق على الهواتف والأجهزة اللوحية لأنها توقف التطبيقات مؤقتًا باستمرار.", "كان حاسوبك مطفأً أو في وضع السكون، لذلك توقف المؤقت عند {time}.", "تابع العدّ"],
+};
+
+for (const [code, values] of Object.entries(AWAY_TEXTS)) {
+  AWAY_KEYS.forEach((key, i) => {
+    if (!(key in TRANSLATIONS[code].texts)) TRANSLATIONS[code].texts[key] = values[i];
+  });
+}
