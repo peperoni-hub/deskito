@@ -191,3 +191,35 @@ for (const [code, values] of Object.entries(AWAY_TEXTS)) {
     if (!(key in TRANSLATIONS[code].texts)) TRANSLATIONS[code].texts[key] = values[i];
   });
 }
+
+// Settings cards (two by two)
+const SETTINGS_KEYS = [
+  "Notifications",
+  "Look and language",
+  "Contact",
+  "Questions, ideas or something not working? Write to Zehra Sinanovic:",
+  "What Deskito stores, what stays locked, and your rights.",
+  "Read the privacy policy",
+];
+
+const SETTINGS_TEXTS = {
+  bs: ["Obavještenja", "Izgled i jezik", "Kontakt", "Pitanja, ideje ili nešto ne radi? Piši Zehri Sinanović:", "Šta Deskito sprema, šta ostaje zaključano i koja su tvoja prava.", "Pročitaj politiku privatnosti"],
+  hr: ["Obavijesti", "Izgled i jezik", "Kontakt", "Pitanja, ideje ili nešto ne radi? Piši Zehri Sinanović:", "Što Deskito sprema, što ostaje zaključano i koja su tvoja prava.", "Pročitaj pravila privatnosti"],
+  sr: ["Обавештења", "Изглед и језик", "Контакт", "Питања, идеје или нешто не ради? Пиши Зехри Синановић:", "Шта Deskito чува, шта остаје закључано и која су твоја права.", "Прочитај политику приватности"],
+  tr: ["Bildirimler", "Görünüm ve dil", "İletişim", "Soruların, fikirlerin mi var ya da bir şey çalışmıyor mu? Zehra Sinanovic'e yaz:", "Deskito neleri saklar, neler kilitli kalır ve hakların nelerdir.", "Gizlilik politikasını oku"],
+  de: ["Benachrichtigungen", "Aussehen und Sprache", "Kontakt", "Fragen, Ideen oder funktioniert etwas nicht? Schreib an Zehra Sinanovic:", "Was Deskito speichert, was verschlüsselt bleibt und welche Rechte du hast.", "Datenschutzerklärung lesen"],
+  fr: ["Notifications", "Apparence et langue", "Contact", "Des questions, des idées ou quelque chose ne marche pas ? Écris à Zehra Sinanovic :", "Ce que Deskito enregistre, ce qui reste verrouillé et tes droits.", "Lire la politique de confidentialité"],
+  it: ["Notifiche", "Aspetto e lingua", "Contatti", "Domande, idee o qualcosa non funziona? Scrivi a Zehra Sinanovic:", "Cosa salva Deskito, cosa resta bloccato e quali sono i tuoi diritti.", "Leggi l'informativa sulla privacy"],
+  zh: ["通知", "外观和语言", "联系", "有问题、想法，或者有什么不正常？写信给 Zehra Sinanovic：", "Deskito 保存什么、哪些保持加密，以及你的权利。", "阅读隐私政策"],
+  ja: ["通知", "見た目と言語", "お問い合わせ", "質問やアイデア、うまく動かないことがあれば Zehra Sinanovic までご連絡ください：", "Deskito が保存するもの、ロックされたままのもの、あなたの権利。", "プライバシーポリシーを読む"],
+  ko: ["알림", "모양 및 언어", "연락처", "질문이나 아이디어가 있거나 작동하지 않는 것이 있나요? Zehra Sinanovic에게 연락하세요:", "Deskito가 저장하는 것, 잠긴 채로 남는 것, 그리고 당신의 권리.", "개인정보 처리방침 읽기"],
+  ar: ["الإشعارات", "المظهر واللغة", "التواصل", "لديك أسئلة أو أفكار أو هناك شيء لا يعمل؟ راسل زهرة سينانوفيتش:", "ما يحفظه Deskito، وما يبقى مقفلًا، وحقوقك.", "اقرأ سياسة الخصوصية"],
+};
+
+for (const [code, values] of Object.entries(SETTINGS_TEXTS)) {
+  SETTINGS_KEYS.forEach((key, i) => {
+    TRANSLATIONS[code].texts[key] = values[i];
+  });
+  // The email address stays the same in every language
+  TRANSLATIONS[code].texts["zehrasinanovic24@gmail.com"] = "zehrasinanovic24@gmail.com";
+}

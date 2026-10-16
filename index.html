@@ -262,146 +262,186 @@
 
       <div class="view" data-view="settings" hidden>
         <h2 class="page-title">Settings</h2>
-        <div class="panel">
-          <label class="field-label" for="settings-language">Language</label>
-          <select id="settings-language" class="picker language-select"></select>
-          <label class="field-label" for="settings-name">Your name</label>
-          <input id="settings-name" class="text-input" type="text">
-
-          <p class="field-label">Theme</p>
-          <div class="theme-options">
-            <button type="button" class="theme-option" data-theme-choice="feminine">
-              <span class="swatches"><i style="background:#fdf6f4"></i><i style="background:#d77a93"></i><i style="background:#a14e67"></i></span>
-              Feminine
-            </button>
-            <button type="button" class="theme-option" data-theme-choice="old-money">
-              <span class="swatches"><i style="background:#14213a"></i><i style="background:#b89b5e"></i><i style="background:#6e1f2b"></i></span>
-              Old money
-            </button>
-            <button type="button" class="theme-option" data-theme-choice="neutral">
-              <span class="swatches"><i style="background:#f3f1ea"></i><i style="background:#6b7d47"></i><i style="background:#4b5a32"></i></span>
-              Neutral
-            </button>
-          </div>
-
-          <p class="field-label">Appearance</p>
-          <div class="appearance-options">
-            <button type="button" class="pomo-preset appearance-option" data-appearance="light">☀ Light</button>
-            <button type="button" class="pomo-preset appearance-option" data-appearance="dark">🌙 Dark</button>
-            <button type="button" class="pomo-preset appearance-option" data-appearance="system">💻 Same as my device</button>
-          </div>
-          <p id="device-mode" class="hint left"></p>
-
-          <p class="field-label">Welcome screen</p>
-          <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
-        </div>
-
-        <h2 class="page-title section-title">Account</h2>
-        <div class="panel settings-list">
-          <div id="account-signed-out">
-            <p class="setting-row">Create a free account to keep your data safe and use Deskito on all your devices.</p>
-            <div class="project-actions">
-              <button type="button" id="account-signup" class="start-button small">CREATE ACCOUNT</button>
-              <button type="button" id="account-login" class="secondary-button small">Log in</button>
+        <div class="settings-grid">
+          <section class="settings-card">
+            <h2 class="page-title section-title">Account</h2>
+            <div class="panel settings-list">
+              <div id="account-signed-out">
+                <p class="setting-row">Create a free account to keep your data safe and use Deskito on all your devices.</p>
+                <div class="project-actions">
+                  <button type="button" id="account-signup" class="start-button small">CREATE ACCOUNT</button>
+                  <button type="button" id="account-login" class="secondary-button small">Log in</button>
+                </div>
+              </div>
+              <div id="account-signed-in" hidden>
+                <p id="account-email" class="account-email"></p>
+                <p id="account-status" class="setting-row"></p>
+                <div class="project-actions">
+                  <button type="button" id="account-sync" class="secondary-button small">Sync now</button>
+                  <button type="button" id="account-logout" class="secondary-button small">Log out</button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div id="account-signed-in" hidden>
-            <p id="account-email" class="account-email"></p>
-            <p id="account-status" class="setting-row"></p>
-            <div class="project-actions">
-              <button type="button" id="account-sync" class="secondary-button small">Sync now</button>
-              <button type="button" id="account-logout" class="secondary-button small">Log out</button>
+          </section>
+
+          <section class="settings-card">
+            <h2 class="page-title section-title">Sharing</h2>
+            <div class="panel settings-list">
+              <p id="sharing-signed-out" class="setting-row">Log in to share your calendar with someone.</p>
+              <div id="sharing-signed-in" hidden>
+                <p class="setting-row">Share your calendar with someone you choose. They can see your plans, but can't change them.</p>
+                <form id="share-form" class="inline-row share-form">
+                  <input id="share-email" class="text-input" type="email" placeholder="Their email" required>
+                  <button type="submit" class="start-button small">SEND REQUEST</button>
+                </form>
+                <div id="share-lists" class="share-lists"></div>
+              </div>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <h2 class="page-title section-title">Sharing</h2>
-        <div class="panel settings-list">
-          <p id="sharing-signed-out" class="setting-row">Log in to share your calendar with someone.</p>
-          <div id="sharing-signed-in" hidden>
-            <p class="setting-row">Share your calendar with someone you choose. They can see your plans, but can't change them.</p>
-            <form id="share-form" class="inline-row share-form">
-              <input id="share-email" class="text-input" type="email" placeholder="Their email" required>
-              <button type="submit" class="start-button small">SEND REQUEST</button>
-            </form>
-            <div id="share-lists" class="share-lists"></div>
-          </div>
-        </div>
-
-        <h2 class="page-title section-title">Help from Deskito support</h2>
-        <div class="panel settings-list">
-          <p class="setting-row">Your synced data is locked on your device, so nobody else can read it – not even Deskito. If you need help, you can give support a copy of your data. You can take it back at any time.</p>
-          <p id="support-signed-out" class="setting-row">Log in first to use this.</p>
-          <div id="support-signed-in" hidden>
-            <p id="support-status" class="account-email"></p>
-            <div class="project-actions">
-              <button type="button" id="support-give" class="secondary-button small">Give support access</button>
-              <button type="button" id="support-update" class="secondary-button small" hidden>Update the copy</button>
-              <button type="button" id="support-take-back" class="secondary-button small danger" hidden>Take back access</button>
+          <section class="settings-card">
+            <h2 class="page-title section-title">Notifications</h2>
+            <div class="panel settings-list">
+              <div class="notify-test-row">
+                <button type="button" id="allow-notifications" class="secondary-button small">Allow desktop notifications</button>
+                <button type="button" id="test-notification" class="secondary-button small">Send a test in 10 seconds</button>
+              </div>
+              <p class="hint left">Press the test, then switch to another app (like Discord). If nothing pops up:</p>
+              <ul class="notify-tips">
+                <li>Windows: Settings → System → Notifications → turn on your browser, and turn off Do not disturb.</li>
+                <li>Windows may hide pop-ups while a game or full-screen app is open (Settings → System → Notifications → Turn on do not disturb automatically).</li>
+                <li>Edge puts background tabs to sleep: install Deskito as an app, or add it under Settings → System and performance → Never put these sites to sleep.</li>
+                <li>Signed in? Then alarms and reminders also arrive when Deskito is closed. Not signed in, Deskito has to stay open (minimised is fine).</li>
+              </ul>
             </div>
-          </div>
-          <p class="setting-row"><a class="privacy-link" href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
-        </div>
+          </section>
 
-        <h2 class="page-title section-title">Backup</h2>
-        <div class="panel settings-list">
-          <p class="setting-row">Your data lives only in this browser. Download a backup now and then, and use it to move your data to another computer or browser.</p>
-          <div class="project-actions">
-            <button type="button" id="backup-download" class="secondary-button small">⬇ Download backup</button>
-            <label class="secondary-button small file-button">
-              ⬆ Restore from backup
-              <input id="backup-restore" type="file" accept=".json,application/json" hidden>
-            </label>
-          </div>
-          <p class="setting-row">Start fresh (download a backup first if you might want it back):</p>
-          <div class="project-actions">
-            <button type="button" id="clear-entries" class="secondary-button small danger">Delete all time entries</button>
-            <button type="button" id="clear-plans" class="secondary-button small danger">Delete all calendar plans</button>
-          </div>
-        </div>
+          <section class="settings-card">
+            <h2 class="page-title section-title">Reminders</h2>
+            <div class="panel settings-list">
+              <label class="checkbox-row"><input type="checkbox" data-pref="remindTrack"> Remind me when I'm not tracking</label>
+              <label class="setting-row">
+                Every
+                <input class="picker tiny" type="number" min="5" max="240" data-pref="remindEveryMin"> <span>minutes,</span>
+                <span>on weekdays between</span>
+                <input class="picker" type="time" data-pref="workStart"> and
+                <input class="picker" type="time" data-pref="workEnd">
+              </label>
+              <label class="setting-row">
+                Warn me if a timer runs longer than
+                <input class="picker tiny" type="number" min="1" max="24" data-pref="longTimerHours"> hours
+              </label>
+              <label class="checkbox-row"><input type="checkbox" data-pref="stopWhenAway"> Stop the timer when my computer turns off or goes to sleep</label>
+              <label class="setting-row">
+                When it was away for more than
+                <input class="picker tiny" type="number" min="2" max="240" data-pref="awayStopMin"> minutes
+              </label>
+              <p class="hint left">It stops at the moment the computer went away. Not on phones and tablets, since they pause apps all the time.</p>
+            </div>
+          </section>
 
-        <h2 class="page-title section-title">Breaks</h2>
-        <div class="panel settings-list">
-          <label class="checkbox-row"><input type="checkbox" data-pref="breakAlarm"> Remind me to take a break automatically</label>
-          <label class="setting-row">
-            After working for
-            <input class="picker tiny" type="number" min="5" max="480" data-pref="breakAfterMin"> <span>minutes,</span>
-            <span>take a</span>
-            <input class="picker tiny" type="number" min="1" max="120" data-pref="breakLengthMin"> minute break
-          </label>
-        </div>
+          <section class="settings-card">
+            <h2 class="page-title section-title">Look and language</h2>
+            <div class="panel">
+              <label class="field-label" for="settings-language">Language</label>
+              <select id="settings-language" class="picker language-select"></select>
+              <label class="field-label" for="settings-name">Your name</label>
+              <input id="settings-name" class="text-input" type="text">
 
-        <h2 class="page-title section-title">Reminders</h2>
-        <div class="panel settings-list">
-          <label class="checkbox-row"><input type="checkbox" data-pref="remindTrack"> Remind me when I'm not tracking</label>
-          <label class="setting-row">
-            Every
-            <input class="picker tiny" type="number" min="5" max="240" data-pref="remindEveryMin"> <span>minutes,</span>
-            <span>on weekdays between</span>
-            <input class="picker" type="time" data-pref="workStart"> and
-            <input class="picker" type="time" data-pref="workEnd">
-          </label>
-          <label class="setting-row">
-            Warn me if a timer runs longer than
-            <input class="picker tiny" type="number" min="1" max="24" data-pref="longTimerHours"> hours
-          </label>
-          <label class="checkbox-row"><input type="checkbox" data-pref="stopWhenAway"> Stop the timer when my computer turns off or goes to sleep</label>
-          <label class="setting-row">
-            When it was away for more than
-            <input class="picker tiny" type="number" min="2" max="240" data-pref="awayStopMin"> minutes
-          </label>
-          <p class="hint left">It stops at the moment the computer went away. Not on phones and tablets, since they pause apps all the time.</p>
-          <div class="notify-test-row">
-            <button type="button" id="allow-notifications" class="secondary-button small">Allow desktop notifications</button>
-            <button type="button" id="test-notification" class="secondary-button small">Send a test in 10 seconds</button>
+              <p class="field-label">Theme</p>
+              <div class="theme-options">
+                <button type="button" class="theme-option" data-theme-choice="feminine">
+                  <span class="swatches"><i style="background:#fdf6f4"></i><i style="background:#d77a93"></i><i style="background:#a14e67"></i></span>
+                  Feminine
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="old-money">
+                  <span class="swatches"><i style="background:#14213a"></i><i style="background:#b89b5e"></i><i style="background:#6e1f2b"></i></span>
+                  Old money
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="neutral">
+                  <span class="swatches"><i style="background:#f3f1ea"></i><i style="background:#6b7d47"></i><i style="background:#4b5a32"></i></span>
+                  Neutral
+                </button>
+              </div>
+
+              <p class="field-label">Appearance</p>
+              <div class="appearance-options">
+                <button type="button" class="pomo-preset appearance-option" data-appearance="light">☀ Light</button>
+                <button type="button" class="pomo-preset appearance-option" data-appearance="dark">🌙 Dark</button>
+                <button type="button" class="pomo-preset appearance-option" data-appearance="system">💻 Same as my device</button>
+              </div>
+              <p id="device-mode" class="hint left"></p>
+
+              <p class="field-label">Welcome screen</p>
+              <button type="button" id="show-welcome" class="secondary-button">Show welcome screen again</button>
+            </div>
+          </section>
+
+          <div class="settings-stack">
+          <section class="settings-card">
+            <h2 class="page-title section-title">Breaks</h2>
+            <div class="panel settings-list">
+              <label class="checkbox-row"><input type="checkbox" data-pref="breakAlarm"> Remind me to take a break automatically</label>
+              <label class="setting-row">
+                After working for
+                <input class="picker tiny" type="number" min="5" max="480" data-pref="breakAfterMin"> <span>minutes,</span>
+                <span>take a</span>
+                <input class="picker tiny" type="number" min="1" max="120" data-pref="breakLengthMin"> minute break
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-card">
+            <h2 class="page-title section-title">Backup</h2>
+            <div class="panel settings-list">
+              <p class="setting-row">Your data lives only in this browser. Download a backup now and then, and use it to move your data to another computer or browser.</p>
+              <div class="project-actions">
+                <button type="button" id="backup-download" class="secondary-button small">⬇ Download backup</button>
+                <label class="secondary-button small file-button">
+                  ⬆ Restore from backup
+                  <input id="backup-restore" type="file" accept=".json,application/json" hidden>
+                </label>
+              </div>
+              <p class="setting-row">Start fresh (download a backup first if you might want it back):</p>
+              <div class="project-actions">
+                <button type="button" id="clear-entries" class="secondary-button small danger">Delete all time entries</button>
+                <button type="button" id="clear-plans" class="secondary-button small danger">Delete all calendar plans</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-card">
+            <h2 class="page-title section-title">Help from Deskito support</h2>
+            <div class="panel settings-list">
+              <p class="setting-row">Your synced data is locked on your device, so nobody else can read it – not even Deskito. If you need help, you can give support a copy of your data. You can take it back at any time.</p>
+              <p id="support-signed-out" class="setting-row">Log in first to use this.</p>
+              <div id="support-signed-in" hidden>
+                <p id="support-status" class="account-email"></p>
+                <div class="project-actions">
+                  <button type="button" id="support-give" class="secondary-button small">Give support access</button>
+                  <button type="button" id="support-update" class="secondary-button small" hidden>Update the copy</button>
+                  <button type="button" id="support-take-back" class="secondary-button small danger" hidden>Take back access</button>
+                </div>
+              </div>
+            </div>
+          </section>
           </div>
-          <p class="hint left">Press the test, then switch to another app (like Discord). If nothing pops up:</p>
-          <ul class="notify-tips">
-            <li>Windows: Settings → System → Notifications → turn on your browser, and turn off Do not disturb.</li>
-            <li>Windows may hide pop-ups while a game or full-screen app is open (Settings → System → Notifications → Turn on do not disturb automatically).</li>
-            <li>Edge puts background tabs to sleep: install Deskito as an app, or add it under Settings → System and performance → Never put these sites to sleep.</li>
-            <li>Signed in? Then alarms and reminders also arrive when Deskito is closed. Not signed in, Deskito has to stay open (minimised is fine).</li>
-          </ul>
+
+          <section class="settings-card">
+            <h2 class="page-title section-title">Contact</h2>
+            <div class="panel settings-list">
+              <p class="setting-row">Questions, ideas or something not working? Write to Zehra Sinanovic:</p>
+              <p class="setting-row"><a class="privacy-link" href="mailto:zehrasinanovic24@gmail.com">zehrasinanovic24@gmail.com</a></p>
+            </div>
+          </section>
+
+          <section class="settings-card">
+            <h2 class="page-title section-title">Privacy policy</h2>
+            <div class="panel settings-list">
+              <p class="setting-row">What Deskito stores, what stays locked, and your rights.</p>
+              <p class="setting-row"><a class="privacy-link" href="privacy.html" target="_blank" rel="noopener">Read the privacy policy</a></p>
+            </div>
+          </section>
         </div>
       </div>
     </main>
