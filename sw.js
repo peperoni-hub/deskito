@@ -2,7 +2,7 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v11";
+const CACHE = "deskito-v12";
 const FILES = [
   "./",
   "index.html",

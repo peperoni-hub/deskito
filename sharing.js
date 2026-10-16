@@ -139,6 +139,7 @@ function setNickname(email, nickname) {
     delete all[email.toLowerCase()];
   }
   writeStore("nicknames", all);
+  if (account) renderShares();
   for (const calendar of sharedCalendars) {
     const share = shares.find((item) => item.owner_id === calendar.ownerId);
     if (share) calendar.name = displayName(share.owner_email, calendar.realName);
@@ -147,10 +148,17 @@ function setNickname(email, nickname) {
   renderMini();
 }
 
+// One nickname box per person, even if they're in both lists
+let nicknameBoxShown = new Set();
+
 function shareRow(email, status, ...buttons) {
+  const key = email.toLowerCase();
+  const firstTime = !nicknameBoxShown.has(key);
+  nicknameBoxShown.add(key);
+  const nickname = nicknames()[key];
   return el("div", { class: "share-row" },
-    el("span", { class: "share-email" }, email),
-    el("input", {
+    el("span", { class: "share-email" }, !firstTime && nickname ? `${email} (${nickname})` : email),
+    firstTime && el("input", {
       type: "text",
       class: "text-input small nickname-input",
       placeholder: t("Nickname"),
@@ -171,6 +179,7 @@ function renderShares() {
   const mine = shares.filter((share) => share.owner_id === account.id);
   const withMe = shares.filter((share) => share.owner_id !== account.id);
   const nobody = () => el("p", { class: "mini-empty" }, t("Nobody yet."));
+  nicknameBoxShown = new Set();
 
   shareLists.replaceChildren(
     el("p", { class: "field-label" }, t("You share your calendar with")),
