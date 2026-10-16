@@ -8,12 +8,15 @@ const upcomingTitle = document.getElementById("upcoming-title");
 const upcomingDate = document.getElementById("upcoming-date");
 const upcomingStart = document.getElementById("upcoming-start");
 const upcomingEnd = document.getElementById("upcoming-end");
+const upcomingAutoStart = document.getElementById("upcoming-auto-start");
+const upcomingReminder = document.getElementById("upcoming-reminder");
 
 function eventTime(plan) {
-  return `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`;
+  return planTimeLabel(plan);
 }
 
 function eventRow(plan, showDay) {
+  const hasDuration = !plan.allDay && !plan.noEnd && plan.end > plan.start;
   return el("li", { class: `event-row plan-${plan.type}`, style: planColorStyle(plan) },
     el("button", {
       type: "button",
@@ -25,18 +28,22 @@ function eventRow(plan, showDay) {
       el("span", { class: "event-title" }, plan.title),
       el("span", { class: "event-meta" },
         el("span", {}, showDay ? `${dayLabel(dayKey(plan.start))} · ${eventTime(plan)}` : eventTime(plan)),
-        plan.type === "other" && plan.otherLabel && el("span", { class: "tag-chip" }, plan.otherLabel)
+        plan.type === "other" && plan.otherLabel && el("span", { class: "tag-chip" }, plan.otherLabel),
+        plan.autoStart && el("span", { class: "tag-chip", title: t("Start the timer automatically") }, "⏱"),
+        (plan.reminders || []).length > 0 && el("span", { class: "tag-chip", title: t("Remind me") }, "🔔")
       )
     ),
-    el("span", { class: "entry-duration" }, formatDuration(plan.end - plan.start))
+    hasDuration && el("span", { class: "entry-duration" }, formatDuration(plan.end - plan.start))
   );
 }
 
 function renderEvents() {
   const todayStart = dayStart(dayKey(Date.now()));
   const open = store.plans.filter((plan) => !plan.done).sort((a, b) => a.start - b.start);
-  const missed = open.filter((plan) => plan.end < todayStart);
-  const coming = open.filter((plan) => plan.end >= todayStart);
+  // An event without an end is "missed" once its day is over
+  const endOf = (plan) => (plan.noEnd ? endOfDay(dayKey(plan.start)) : plan.end);
+  const missed = open.filter((plan) => endOf(plan) <= todayStart);
+  const coming = open.filter((plan) => endOf(plan) > todayStart);
 
   const days = new Map();
   for (const plan of coming) {
@@ -62,6 +69,8 @@ function eventDay(title, plans, showDay, extraClass = "") {
 // Done: the event becomes a finished entry in "Your time"; not done: it comes back here
 function setDone(plan, done) {
   if (done) {
+    // All-day events and events without an end are recorded by their day / start time only
+    const timed = !plan.allDay && !plan.noEnd;
     const entry = {
       id: uid(),
       description: plan.title,
@@ -70,9 +79,10 @@ function setDone(plan, done) {
       taskId: plan.taskId || "",
       tagIds: [],
       start: plan.start,
-      end: plan.end,
+      end: timed ? plan.end : plan.start,
       planId: plan.id,
       fromEvent: true,
+      allDay: Boolean(plan.allDay),
     };
     store.entries.push(entry);
     saveEntries();
@@ -105,21 +115,52 @@ async function timesLookRight(start, end) {
   );
 }
 
-upcomingForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const { start, end } = timeRange(upcomingDate.value, upcomingStart.value, upcomingEnd.value);
-  if (end === start) {
-    notify(t("The start and end time can't be the same."));
-    return;
-  }
-  if (!await timesLookRight(start, end)) return;
+function quickEventFields() {
   const title = upcomingTitle.value.trim();
-  store.plans.push({ id: uid(), title, type: moodFromText(title) === "meeting" ? "meeting" : "task", projectId: "", taskId: "", start, end, notes: "", otherLabel: "", color: "" });
-  plansChanged();
+  return {
+    title,
+    type: moodFromText(title) === "meeting" ? "meeting" : "task",
+    projectId: "",
+    taskId: "",
+    notes: "",
+    otherLabel: "",
+    color: "",
+    autoStart: upcomingAutoStart.checked,
+    reminders: upcomingReminder.value ? [Number(upcomingReminder.value)] : [],
+    ...eventRange(upcomingDate.value, upcomingStart.value, "", upcomingEnd.value),
+  };
+}
+
+function resetQuickForm() {
   upcomingTitle.value = "";
   upcomingStart.value = "";
   upcomingEnd.value = "";
+  upcomingAutoStart.checked = false;
+  upcomingReminder.value = "";
+}
+
+upcomingForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const fields = quickEventFields();
+  if (!fields.allDay && !fields.noEnd && fields.end === fields.start) {
+    notify(t("The end must be after the start."));
+    return;
+  }
+  if (!fields.allDay && !fields.noEnd && !await timesLookRight(fields.start, fields.end)) return;
+  if ((fields.autoStart || fields.reminders.length) && "Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+  store.plans.push({ id: uid(), ...fields });
+  plansChanged();
+  resetQuickForm();
   upcomingTitle.focus();
+});
+
+// More options: open the full window with what's typed so far
+document.getElementById("upcoming-more").addEventListener("click", () => {
+  const fields = quickEventFields();
+  openPlanDialog({ ...fields, title: fields.title });
+  resetQuickForm();
 });
 
 upcomingDate.value = dayKey(Date.now());

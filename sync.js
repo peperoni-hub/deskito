@@ -8,7 +8,7 @@
 const SUPABASE_URL = "https://udhmreajsncijlxzpvkm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_44nWOAwDYF5lxoXGDsAVuQ_x6SwGU4C";
 
-const SYNC_KEYS = ["entries", "projects", "tags", "plans", "deleted", "prefs", "profile", "theme", "appearance", "language", "running"];
+const SYNC_KEYS = ["entries", "projects", "tags", "plans", "deleted", "prefs", "profile", "theme", "appearance", "language", "running", "alarms", "nicknames"];
 const TEXT_KEYS = ["theme", "appearance", "language"];
 
 const cloud = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -243,6 +243,7 @@ function showRemoteChanges(changed) {
     renderCalendar();
     renderMini();
     renderEvents();
+    if (typeof renderAlarms === "function") renderAlarms();
   }
 
   if (changed.has("prefs")) {

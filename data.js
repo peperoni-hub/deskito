@@ -16,7 +16,7 @@ function writeStore(key, value) {
 
 // For syncing between devices: remember when each item last changed, and which items were
 // deleted, so two devices can be merged without losing or bringing back anything
-const LIST_KEYS = ["entries", "projects", "tags", "plans"];
+const LIST_KEYS = ["entries", "projects", "tags", "plans", "alarms"];
 
 function withoutStamp(item) {
   return JSON.stringify({ ...item, updatedAt: undefined });
@@ -61,6 +61,7 @@ const store = {
     type: entry.type || "task",
     planId: entry.planId || "",
     fromEvent: Boolean(entry.fromEvent),
+    allDay: Boolean(entry.allDay),
     updatedAt: entry.updatedAt || 0,
     start: entry.start,
     end: entry.end,
@@ -68,6 +69,7 @@ const store = {
   projects: readStore("projects", []),
   tags: readStore("tags", []),
   plans: readStore("plans", []),
+  alarms: readStore("alarms", []),
 };
 
 const prefs = {
@@ -275,4 +277,45 @@ function timeRange(dateValue, startValue, endValue) {
     end = nextDay.getTime();
   }
   return { start, end };
+}
+
+function saveAlarms() {
+  writeStore("alarms", store.alarms);
+}
+
+/* Event times: only the start day is required. No times = all day; no end = no set end. */
+
+function endOfDay(dateValue) {
+  const date = new Date(`${dateValue}T00:00`);
+  date.setDate(date.getDate() + 1);
+  return date.getTime();
+}
+
+function eventRange(startDate, startTime, endDate, endTime) {
+  if (!startTime && !endTime) {
+    const start = new Date(`${startDate}T00:00`).getTime();
+    return { start, end: endOfDay(endDate && endDate > startDate ? endDate : startDate), allDay: true, noEnd: false };
+  }
+  const start = fromDateAndTime(startDate, startTime || "00:00");
+  if (!endDate && !endTime) return { start, end: start, allDay: false, noEnd: true };
+  if (!endDate) return { ...timeRange(startDate, startTime || "00:00", endTime), allDay: false, noEnd: false };
+  const end = endTime ? fromDateAndTime(endDate, endTime) : endOfDay(endDate);
+  return { start, end, allDay: false, noEnd: false };
+}
+
+function shortDate(timestamp) {
+  return new Date(timestamp).toLocaleDateString(locale(), { day: "numeric", month: "short" });
+}
+
+// "All day", "3:00 PM", "3:00 PM – 5:00 PM" or "16 Oct 15:00 – 18 Oct 12:00"
+function planTimeLabel(plan) {
+  if (plan.allDay) {
+    const days = Math.round((plan.end - plan.start) / 86400000);
+    return days > 1 ? `${shortDate(plan.start)} – ${shortDate(plan.end - 1)}` : t("All day");
+  }
+  if (plan.noEnd || plan.end <= plan.start) return formatTimeOfDay(plan.start);
+  if (plan.end - plan.start > 20 * 3600000) {
+    return `${shortDate(plan.start)} ${formatTimeOfDay(plan.start)} – ${shortDate(plan.end)} ${formatTimeOfDay(plan.end)}`;
+  }
+  return `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`;
 }

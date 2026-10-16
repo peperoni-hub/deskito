@@ -226,8 +226,8 @@ function entryRow(entry) {
       ),
       entryMeta(entry)
     ),
-    el("span", { class: "entry-times" }, `${formatTimeOfDay(entry.start)} – ${formatTimeOfDay(entry.end)}`),
-    el("span", { class: "entry-duration" }, formatDuration(entry.end - entry.start)),
+    el("span", { class: "entry-times" }, entry.allDay ? t("All day") : entry.end === entry.start ? formatTimeOfDay(entry.start) : `${formatTimeOfDay(entry.start)} – ${formatTimeOfDay(entry.end)}`),
+    el("span", { class: "entry-duration" }, entry.allDay || entry.end === entry.start ? "" : formatDuration(entry.end - entry.start)),
     el("span", { class: "entry-actions" },
       el("button", { class: "icon-button", title: t("Continue this entry"), onclick: () => continueEntry(entry) }, "▶"),
       el("button", { class: "icon-button", title: t("Edit"), onclick: () => openEditor(entry) }, "✎"),

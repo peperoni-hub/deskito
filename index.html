@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Deskito">
   <meta name="description" content="Every minute in its place.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&family=Inter:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="theme.js"></script>
   <script src="i18n.js"></script>
@@ -40,6 +40,11 @@
     <main class="content">
       <div class="view tracker-layout" data-view="tracker">
         <div class="tracker-main">
+        <div id="notify-banner" class="notify-banner" hidden>
+          <span>Allow notifications so Deskito can remind you about events, breaks and alarms, also when it's in the background.</span>
+          <button type="button" id="notify-allow" class="start-button small">ALLOW</button>
+          <button type="button" id="notify-later" class="link-button">Not now</button>
+        </div>
         <section class="timer-bar">
           <input type="text" id="description" placeholder="What are you working on?">
           <select id="entry-type" class="picker" title="Type"></select>
@@ -99,10 +104,22 @@
           <form id="upcoming-form" class="upcoming-form">
             <input id="upcoming-title" class="upcoming-title" type="text" placeholder="What's coming up?" required>
             <input id="upcoming-date" type="date" class="picker" title="Date" required>
-            <input id="upcoming-start" type="time" class="picker" title="From" required>
+            <input id="upcoming-start" type="time" class="picker" title="From (optional)">
             <span>–</span>
-            <input id="upcoming-end" type="time" class="picker" title="To" required>
+            <input id="upcoming-end" type="time" class="picker" title="To (optional)">
             <button type="submit" class="start-button">ADD</button>
+            <div class="upcoming-options">
+              <label class="checkbox-row"><input type="checkbox" id="upcoming-auto-start"> Start the timer automatically</label>
+              <select id="upcoming-reminder" class="picker" title="Remind me">
+                <option value="">No reminder</option>
+                <option value="10">10 min before</option>
+                <option value="30">30 min before</option>
+                <option value="60">1 hour before</option>
+                <option value="120">2 hours before</option>
+                <option value="1440">1 day before</option>
+              </select>
+              <button type="button" id="upcoming-more" class="link-button">More options (end day, notes…)</button>
+            </div>
           </form>
           <div id="upcoming-list"></div>
         </section>
@@ -140,6 +157,22 @@
                 <button id="mini-open" class="secondary-button small">Open in calendar</button>
               </div>
             </div>
+          </div>
+          <div class="mini-cal alarms-card">
+            <div class="mini-header"><span class="mini-month">⏰ Alarms</span></div>
+            <form id="alarm-form" class="alarm-form">
+              <input id="alarm-time" type="time" class="picker" required>
+              <select id="alarm-repeat" class="picker" title="Repeat">
+                <option value="once">Once</option>
+                <option value="daily">Every day</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+              </select>
+              <input id="alarm-label" type="text" class="text-input small" placeholder="Label (optional)">
+              <button type="submit" class="start-button small">ADD</button>
+            </form>
+            <ul id="alarm-list" class="alarm-list"></ul>
+            <p class="hint left">Alarms ring while Deskito is open or in the background.</p>
           </div>
         </aside>
       </div>
@@ -441,6 +474,17 @@
     </form>
   </dialog>
 
+  <dialog id="alarm-dialog" class="dialog alarm-dialog">
+    <p class="alarm-ring-icon">⏰</p>
+    <p id="alarm-ring-time" class="alarm-ring-time"></p>
+    <p id="alarm-ring-label" class="alarm-ring-label"></p>
+    <div class="dialog-actions">
+      <button type="button" id="alarm-snooze" class="secondary-button">Snooze 5 min</button>
+      <span class="spacer"></span>
+      <button type="button" id="alarm-stop" class="start-button">STOP</button>
+    </div>
+  </dialog>
+
   <dialog id="confirm-dialog" class="dialog confirm-dialog">
     <p class="confirm-message"></p>
     <div class="dialog-actions">
@@ -499,17 +543,35 @@
 
       <div class="dialog-row">
         <div>
-          <label class="field-label" for="plan-date">Date</label>
+          <label class="field-label" for="plan-date">Starts</label>
           <input id="plan-date" type="date" class="picker" required>
         </div>
         <div>
-          <label class="field-label" for="plan-start">From</label>
-          <input id="plan-start" type="time" class="picker" required>
+          <label class="field-label" for="plan-start">At</label>
+          <input id="plan-start" type="time" class="picker">
+        </div>
+      </div>
+      <div class="dialog-row">
+        <div>
+          <label class="field-label" for="plan-end-date">Ends</label>
+          <input id="plan-end-date" type="date" class="picker">
         </div>
         <div>
-          <label class="field-label" for="plan-end">To</label>
-          <input id="plan-end" type="time" class="picker" required>
+          <label class="field-label" for="plan-end">At</label>
+          <input id="plan-end" type="time" class="picker">
         </div>
+      </div>
+      <p class="hint left">No times = all day. No end = it has no set end.</p>
+
+      <label class="checkbox-row plan-option"><input type="checkbox" id="plan-auto-start"> Start the timer automatically when it begins</label>
+
+      <p class="field-label">Remind me</p>
+      <div class="reminder-options" id="plan-reminders">
+        <label class="reminder-option"><input type="checkbox" value="10"> <span>10 min before</span></label>
+        <label class="reminder-option"><input type="checkbox" value="30"> <span>30 min before</span></label>
+        <label class="reminder-option"><input type="checkbox" value="60"> <span>1 hour before</span></label>
+        <label class="reminder-option"><input type="checkbox" value="120"> <span>2 hours before</span></label>
+        <label class="reminder-option"><input type="checkbox" value="1440"> <span>1 day before</span></label>
       </div>
 
       <label class="field-label" for="plan-notes">Notes</label>
@@ -585,6 +647,7 @@
   <script src="lang/sharing.js"></script>
   <script src="lang/privacy.js"></script>
   <script src="lang/events.js"></script>
+  <script src="lang/reminders.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
@@ -598,6 +661,7 @@
   <script src="pomodoro.js"></script>
   <script src="calendar.js"></script>
   <script src="events.js"></script>
+  <script src="reminders.js"></script>
   <script src="reports.js"></script>
   <script src="icons.js"></script>
   <!-- Supabase's official code (version 2.49.4), kept in the project so it works offline -->

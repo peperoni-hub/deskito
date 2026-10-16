@@ -2,7 +2,7 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v7";
+const CACHE = "deskito-v8";
 const FILES = [
   "./",
   "index.html",
@@ -24,6 +24,7 @@ const FILES = [
   "lang/sharing.js",
   "lang/privacy.js",
   "lang/events.js",
+  "lang/reminders.js",
   "data.js",
   "app.js",
   "projects.js",
@@ -33,6 +34,7 @@ const FILES = [
   "pomodoro.js",
   "calendar.js",
   "events.js",
+  "reminders.js",
   "reports.js",
   "icons.js",
   "crypto.js",
@@ -78,5 +80,16 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() => caches.match(event.request, { ignoreSearch: true }))
+  );
+});
+
+// Clicking a notification opens Deskito (or brings it to the front)
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      const open = windows.find((client) => client.url.includes("/deskito/"));
+      return open ? open.focus() : self.clients.openWindow("./");
+    })
   );
 });

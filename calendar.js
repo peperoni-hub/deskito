@@ -30,6 +30,9 @@ const planProject = document.getElementById("plan-project");
 const planDate = document.getElementById("plan-date");
 const planStart = document.getElementById("plan-start");
 const planEnd = document.getElementById("plan-end");
+const planEndDate = document.getElementById("plan-end-date");
+const planAutoStart = document.getElementById("plan-auto-start");
+const planReminders = document.getElementById("plan-reminders");
 const planNotes = document.getElementById("plan-notes");
 const planOtherRow = document.getElementById("plan-other-row");
 const planOtherLabel = document.getElementById("plan-other-label");
@@ -122,7 +125,7 @@ function entriesOn(key) {
 function plannedMs(plans, key) {
   const from = dayStart(key);
   const to = addDays(from, 1);
-  return plans.reduce((sum, plan) => sum + Math.min(plan.end, to) - Math.max(plan.start, from), 0);
+  return plans.filter((plan) => !plan.allDay).reduce((sum, plan) => sum + Math.max(0, Math.min(plan.end, to) - Math.max(plan.start, from)), 0);
 }
 
 /* Week view */
@@ -139,13 +142,13 @@ function planBlock(plan, lane, lanes, key) {
   return el("div", {
     class: `plan-block plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`,
     style: `top:${top}px;height:${height}px;left:calc(${(lane * 100) / lanes}% + 8px);width:calc(${100 / lanes}% - 10px);${planColorStyle(plan)}`,
-    title: plan.notes || "",
+    title: plan.shared ? t("Added by {name}", { name: plan.ownerName }) + (plan.notes ? ` · ${plan.notes}` : "") : plan.notes || "",
     onclick: () => openPlan(plan),
   },
     plan.shared && el("span", { class: "shared-name" }, plan.ownerName),
     el("span", { class: "plan-title" }, plan.title),
     plan.type === "other" && plan.otherLabel && el("span", { class: "plan-kind" }, plan.otherLabel),
-    el("span", { class: "plan-time" }, `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`),
+    el("span", { class: "plan-time" }, planTimeLabel(plan)),
     project && el("span", { class: "plan-project" }, project.name)
   );
 }
@@ -174,7 +177,8 @@ function dayColumn(key, isToday) {
 
   // Plans that overlap are placed side by side
   const laneEnds = [];
-  const placed = visiblePlansOn(key).map((plan) => {
+  // All-day events are shown above the hours, not in them
+  const placed = visiblePlansOn(key).filter((plan) => !plan.allDay).map((plan) => {
     let lane = laneEnds.findIndex((end) => end <= plan.start);
     if (lane === -1) {
       lane = laneEnds.length;
@@ -209,7 +213,18 @@ function renderWeek() {
       return el("div", { class: `week-day-head${key === todayKey ? " today" : ""}` },
         el("span", { class: "week-day-name" }, names[i]),
         el("span", { class: "week-day-number" }, new Date(day).getDate()),
-        el("span", { class: "week-day-planned" }, planned ? t("{time} planned", { time: formatHours(planned) }) : " ")
+        el("span", { class: "week-day-planned" }, planned ? t("{time} planned", { time: formatHours(planned) }) : " "),
+        el("span", { class: "all-day-list" },
+          visiblePlansOn(key).filter((plan) => plan.allDay).map((plan) =>
+            el("button", {
+              type: "button",
+              class: `month-chip all-day-chip plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`,
+              style: planColorStyle(plan),
+              title: plan.shared ? t("Added by {name}", { name: plan.ownerName }) : "",
+              onclick: () => openPlan(plan),
+            }, (plan.shared ? `${plan.ownerName}: ` : "") + plan.title)
+          )
+        )
       );
     })
   );
@@ -254,7 +269,7 @@ function renderMonth() {
       el("span", { class: "month-date" }, new Date(day).getDate()),
       plans.slice(0, 3).map((plan) =>
         el("button", { class: `month-chip plan-${plan.type}${plan.shared ? " shared" : ""}${plan.done ? " done" : ""}`, style: planColorStyle(plan), onclick: () => openPlan(plan) },
-          `${formatTimeOfDay(plan.start)} ${plan.title}`
+          (plan.shared ? `${plan.ownerName}: ` : "") + (plan.allDay ? plan.title : `${formatTimeOfDay(plan.start)} ${plan.title}`)
         )
       ),
       plans.length > 3 && el("span", { class: "month-more" }, t("+{count} more", { count: plans.length - 3 })),
@@ -356,7 +371,7 @@ function renderMini() {
                 setDone(plan, !plan.done);
               },
             }, plan.done ? "✓" : ""),
-            el("span", { class: "mini-plan-time" }, `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`),
+            el("span", { class: "mini-plan-time" }, planTimeLabel(plan)),
             el("span", { class: "mini-plan-title" }, (plan.shared ? `${plan.ownerName}: ` : "") + (plan.type === "other" && plan.otherLabel ? `${plan.title} · ${plan.otherLabel}` : plan.title))
           )
         )
@@ -405,8 +420,16 @@ function openPlanDialog(plan) {
   showPlanColor(plan.color);
   fillProjectSelect(planProject, plan.projectId ? projectValue(plan) : "");
   planDate.value = dayKey(plan.start);
-  planStart.value = timeKey(plan.start);
-  planEnd.value = timeKey(plan.end);
+  planStart.value = plan.allDay ? "" : timeKey(plan.start);
+  // The end day is only filled in when it's a different day (otherwise the end time is enough)
+  const lastDay = plan.allDay ? dayKey(plan.end - 1) : dayKey(plan.end);
+  const overnight = !plan.allDay && plan.end - plan.start <= 20 * 3600000;
+  planEndDate.value = plan.noEnd || lastDay === dayKey(plan.start) || overnight ? "" : lastDay;
+  planEnd.value = plan.allDay || plan.noEnd ? "" : timeKey(plan.end);
+  planAutoStart.checked = Boolean(plan.autoStart);
+  for (const box of planReminders.querySelectorAll("input")) {
+    box.checked = (plan.reminders || []).includes(Number(box.value));
+  }
   planNotes.value = plan.notes || "";
   planDeleteButton.hidden = !plan.id;
   planTimerButton.hidden = !plan.id;
@@ -424,23 +447,36 @@ function plansChanged() {
 
 planForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const { start, end } = timeRange(planDate.value, planStart.value, planEnd.value);
-  if (end === start) {
-    notify(t("The start and end time can't be the same."));
+  const { start, end, allDay, noEnd } = eventRange(planDate.value, planStart.value, planEndDate.value, planEnd.value);
+  if (end < start || (end === start && !noEnd)) {
+    notify(t("The end must be after the start."));
     return;
   }
-  if (!await timesLookRight(start, end)) return;
+  // Only double-check overnight guesses, not an end day picked on purpose
+  const pickedEndDay = planEndDate.value && planEndDate.value !== planDate.value;
+  if (!allDay && !noEnd && !pickedEndDay && !await timesLookRight(start, end)) return;
+  const reminders = [...planReminders.querySelectorAll("input:checked")].map((box) => Number(box.value));
+  if ((reminders.length || planAutoStart.checked) && "Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+  const existing = store.plans.find((plan) => plan.id === editingPlanId);
+  const timesChanged = existing && (existing.start !== start || existing.end !== end);
   const fields = {
     title: planTitle.value.trim(),
     type: planType.value,
     ...parseProjectValue(planProject.value),
     start,
     end,
+    allDay,
+    noEnd,
+    autoStart: planAutoStart.checked,
+    reminders,
+    // New times: reminders and the automatic timer may happen again
+    ...(timesChanged ? { autoStarted: false, remindersSent: [] } : {}),
     notes: planNotes.value.trim(),
     otherLabel: planType.value === "other" ? planOtherLabel.value.trim() : "",
     color: planColorChosen ? planColor.value : "",
   };
-  const existing = store.plans.find((plan) => plan.id === editingPlanId);
   if (existing) {
     Object.assign(existing, fields);
   } else {

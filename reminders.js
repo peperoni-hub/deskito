@@ -1,0 +1,273 @@
+// Reminders before events, starting the timer automatically, alarms, and system
+// notifications. These work while Deskito is open or running in the background; a web app
+// can't wake itself up once it's fully closed.
+
+/* System notifications (they show on top of other apps) */
+
+async function systemNotify(title, body) {
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  const options = { body, icon: "icons/icon-192.png", badge: "icons/icon-192.png", tag: `${title}|${body}` };
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration();
+    if (registration) {
+      await registration.showNotification(title, options);
+      return;
+    }
+  } catch {
+    // Fall back to a plain notification below
+  }
+  try {
+    new Notification(title, options);
+  } catch {
+    // Some phones only allow notifications through the service worker
+  }
+}
+
+const notifyBanner = document.getElementById("notify-banner");
+
+function wantsNotifications() {
+  return store.plans.some((plan) => !plan.done && ((plan.reminders || []).length || plan.autoStart))
+    || store.alarms.some((alarm) => alarm.on)
+    || prefs.breakAlarm;
+}
+
+function showNotifyBanner() {
+  let dismissed = false;
+  try {
+    dismissed = sessionStorage.getItem("notifyBannerDismissed") === "1";
+  } catch {
+    // Not important
+  }
+  notifyBanner.hidden = !("Notification" in window) || Notification.permission !== "default" || dismissed || !wantsNotifications();
+}
+
+document.getElementById("notify-allow").addEventListener("click", async () => {
+  const answer = await Notification.requestPermission();
+  notifyBanner.hidden = true;
+  showToast(answer === "granted" ? t("Desktop notifications are on.") : t("Notifications were not allowed."));
+});
+
+document.getElementById("notify-later").addEventListener("click", () => {
+  notifyBanner.hidden = true;
+  try {
+    sessionStorage.setItem("notifyBannerDismissed", "1");
+  } catch {
+    // Not important
+  }
+});
+
+/* Reminders before events */
+
+function minutesText(minutes) {
+  return minutes >= 60 ? formatHours(minutes * 60000) : t("{minutes}m", { minutes });
+}
+
+function checkEventReminders(now) {
+  let changed = false;
+  for (const plan of store.plans) {
+    if (plan.done || !(plan.reminders || []).length) continue;
+    const sent = new Set(plan.remindersSent || []);
+    const due = plan.reminders.filter((minutes) => !sent.has(minutes) && now >= plan.start - minutes * 60000);
+    if (!due.length) continue;
+    due.forEach((minutes) => sent.add(minutes));
+    plan.remindersSent = [...sent];
+    changed = true;
+    // Several reminders due at once (e.g. Deskito was closed) give one message, and none after the start
+    if (now >= plan.start) continue;
+    const left = Math.max(1, Math.round((plan.start - now) / 60000));
+    let message = t("{title} starts in {time}.", { title: plan.title, time: minutesText(left) });
+    if (plan.autoStart && !plan.allDay) message += ` ${t("The timer will start automatically.")}`;
+    alertUser(message);
+  }
+  if (changed) savePlans();
+}
+
+/* Starting the timer automatically */
+
+const endNoticeShown = new Set();
+
+function checkAutoStart(now) {
+  for (const plan of store.plans) {
+    if (!plan.autoStart || plan.autoStarted || plan.done || plan.allDay) continue;
+    const until = plan.noEnd ? plan.start + 15 * 60000 : plan.end;
+    if (now < plan.start || now >= until) continue;
+
+    plan.autoStarted = true;
+    savePlans();
+    if (running?.planId === plan.id) continue;
+
+    const wasRunning = Boolean(running);
+    continueEntry({
+      description: plan.title,
+      type: plan.type === "meeting" ? "meeting" : "task",
+      projectId: plan.projectId || "",
+      taskId: plan.taskId || "",
+      tagIds: [],
+      planId: plan.id,
+    });
+    // Opened a bit late? Then count from the event's start
+    if (!wasRunning) {
+      running.start = plan.start;
+      saveRunning();
+    }
+    alertUser(t("Timer started for {title}.", { title: plan.title }));
+  }
+
+  // The event has ended while its timer is still running
+  const plan = running?.planId && store.plans.find((item) => item.id === running.planId);
+  if (plan && plan.autoStart && !plan.noEnd && !plan.allDay && now >= plan.end && !endNoticeShown.has(plan.id)) {
+    endNoticeShown.add(plan.id);
+    alertUser(t("{title} has ended. Stop the timer?", { title: plan.title }), [
+      { label: t("Stop timer"), primary: true, run: stopTimer },
+      { label: t("Keep going") },
+    ], { sticky: true });
+  }
+}
+
+/* Alarms */
+
+const alarmForm = document.getElementById("alarm-form");
+const alarmTime = document.getElementById("alarm-time");
+const alarmLabel = document.getElementById("alarm-label");
+const alarmRepeat = document.getElementById("alarm-repeat");
+const alarmList = document.getElementById("alarm-list");
+const alarmDialog = document.getElementById("alarm-dialog");
+const alarmRingTime = document.getElementById("alarm-ring-time");
+const alarmRingLabel = document.getElementById("alarm-ring-label");
+
+const REPEAT_LABELS = { once: "Once", daily: "Every day", weekdays: "Weekdays", weekends: "Weekends" };
+let ringingSound = null;
+let snoozed = null;
+
+function alarmToday(alarm, date) {
+  const day = date.getDay();
+  if (alarm.repeat === "once") return alarm.date === dayKey(date.getTime());
+  if (alarm.repeat === "weekdays") return day >= 1 && day <= 5;
+  if (alarm.repeat === "weekends") return day === 0 || day === 6;
+  return true;
+}
+
+function renderAlarms() {
+  const sorted = [...store.alarms].sort((a, b) => a.time.localeCompare(b.time));
+  alarmList.replaceChildren(
+    ...sorted.map((alarm) =>
+      el("li", { class: `alarm-row${alarm.on ? "" : " off"}` },
+        el("label", { class: "alarm-switch", title: t("On") },
+          el("input", {
+            type: "checkbox",
+            checked: alarm.on,
+            onchange: (event) => {
+              alarm.on = event.target.checked;
+              if (alarm.on && alarm.repeat === "once") alarm.date = nextDateFor(alarm.time);
+              saveAlarms();
+              renderAlarms();
+            },
+          })
+        ),
+        el("span", { class: "alarm-time" }, formatTimeOfDay(fromDateAndTime("2000-01-01", alarm.time))),
+        el("span", { class: "alarm-info" },
+          el("span", {}, alarm.label || t("Alarm")),
+          el("span", { class: "alarm-repeat" }, alarm.repeat === "once" && alarm.date ? dayLabel(alarm.date) : t(REPEAT_LABELS[alarm.repeat]))
+        ),
+        el("button", {
+          type: "button",
+          class: "icon-button",
+          title: t("Delete alarm"),
+          onclick: () => {
+            store.alarms = store.alarms.filter((item) => item.id !== alarm.id);
+            saveAlarms();
+            renderAlarms();
+          },
+        }, "✕")
+      )
+    )
+  );
+}
+
+// A "once" alarm rings today if that time is still to come, otherwise tomorrow
+function nextDateFor(time) {
+  const today = dayKey(Date.now());
+  return fromDateAndTime(today, time) > Date.now() ? today : dayKey(Date.now() + 86400000);
+}
+
+alarmForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  store.alarms.push({
+    id: uid(),
+    time: alarmTime.value,
+    label: alarmLabel.value.trim(),
+    repeat: alarmRepeat.value,
+    date: alarmRepeat.value === "once" ? nextDateFor(alarmTime.value) : "",
+    on: true,
+    lastRung: "",
+  });
+  saveAlarms();
+  renderAlarms();
+  alarmForm.reset();
+  if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+});
+
+function ring(alarm) {
+  alarmRingTime.textContent = formatTimeOfDay(fromDateAndTime("2000-01-01", alarm.time));
+  alarmRingLabel.textContent = alarm.label || t("Alarm");
+  if (!alarmDialog.open) alarmDialog.showModal();
+  systemNotify(`⏰ ${alarmRingTime.textContent}`, alarm.label || t("Alarm"));
+  clearInterval(ringingSound);
+  chime();
+  const stopAt = Date.now() + 3 * 60000;
+  ringingSound = setInterval(() => {
+    if (Date.now() > stopAt) {
+      clearInterval(ringingSound);
+      return;
+    }
+    chime();
+  }, 2500);
+}
+
+function stopRinging() {
+  clearInterval(ringingSound);
+  alarmDialog.close();
+}
+
+document.getElementById("alarm-stop").addEventListener("click", stopRinging);
+document.getElementById("alarm-snooze").addEventListener("click", () => {
+  const alarm = { time: timeKey(Date.now() + 5 * 60000), label: alarmRingLabel.textContent };
+  snoozed = { at: Date.now() + 5 * 60000, alarm };
+  stopRinging();
+});
+
+function checkAlarms(now) {
+  const today = dayKey(now);
+  for (const alarm of store.alarms) {
+    if (!alarm.on || alarm.lastRung === today || !alarmToday(alarm, new Date(now))) continue;
+    const at = fromDateAndTime(today, alarm.time);
+    if (now < at || now > at + 10 * 60000) continue; // rings up to 10 minutes late, not hours later
+    alarm.lastRung = today;
+    if (alarm.repeat === "once") alarm.on = false;
+    saveAlarms();
+    renderAlarms();
+    ring(alarm);
+  }
+  if (snoozed && now >= snoozed.at) {
+    const { alarm } = snoozed;
+    snoozed = null;
+    ring(alarm);
+  }
+}
+
+/* One heartbeat for all of it */
+
+function checkEverything() {
+  const now = Date.now();
+  checkEventReminders(now);
+  checkAutoStart(now);
+  checkAlarms(now);
+  showNotifyBanner();
+}
+
+setInterval(checkEverything, 15000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") checkEverything();
+});
+renderAlarms();
+setTimeout(checkEverything, 2000);

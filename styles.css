@@ -2916,3 +2916,213 @@ body {
     flex: 1 1 28%;
   }
 }
+
+/* What users type themselves (tasks, events, plans): bold, in a calm, discreet font */
+.entry-description,
+.event-title,
+.plan-title,
+.mini-plan-title,
+.month-chip,
+.share-email,
+#description,
+.upcoming-title,
+.alarm-info > span:first-child {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.entry-description,
+.event-title,
+.plan-title,
+.mini-plan-title {
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.entry-description.no-description {
+  font-weight: 500;
+}
+
+/* Notification banner */
+.notify-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+.notify-banner span {
+  flex: 1;
+  min-width: 200px;
+}
+
+.notify-banner[hidden] {
+  display: none;
+}
+
+/* Event options */
+.upcoming-options {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 0 8px 2px;
+}
+
+.upcoming-options .checkbox-row {
+  margin: 0;
+}
+
+.plan-option {
+  margin: 12px 0 0;
+  color: var(--text);
+}
+
+.reminder-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reminder-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.reminder-option input {
+  position: absolute;
+  opacity: 0;
+}
+
+.reminder-option span {
+  display: block;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--button-radius);
+  background: var(--bg);
+  font-size: 12px;
+}
+
+.reminder-option input:checked + span {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.reminder-option input:focus-visible + span {
+  outline: 2px solid var(--accent);
+}
+
+/* All-day events above the hours in the week view */
+.all-day-list {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.all-day-chip {
+  width: 100%;
+}
+
+/* Alarms */
+.alarms-card {
+  margin-top: 16px;
+  position: static;
+}
+
+.alarm-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.alarm-form .picker,
+.alarm-form .text-input {
+  flex: 1 1 45%;
+  min-width: 0;
+}
+
+.alarm-list {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.alarm-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.alarm-row.off {
+  opacity: 0.5;
+}
+
+.alarm-time {
+  font-family: var(--font-numbers);
+  font-weight: var(--numbers-weight);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.alarm-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  font-size: 13px;
+}
+
+.alarm-repeat {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.alarm-switch input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.alarm-dialog {
+  width: min(360px, calc(100% - 32px));
+  text-align: center;
+}
+
+.alarm-ring-icon {
+  font-size: 54px;
+  animation: alarm-shake 0.5s ease-in-out infinite alternate;
+}
+
+.alarm-ring-time {
+  font-family: var(--font-numbers);
+  font-weight: var(--numbers-weight);
+  font-size: 40px;
+}
+
+.alarm-ring-label {
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+@keyframes alarm-shake {
+  from { transform: rotate(-12deg); }
+  to { transform: rotate(12deg); }
+}
+
+.nickname-input {
+  flex: 0 1 150px;
+  text-align: left;
+}

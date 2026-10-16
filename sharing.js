@@ -27,8 +27,8 @@ function sharedPlansOn(key) {
 }
 
 function showSharedPlan(plan) {
-  const time = `${formatTimeOfDay(plan.start)} – ${formatTimeOfDay(plan.end)}`;
-  showToast(t("{name}'s plan: {title} · {time}", { name: plan.ownerName, title: plan.title, time }));
+  const time = planTimeLabel(plan);
+  showToast(t("Added by {name}", { name: plan.ownerName }) + ` · ${plan.title} · ${time}` + (plan.notes ? ` · ${plan.notes}` : ""));
 }
 
 calShowShared.addEventListener("change", () => {
@@ -80,7 +80,7 @@ async function loadSharedCalendars() {
           console.warn("Deskito sharing: can't open a shared calendar", problem);
         }
       }
-      sharedCalendars.push({ ownerId: share.owner_id, name: calendar.name || share.owner_email, plans: calendar.plans || [] });
+      sharedCalendars.push({ ownerId: share.owner_id, name: displayName(share.owner_email, calendar.name || share.owner_email), realName: calendar.name || share.owner_email, plans: calendar.plans || [] });
     }
   }
   calSharedRow.hidden = sharedCalendars.length === 0;
@@ -95,7 +95,7 @@ async function publishSharedCalendars() {
   if (!account || !cloud || !myKeyPair || !navigator.onLine) return;
   const mine = shares.filter((share) => share.owner_id === account.id && share.status === "accepted" && share.viewer_public_key);
   const name = readLocal("profile")?.name || account.email;
-  const plans = store.plans.map(({ id, title, type, otherLabel, start, end, notes, color, done }) => ({ id, title, type, otherLabel, start, end, notes, color, done }));
+  const plans = store.plans.map(({ id, title, type, otherLabel, start, end, notes, color, done, allDay, noEnd }) => ({ id, title, type, otherLabel, start, end, notes, color, done, allDay, noEnd }));
   const payload = JSON.stringify({ name, plans });
 
   for (const share of mine) {
@@ -122,9 +122,42 @@ function showSharingSection() {
   sharingSignedIn.hidden = !account;
 }
 
+// Nicknames you give people (only you see them); they replace names in your calendar
+function nicknames() {
+  return readStore("nicknames", {});
+}
+
+function displayName(email, fallback) {
+  return nicknames()[email.toLowerCase()] || fallback || email;
+}
+
+function setNickname(email, nickname) {
+  const all = nicknames();
+  if (nickname) {
+    all[email.toLowerCase()] = nickname;
+  } else {
+    delete all[email.toLowerCase()];
+  }
+  writeStore("nicknames", all);
+  for (const calendar of sharedCalendars) {
+    const share = shares.find((item) => item.owner_id === calendar.ownerId);
+    if (share) calendar.name = displayName(share.owner_email, calendar.realName);
+  }
+  renderCalendar();
+  renderMini();
+}
+
 function shareRow(email, status, ...buttons) {
   return el("div", { class: "share-row" },
     el("span", { class: "share-email" }, email),
+    el("input", {
+      type: "text",
+      class: "text-input small nickname-input",
+      placeholder: t("Nickname"),
+      title: t("A nickname only you see"),
+      value: nicknames()[email.toLowerCase()] || "",
+      onchange: (event) => setNickname(email, event.target.value.trim()),
+    }),
     status && el("span", { class: `badge ${status === "accepted" ? "accepted" : ""}` }, status === "accepted" ? t("Accepted") : t("Waiting")),
     el("span", { class: "share-buttons" }, buttons)
   );

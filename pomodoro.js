@@ -70,9 +70,8 @@ function chime() {
 
 function alertUser(message, actions, options) {
   chime();
-  if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
-    new Notification("Deskito", { body: message });
-  }
+  // When you are in another app or tab, also show it as a system notification
+  if (document.hidden) systemNotify("Deskito", message);
   return showToast(message, actions, options);
 }
 
