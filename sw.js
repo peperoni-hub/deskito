@@ -2,7 +2,7 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v8";
+const CACHE = "deskito-v9";
 const FILES = [
   "./",
   "index.html",
@@ -25,6 +25,7 @@ const FILES = [
   "lang/privacy.js",
   "lang/events.js",
   "lang/reminders.js",
+  "lang/notifications.js",
   "data.js",
   "app.js",
   "projects.js",
@@ -83,12 +84,18 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// Clicking a notification opens Deskito (or brings it to the front)
+// Clicking a notification opens Deskito (or brings it to the front).
+// Clicking one of its buttons (like Stop or Snooze on an alarm) tells Deskito without leaving your app.
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
-      const open = windows.find((client) => client.url.includes("/deskito/"));
+      const scope = self.registration.scope;
+      const open = windows.find((client) => client.url.startsWith(scope)) || windows[0];
+      if (event.action) {
+        for (const client of windows) client.postMessage({ type: "notification-action", action: event.action });
+        return;
+      }
       return open ? open.focus() : self.clients.openWindow("./");
     })
   );

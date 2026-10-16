@@ -4,9 +4,19 @@
 
 /* System notifications (they show on top of other apps) */
 
-async function systemNotify(title, body) {
+// sticky: stays on screen until you click it. actions: buttons on the notification itself
+async function systemNotify(title, body, { sticky = false, actions = [], tag = `${title}|${body}` } = {}) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
-  const options = { body, icon: "icons/icon-192.png", badge: "icons/icon-192.png", tag: `${title}|${body}` };
+  const options = {
+    body,
+    icon: "icons/icon-192.png",
+    badge: "icons/icon-192.png",
+    tag,
+    renotify: true,
+    requireInteraction: sticky,
+    silent: false,
+  };
+  if (actions.length) options.actions = actions;
   try {
     const registration = await navigator.serviceWorker?.getRegistration();
     if (registration) {
@@ -17,7 +27,13 @@ async function systemNotify(title, body) {
     // Fall back to a plain notification below
   }
   try {
-    new Notification(title, options);
+    // Buttons only work through the service worker
+    delete options.actions;
+    const notification = new Notification(title, options);
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
   } catch {
     // Some phones only allow notifications through the service worker
   }
@@ -54,6 +70,23 @@ document.getElementById("notify-later").addEventListener("click", () => {
   } catch {
     // Not important
   }
+});
+
+// A test you can try from another app
+document.getElementById("test-notification").addEventListener("click", async () => {
+  if (!("Notification" in window)) {
+    showToast(t("This browser doesn't support desktop notifications."));
+    return;
+  }
+  if (Notification.permission !== "granted" && await Notification.requestPermission() !== "granted") {
+    showToast(t("Notifications were not allowed."));
+    return;
+  }
+  showToast(t("Switch to another app now. The test arrives in 10 seconds."));
+  setTimeout(() => {
+    chime();
+    systemNotify("Deskito", t("This is a test. Notifications work!"), { sticky: true, tag: "deskito-test" });
+  }, 10000);
 });
 
 /* Reminders before events */
@@ -211,7 +244,14 @@ function ring(alarm) {
   alarmRingTime.textContent = formatTimeOfDay(fromDateAndTime("2000-01-01", alarm.time));
   alarmRingLabel.textContent = alarm.label || t("Alarm");
   if (!alarmDialog.open) alarmDialog.showModal();
-  systemNotify(`⏰ ${alarmRingTime.textContent}`, alarm.label || t("Alarm"));
+  systemNotify(`⏰ ${alarmRingTime.textContent}`, alarm.label || t("Alarm"), {
+    sticky: true,
+    tag: "deskito-alarm",
+    actions: [
+      { action: "alarm-stop", title: t("STOP") },
+      { action: "alarm-snooze", title: t("Snooze 5 min") },
+    ],
+  });
   clearInterval(ringingSound);
   chime();
   const stopAt = Date.now() + 3 * 60000;
@@ -229,11 +269,35 @@ function stopRinging() {
   alarmDialog.close();
 }
 
-document.getElementById("alarm-stop").addEventListener("click", stopRinging);
-document.getElementById("alarm-snooze").addEventListener("click", () => {
+function snoozeAlarm() {
   const alarm = { time: timeKey(Date.now() + 5 * 60000), label: alarmRingLabel.textContent };
   snoozed = { at: Date.now() + 5 * 60000, alarm };
   stopRinging();
+}
+
+async function closeAlarmNotification() {
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration();
+    for (const notification of await registration?.getNotifications({ tag: "deskito-alarm" }) || []) notification.close();
+  } catch {
+    // Nothing to close
+  }
+}
+
+document.getElementById("alarm-stop").addEventListener("click", () => {
+  stopRinging();
+  closeAlarmNotification();
+});
+document.getElementById("alarm-snooze").addEventListener("click", () => {
+  snoozeAlarm();
+  closeAlarmNotification();
+});
+
+// The Stop / Snooze buttons on the system notification (e.g. clicked while in another app)
+navigator.serviceWorker?.addEventListener("message", (event) => {
+  if (event.data?.type !== "notification-action") return;
+  if (event.data.action === "alarm-stop") stopRinging();
+  if (event.data.action === "alarm-snooze") snoozeAlarm();
 });
 
 function checkAlarms(now) {

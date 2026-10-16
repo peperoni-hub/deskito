@@ -70,8 +70,9 @@ function chime() {
 
 function alertUser(message, actions, options) {
   chime();
-  // When you are in another app or tab, also show it as a system notification
-  if (document.hidden) systemNotify("Deskito", message);
+  // When you are in another app (like Discord) or tab, also show it as a system notification.
+  // Deskito can be visible behind another window, so check focus too, not just "hidden".
+  if (document.hidden || !document.hasFocus()) systemNotify("Deskito", message, { sticky: options?.sticky });
   return showToast(message, actions, options);
 }
 

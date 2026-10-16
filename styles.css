@@ -3126,3 +3126,18 @@ body {
   flex: 0 1 150px;
   text-align: left;
 }
+
+/* Notification test and tips in Settings */
+.notify-test-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notify-tips {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

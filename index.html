@@ -385,9 +385,17 @@
             Warn me if a timer runs longer than
             <input class="picker tiny" type="number" min="1" max="24" data-pref="longTimerHours"> hours
           </label>
-          <div>
+          <div class="notify-test-row">
             <button type="button" id="allow-notifications" class="secondary-button small">Allow desktop notifications</button>
+            <button type="button" id="test-notification" class="secondary-button small">Send a test in 10 seconds</button>
           </div>
+          <p class="hint left">Press the test, then switch to another app (like Discord). If nothing pops up:</p>
+          <ul class="notify-tips">
+            <li>Windows: Settings → System → Notifications → turn on your browser, and turn off Do not disturb.</li>
+            <li>Windows may hide pop-ups while a game or full-screen app is open (Settings → System → Notifications → Turn on do not disturb automatically).</li>
+            <li>Edge puts background tabs to sleep: install Deskito as an app, or add it under Settings → System and performance → Never put these sites to sleep.</li>
+            <li>Deskito has to stay open, even minimised; closed apps can't ring.</li>
+          </ul>
         </div>
       </div>
     </main>
@@ -648,6 +656,7 @@
   <script src="lang/privacy.js"></script>
   <script src="lang/events.js"></script>
   <script src="lang/reminders.js"></script>
+  <script src="lang/notifications.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
