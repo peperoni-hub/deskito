@@ -2,7 +2,7 @@
 // Online, it always asks the website for the newest files first (so updates never mix
 // old and new files); the saved copy is only used when there's no connection.
 
-const CACHE = "deskito-v9";
+const CACHE = "deskito-v10";
 const FILES = [
   "./",
   "index.html",
@@ -43,6 +43,7 @@ const FILES = [
   "sync.js",
   "sharing.js",
   "support.js",
+  "push.js",
   "privacy.html",
   "vendor/supabase.js",
   "icon.svg",
@@ -82,6 +83,32 @@ self.addEventListener("fetch", (event) => {
       })
       .catch(() => caches.match(event.request, { ignoreSearch: true }))
   );
+});
+
+// A notification sent by the server (see push.js), also when Deskito is closed
+self.addEventListener("push", (event) => {
+  let message = {};
+  try {
+    message = event.data ? event.data.json() : {};
+  } catch {
+    message = { body: event.data ? event.data.text() : "" };
+  }
+  const tag = message.tag || "deskito";
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    // You're looking at Deskito right now: it shows this itself
+    if (windows.some((client) => client.focused && client.visibilityState === "visible")) return;
+    // Deskito is open in the background and already showed it
+    if ((await self.registration.getNotifications({ tag })).length) return;
+    await self.registration.showNotification(message.title || "Deskito", {
+      body: message.body || "",
+      tag,
+      icon: "icons/icon-192.png",
+      badge: "icons/icon-192.png",
+      renotify: true,
+      requireInteraction: Boolean(message.sticky),
+    });
+  })());
 });
 
 // Clicking a notification opens Deskito (or brings it to the front).

@@ -20,6 +20,8 @@ async function systemNotify(title, body, { sticky = false, actions = [], tag = `
   try {
     const registration = await navigator.serviceWorker?.getRegistration();
     if (registration) {
+      // Already sent by the server (push.js) while Deskito was in the background? Don't show it twice
+      if (/^(rem|auto|alarm):/.test(tag) && (await registration.getNotifications({ tag })).length) return;
       await registration.showNotification(title, options);
       return;
     }
@@ -92,7 +94,14 @@ document.getElementById("test-notification").addEventListener("click", async () 
 /* Reminders before events */
 
 function minutesText(minutes) {
+  if (minutes >= 60 && minutes % 60 === 0) return t("{hours}h", { hours: minutes / 60 });
   return minutes >= 60 ? formatHours(minutes * 60000) : t("{minutes}m", { minutes });
+}
+
+function reminderText(plan, minutesLeft) {
+  let message = t("{title} starts in {time}.", { title: plan.title, time: minutesText(minutesLeft) });
+  if (plan.autoStart && !plan.allDay) message += ` ${t("The timer will start automatically.")}`;
+  return message;
 }
 
 function checkEventReminders(now) {
@@ -102,15 +111,16 @@ function checkEventReminders(now) {
     const sent = new Set(plan.remindersSent || []);
     const due = plan.reminders.filter((minutes) => !sent.has(minutes) && now >= plan.start - minutes * 60000);
     if (!due.length) continue;
-    due.forEach((minutes) => sent.add(minutes));
+    due.forEach((minutes) => {
+      sent.add(minutes);
+      if (typeof markPushSent === "function") markPushSent(`rem:${plan.id}:${minutes}`);
+    });
     plan.remindersSent = [...sent];
     changed = true;
     // Several reminders due at once (e.g. Deskito was closed) give one message, and none after the start
     if (now >= plan.start) continue;
     const left = Math.max(1, Math.round((plan.start - now) / 60000));
-    let message = t("{title} starts in {time}.", { title: plan.title, time: minutesText(left) });
-    if (plan.autoStart && !plan.allDay) message += ` ${t("The timer will start automatically.")}`;
-    alertUser(message);
+    alertUser(reminderText(plan, left), [], { tag: `rem:${plan.id}:${Math.min(...due)}` });
   }
   if (changed) savePlans();
 }
@@ -127,6 +137,7 @@ function checkAutoStart(now) {
 
     plan.autoStarted = true;
     savePlans();
+    if (typeof markPushSent === "function") markPushSent(`auto:${plan.id}`);
     if (running?.planId === plan.id) continue;
 
     const wasRunning = Boolean(running);
@@ -143,7 +154,7 @@ function checkAutoStart(now) {
       running.start = plan.start;
       saveRunning();
     }
-    alertUser(t("Timer started for {title}.", { title: plan.title }));
+    alertUser(t("Timer started for {title}.", { title: plan.title }), [], { tag: `auto:${plan.id}` });
   }
 
   // The event has ended while its timer is still running
@@ -240,13 +251,26 @@ alarmForm.addEventListener("submit", (event) => {
   if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
 });
 
-function ring(alarm) {
+// The same names are used by the server (push.js), so one alarm never pops up twice
+function alarmTag(alarm, day) {
+  return `alarm:${alarm.id}:${day}`;
+}
+
+function alarmTitle(time) {
+  return `⏰ ${formatTimeOfDay(fromDateAndTime("2000-01-01", time))}`;
+}
+
+let ringingTag = "";
+
+function ring(alarm, tag) {
+  ringingTag = tag;
+  if (typeof markPushSent === "function") markPushSent(tag);
   alarmRingTime.textContent = formatTimeOfDay(fromDateAndTime("2000-01-01", alarm.time));
   alarmRingLabel.textContent = alarm.label || t("Alarm");
   if (!alarmDialog.open) alarmDialog.showModal();
-  systemNotify(`⏰ ${alarmRingTime.textContent}`, alarm.label || t("Alarm"), {
+  systemNotify(alarmTitle(alarm.time), alarm.label || t("Alarm"), {
     sticky: true,
-    tag: "deskito-alarm",
+    tag,
     actions: [
       { action: "alarm-stop", title: t("STOP") },
       { action: "alarm-snooze", title: t("Snooze 5 min") },
@@ -278,7 +302,7 @@ function snoozeAlarm() {
 async function closeAlarmNotification() {
   try {
     const registration = await navigator.serviceWorker?.getRegistration();
-    for (const notification of await registration?.getNotifications({ tag: "deskito-alarm" }) || []) notification.close();
+    for (const notification of await registration?.getNotifications({ tag: ringingTag }) || []) notification.close();
   } catch {
     // Nothing to close
   }
@@ -310,12 +334,12 @@ function checkAlarms(now) {
     if (alarm.repeat === "once") alarm.on = false;
     saveAlarms();
     renderAlarms();
-    ring(alarm);
+    ring(alarm, alarmTag(alarm, today));
   }
   if (snoozed && now >= snoozed.at) {
     const { alarm } = snoozed;
     snoozed = null;
-    ring(alarm);
+    ring(alarm, "snooze");
   }
 }
 

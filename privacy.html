@@ -79,7 +79,7 @@
   <!-- English -->
   <article data-lang="en">
     <h1>Privacy policy</h1>
-    <p class="updated">Last updated: 15 October 2026</p>
+    <p class="updated">Last updated: 16 October 2026</p>
 
     <div class="summary">
       <strong>The short version</strong>
@@ -87,6 +87,7 @@
         <li>You can use Deskito without an account: then your data never leaves your device.</li>
         <li>With an account, your entries, plans, projects and settings are <strong>locked on your device before they're synced</strong>. We can't read them.</li>
         <li>We can see your email address, when you signed up and last logged in, and technical details like your IP address in short-lived server logs.</li>
+        <li>If you allow notifications, the <strong>text and time of your upcoming reminders and alarms</strong> are stored unlocked, so they can reach you even when Deskito is closed.</li>
         <li>Support can only see your data if you give them a copy, and you can take it back any time.</li>
         <li>No ads, no tracking, no selling of data.</li>
       </ul>
@@ -109,6 +110,14 @@
     <h2>Your lock, password and recovery key</h2>
     <p>Your data key is unlocked with your password. When you create it, you get a <strong>recovery key</strong>. If you forget your password, the recovery key is the only way to unlock your data again. <strong>We cannot reset or recover it for you</strong>, because we never have your key.</p>
 
+    <h2>Notifications when Deskito is closed</h2>
+    <p>If you're signed in and allow notifications, Deskito can send you reminders, alarms and automatic timer starts even when the app is closed. For that, we store:</p>
+    <ul>
+      <li>a <strong>push address</strong> for each browser or phone where you allowed notifications;</li>
+      <li>for each upcoming notification: <strong>when</strong> to send it and <strong>its text</strong>, for example "PASS3 starts in 30m." or "⏰ 07:00 Wake up". This text includes the event's or alarm's name and is <strong>not locked</strong>, so we could technically read it.</li>
+    </ul>
+    <p>Only the next notifications are stored (alarms up to 14 days ahead), and sent ones are deleted after 2 days. Your entries, notes, projects and everything else stay locked. Logging out removes this device's push address. Don't want this? Don't allow notifications, or turn them off for Deskito in your browser settings.</p>
+
     <h2>Sharing your calendar</h2>
     <p>If you share your calendar with someone, we store your email, their email and whether they accepted. Your plans are given to them as a separate locked copy that only the two of you can open. They can see your plans and name, but can't change anything. You can stop sharing at any time.</p>
 
@@ -118,6 +127,7 @@
     <h2>Services we use</h2>
     <ul>
       <li><strong>Supabase</strong> stores accounts and the locked data, on servers in the European Union.</li>
+      <li><strong>Your browser's push service</strong> (Google for Chrome, Microsoft for Edge, Mozilla for Firefox, Apple for Safari) delivers notifications to your device. The message is locked on the way, so they can't read it; they only see that a notification is sent.</li>
       <li><strong>GitHub Pages</strong> delivers the Deskito app to your browser. Like any website host, it sees your IP address when you open the app.</li>
       <li><strong>Google Fonts</strong> delivers the fonts Deskito uses. Google receives your IP address when the fonts are loaded.</li>
     </ul>
@@ -138,7 +148,7 @@
   <!-- Bosanski -->
   <article data-lang="bs" hidden>
     <h1>Politika privatnosti</h1>
-    <p class="updated">Posljednja izmjena: 15. oktobar 2026.</p>
+    <p class="updated">Posljednja izmjena: 16. oktobar 2026.</p>
 
     <div class="summary">
       <strong>Ukratko</strong>
@@ -146,6 +156,7 @@
         <li>Deskito možeš koristiti bez računa: tada tvoji podaci nikad ne napuštaju tvoj uređaj.</li>
         <li>S računom se tvoji unosi, planovi, projekti i postavke <strong>zaključavaju na tvom uređaju prije sinhronizacije</strong>. Mi ih ne možemo pročitati.</li>
         <li>Vidimo tvoju e-mail adresu, kada si se registrovao/la i zadnji put prijavio/la, te tehničke podatke poput IP adrese u kratkotrajnim serverskim zapisima.</li>
+        <li>Ako dozvoliš obavještenja, <strong>tekst i vrijeme tvojih nadolazećih podsjetnika i alarma</strong> spremaju se nezaključani, kako bi stigli i kad je Deskito zatvoren.</li>
         <li>Podrška vidi tvoje podatke samo ako im ti daš kopiju, a možeš je povući bilo kada.</li>
         <li>Bez reklama, bez praćenja, bez prodaje podataka.</li>
       </ul>
@@ -168,6 +179,14 @@
     <h2>Tvoja brava, lozinka i ključ za oporavak</h2>
     <p>Tvoj ključ za podatke otključava se tvojom lozinkom. Kad ga napraviš, dobiješ <strong>ključ za oporavak</strong>. Ako zaboraviš lozinku, ključ za oporavak je jedini način da ponovo otključaš podatke. <strong>Mi ga ne možemo resetovati niti vratiti</strong>, jer nikada nemamo tvoj ključ.</p>
 
+    <h2>Obavještenja kad je Deskito zatvoren</h2>
+    <p>Ako si prijavljen/a i dozvoliš obavještenja, Deskito ti može slati podsjetnike, alarme i automatska pokretanja tajmera i kad je aplikacija zatvorena. Za to spremamo:</p>
+    <ul>
+      <li><strong>adresu za obavještenja</strong> za svaki preglednik ili telefon na kojem si dozvolio/la obavještenja;</li>
+      <li>za svako nadolazeće obavještenje: <strong>kada</strong> ga poslati i <strong>njegov tekst</strong>, npr. "PASS3 počinje za 30m." ili "⏰ 07:00 Buđenje". Taj tekst sadrži naziv događaja ili alarma i <strong>nije zaključan</strong>, pa bismo ga tehnički mogli pročitati.</li>
+    </ul>
+    <p>Spremaju se samo sljedeća obavještenja (alarmi do 14 dana unaprijed), a poslana se brišu nakon 2 dana. Tvoji unosi, bilješke, projekti i sve ostalo ostaju zaključani. Odjavom se briše adresa za obavještenja ovog uređaja. Ne želiš ovo? Nemoj dozvoliti obavještenja ili ih isključi za Deskito u postavkama preglednika.</p>
+
     <h2>Dijeljenje kalendara</h2>
     <p>Ako podijeliš kalendar s nekim, spremamo tvoj e-mail, njegov/njen e-mail i da li je prihvatio/la. Tvoji planovi mu se daju kao posebna zaključana kopija koju možete otvoriti samo vas dvoje. Vidi tvoje planove i ime, ali ne može ništa mijenjati. Dijeljenje možeš prekinuti bilo kada.</p>
 
@@ -177,6 +196,7 @@
     <h2>Usluge koje koristimo</h2>
     <ul>
       <li><strong>Supabase</strong> čuva račune i zaključane podatke, na serverima u Evropskoj uniji.</li>
+      <li><strong>Usluga obavještenja tvog preglednika</strong> (Google za Chrome, Microsoft za Edge, Mozilla za Firefox, Apple za Safari) dostavlja obavještenja na tvoj uređaj. Poruka je zaključana na putu, pa je ne mogu pročitati; vide samo da je obavještenje poslano.</li>
       <li><strong>GitHub Pages</strong> dostavlja aplikaciju Deskito tvom pregledniku. Kao i svaki hosting, vidi tvoju IP adresu kad otvoriš aplikaciju.</li>
       <li><strong>Google Fonts</strong> dostavlja fontove koje Deskito koristi. Google dobija tvoju IP adresu kada se fontovi učitaju.</li>
     </ul>

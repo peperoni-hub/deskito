@@ -356,6 +356,8 @@ function clearSyncedData() {
 async function logOut() {
   if (!await askConfirm(t("Log out? Your data stays safe in your account and is removed from this device."), t("Log out"))) return;
   await syncNow();
+  // Stop sending this account's notifications to this browser
+  if (typeof forgetPushDevice === "function") await forgetPushDevice();
   await cloud.auth.signOut();
   clearSyncedData();
   originalRemoveItem.call(localStorage, SIGNED_IN_BEFORE);

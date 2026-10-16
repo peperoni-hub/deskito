@@ -172,7 +172,7 @@
               <button type="submit" class="start-button small">ADD</button>
             </form>
             <ul id="alarm-list" class="alarm-list"></ul>
-            <p class="hint left">Alarms ring while Deskito is open or in the background.</p>
+            <p class="hint left">Signed in, alarms pop up even when Deskito is closed. Otherwise keep it open or minimised.</p>
           </div>
         </aside>
       </div>
@@ -394,7 +394,7 @@
             <li>Windows: Settings → System → Notifications → turn on your browser, and turn off Do not disturb.</li>
             <li>Windows may hide pop-ups while a game or full-screen app is open (Settings → System → Notifications → Turn on do not disturb automatically).</li>
             <li>Edge puts background tabs to sleep: install Deskito as an app, or add it under Settings → System and performance → Never put these sites to sleep.</li>
-            <li>Deskito has to stay open, even minimised; closed apps can't ring.</li>
+            <li>Signed in? Then alarms and reminders also arrive when Deskito is closed. Not signed in, Deskito has to stay open (minimised is fine).</li>
           </ul>
         </div>
       </div>
@@ -680,6 +680,7 @@
   <script src="sync.js"></script>
   <script src="sharing.js"></script>
   <script src="support.js"></script>
+  <script src="push.js"></script>
   <script>
     // Works offline once installed (only on the website, not when opened as a file)
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

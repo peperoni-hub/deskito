@@ -128,3 +128,36 @@ for (const [code, values] of Object.entries(NOTIFY_TEXTS)) {
     TRANSLATIONS[code].texts[key] = values[i];
   });
 }
+
+// Notifications while Deskito is closed (push.js)
+const PUSH_KEYS = [
+  "Signed in? Then alarms and reminders also arrive when Deskito is closed. Not signed in, Deskito has to stay open (minimised is fine).",
+  "Signed in, alarms pop up even when Deskito is closed. Otherwise keep it open or minimised.",
+  "{title} is starting. Open Deskito and the timer will start.",
+];
+
+const PUSH_TEXTS = {
+  bs: ["Prijavljen/a? Onda alarmi i podsjetnici stižu i kad je Deskito zatvoren. Bez prijave Deskito mora ostati otvoren (može biti smanjen).", "Kad si prijavljen/a, alarmi se pojavljuju i kad je Deskito zatvoren. Inače ga drži otvorenim ili smanjenim.", "{title} počinje. Otvori Deskito i tajmer će se pokrenuti."],
+  hr: ["Prijavljen/a? Onda alarmi i podsjetnici stižu i kad je Deskito zatvoren. Bez prijave Deskito mora ostati otvoren (može biti smanjen).", "Kad si prijavljen/a, alarmi se pojavljuju i kad je Deskito zatvoren. Inače ga drži otvorenim ili smanjenim.", "{title} počinje. Otvori Deskito i mjerač će se pokrenuti."],
+  sr: ["Пријављен/а? Онда аларми и подсетници стижу и кад је Deskito затворен. Без пријаве Deskito мора остати отворен (може бити умањен).", "Кад си пријављен/а, аларми се појављују и кад је Deskito затворен. Иначе га држи отвореним или умањеним.", "{title} почиње. Отвори Deskito и тајмер ће се покренути."],
+  tr: ["Giriş yaptın mı? O zaman alarmlar ve hatırlatmalar Deskito kapalıyken de gelir. Giriş yapmadıysan Deskito açık kalmalı (küçültülmüş olabilir).", "Giriş yaptıysan alarmlar Deskito kapalıyken de çıkar. Aksi halde açık veya küçültülmüş tut.", "{title} başlıyor. Deskito'yu aç, zamanlayıcı başlayacak."],
+  de: ["Angemeldet? Dann kommen Wecker und Erinnerungen auch, wenn Deskito geschlossen ist. Ohne Anmeldung muss Deskito geöffnet bleiben (minimiert reicht).", "Angemeldet klingeln Wecker auch, wenn Deskito geschlossen ist. Sonst lass es geöffnet oder minimiert.", "{title} beginnt. Öffne Deskito, dann startet der Timer."],
+  fr: ["Connecté·e ? Alors les alarmes et rappels arrivent même quand Deskito est fermé. Sans connexion, Deskito doit rester ouvert (réduit, ça suffit).", "Connecté·e, les alarmes s'affichent même quand Deskito est fermé. Sinon, garde-le ouvert ou réduit.", "{title} commence. Ouvre Deskito et le chronomètre démarrera."],
+  it: ["Hai effettuato l'accesso? Allora sveglie e promemoria arrivano anche con Deskito chiuso. Senza accesso Deskito deve restare aperto (anche ridotto a icona).", "Con l'accesso, le sveglie compaiono anche con Deskito chiuso. Altrimenti tienilo aperto o ridotto a icona.", "{title} sta iniziando. Apri Deskito e il timer partirà."],
+  zh: ["已登录？那么即使 Deskito 已关闭，闹钟和提醒也会送达。未登录时，Deskito 必须保持打开（最小化也可以）。", "登录后，即使 Deskito 已关闭，闹钟也会弹出。否则请保持打开或最小化。", "{title} 即将开始。打开 Deskito，计时就会启动。"],
+  ja: ["ログインしていれば、Deskito を閉じていてもアラームとリマインダーが届きます。ログインしていない場合は Deskito を開いたままにしてください（最小化で OK）。", "ログインしていれば、Deskito を閉じていてもアラームが表示されます。そうでなければ開いたまま、または最小化してください。", "{title} が始まります。Deskito を開くとタイマーが開始します。"],
+  ko: ["로그인했나요? 그러면 Deskito가 닫혀 있어도 알람과 알림이 도착합니다. 로그인하지 않았다면 Deskito를 열어 두어야 합니다 (최소화해도 됩니다).", "로그인하면 Deskito가 닫혀 있어도 알람이 뜹니다. 그렇지 않으면 열어 두거나 최소화하세요.", "{title}이(가) 시작됩니다. Deskito를 열면 타이머가 시작됩니다."],
+  ar: ["هل سجّلت الدخول؟ إذن تصل المنبّهات والتذكيرات حتى عندما يكون Deskito مغلقًا. بدون تسجيل الدخول يجب أن يبقى Deskito مفتوحًا (يكفي أن يكون مصغّرًا).", "عند تسجيل الدخول تظهر المنبّهات حتى عندما يكون Deskito مغلقًا. وإلا فأبقه مفتوحًا أو مصغّرًا.", "يبدأ {title} الآن. افتح Deskito وسيبدأ المؤقت."],
+};
+
+for (const [code, values] of Object.entries(PUSH_TEXTS)) {
+  PUSH_KEYS.forEach((key, i) => {
+    TRANSLATIONS[code].texts[key] = values[i];
+  });
+}
+
+// "1h" on its own (e.g. "starts in 1h"), taken from each language's "1h 30m" format
+for (const language of Object.values(TRANSLATIONS)) {
+  const both = language.texts["{hours}h {minutes}m"];
+  if (both && !language.texts["{hours}h"]) language.texts["{hours}h"] = both.split("{minutes}")[0].trim();
+}
