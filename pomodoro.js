@@ -95,11 +95,6 @@ function phaseLength(phase) {
   return (phase === "focus" ? prefs.pomoWork : prefs.pomoBreak) * 60000;
 }
 
-function formatCountdown(milliseconds) {
-  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
-  return `${pad(Math.floor(totalSeconds / 60))}:${pad(totalSeconds % 60)}`;
-}
-
 function renderPomo() {
   let left = phaseLength("focus");
   if (pomo.active) {
@@ -188,28 +183,9 @@ for (const input of [pomoWorkInput, pomoBreakInput]) {
 
 let alarmFiredFor = null;
 let snoozeUntil = 0;
-let breakToast = null;
-
+// Same as pressing Pause: the work is saved, the break timer starts and says when it's over
 function startAlarmBreak() {
-  const workFields = currentFields();
-  stopTimer();
-  setTimerFields({ description: t("Break"), type: "break" });
-  startTimer();
-
-  const endsAt = Date.now() + prefs.breakLengthMin * 60000;
-  breakToast = showToast("", [], { sticky: true });
-  const message = breakToast.querySelector(".toast-message");
-  const timer = setInterval(() => {
-    const left = endsAt - Date.now();
-    message.textContent = t("On a break: {time} left", { time: formatCountdown(left) });
-    if (left <= 0) {
-      clearInterval(timer);
-      breakToast.remove();
-      alertUser(t("Break's over! Ready to get back to work?"), [
-        { label: t("Back to work"), primary: true, run: () => continueEntry(workFields) },
-      ], { sticky: true });
-    }
-  }, 1000);
+  if (running && !running.isBreak) pauseTimer();
 }
 
 function checkBreakAlarm(now) {

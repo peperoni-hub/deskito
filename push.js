@@ -93,6 +93,13 @@ function upcomingPushJobs(now) {
   }
 
   if (snoozed) add("snooze", snoozed.at, alarmTitle(snoozed.alarm.time), snoozed.alarm.label || t("Alarm"), true);
+
+  // The break you're on is over
+  if (running?.isBreak && running.breakEndsAt && !running.breakNotified) {
+    const task = pausedTimer?.description;
+    add(`break:${running.start}`, running.breakEndsAt, "Deskito",
+      task ? t("Break's over! Continue with {task}?", { task }) : t("Break's over! Ready to get back to work?"), true);
+  }
   return jobs.sort((a, b) => a.job_key.localeCompare(b.job_key));
 }
 

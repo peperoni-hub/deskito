@@ -223,3 +223,24 @@ for (const [code, values] of Object.entries(SETTINGS_TEXTS)) {
   // The email address stays the same in every language
   TRANSLATIONS[code].texts["zehrasinanovic24@gmail.com"] = "zehrasinanovic24@gmail.com";
 }
+
+// Breaks (Pause starts a break timer)
+const BREAK_KEYS = ["Break time is up", "Break's over! Continue with {task}?"];
+const BREAK_TEXTS = {
+  bs: ["Pauza je gotova", "Pauza je gotova! Nastaviti s {task}?"],
+  hr: ["Pauza je gotova", "Pauza je gotova! Nastaviti s {task}?"],
+  sr: ["Пауза је готова", "Пауза је готова! Наставити са {task}?"],
+  tr: ["Mola bitti", "Mola bitti! {task} ile devam edilsin mi?"],
+  de: ["Die Pause ist vorbei", "Pause vorbei! Mit {task} weitermachen?"],
+  fr: ["La pause est finie", "Pause terminée ! Reprendre {task} ?"],
+  it: ["La pausa è finita", "Pausa finita! Riprendere {task}?"],
+  zh: ["休息时间到了", "休息结束！继续 {task} 吗？"],
+  ja: ["休憩時間が終わりました", "休憩終了！{task} を再開しますか？"],
+  ko: ["휴식 시간이 끝났습니다", "휴식 끝! {task}을(를) 계속할까요?"],
+  ar: ["انتهى وقت الاستراحة", "انتهت الاستراحة! هل تتابع {task}؟"],
+};
+for (const [code, values] of Object.entries(BREAK_TEXTS)) {
+  BREAK_KEYS.forEach((key, i) => {
+    TRANSLATIONS[code].texts[key] = values[i];
+  });
+}

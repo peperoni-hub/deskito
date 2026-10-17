@@ -153,6 +153,12 @@ function pad(number) {
   return String(number).padStart(2, "0");
 }
 
+// 05:00 (minutes:seconds), for Pomodoro and the break timer
+function formatCountdown(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  return `${pad(Math.floor(totalSeconds / 60))}:${pad(totalSeconds % 60)}`;
+}
+
 function dayKey(timestamp) {
   const date = new Date(timestamp);
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

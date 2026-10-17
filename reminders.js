@@ -21,7 +21,7 @@ async function systemNotify(title, body, { sticky = false, actions = [], tag = `
     const registration = await navigator.serviceWorker?.getRegistration();
     if (registration) {
       // Already sent by the server (push.js) while Deskito was in the background? Don't show it twice
-      if (/^(rem|auto|alarm):/.test(tag) && (await registration.getNotifications({ tag })).length) return;
+      if (/^(rem|auto|alarm|break):/.test(tag) && (await registration.getNotifications({ tag })).length) return;
       await registration.showNotification(title, options);
       return;
     }

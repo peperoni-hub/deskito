@@ -3222,3 +3222,18 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .clock.paused { animation: none; }
 }
+
+/* On a break */
+.break-left {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.break-left[hidden] {
+  display: none;
+}
+
+.clock.on-break {
+  color: var(--plan-other);
+}

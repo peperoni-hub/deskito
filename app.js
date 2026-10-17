@@ -64,20 +64,32 @@ function showClock(elapsed) {
   clockFraction.textContent = "." + String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0");
 }
 
+const breakLeft = document.getElementById("break-left");
+
 function updateClock() {
-  showClock((running.sessionMs || 0) + Date.now() - running.start);
+  const now = Date.now();
+  showClock((running.sessionMs || 0) + now - running.start);
+  if (running.isBreak && running.breakEndsAt) {
+    const left = running.breakEndsAt - now;
+    const text = left > 0 ? t("On a break: {time} left", { time: formatCountdown(left) }) : t("Break time is up");
+    if (breakLeft.textContent !== text) breakLeft.textContent = text;
+  }
   frameRequest = requestAnimationFrame(updateClock);
 }
 
 function showRunningState() {
   cancelAnimationFrame(frameRequest);
-  startStopButton.textContent = t("STOP");
-  startStopButton.classList.add("running");
+  const onBreak = Boolean(running.isBreak);
+  startStopButton.textContent = onBreak ? `▶ ${t("Back to work")}` : t("STOP");
+  startStopButton.classList.toggle("running", !onBreak);
+  startStopButton.classList.toggle("on-break", onBreak);
   startStopButton.classList.remove("paused");
-  pauseButton.textContent = `⏸ ${t("PAUSE")}`;
+  pauseButton.textContent = onBreak ? `■ ${t("STOP")}` : `⏸ ${t("PAUSE")}`;
   pauseButton.hidden = false;
   discardButton.hidden = false;
+  breakLeft.hidden = !onBreak;
   clockMain.parentElement.classList.remove("paused");
+  clockMain.parentElement.classList.toggle("on-break", onBreak);
   frameRequest = requestAnimationFrame(updateClock);
 }
 
@@ -91,6 +103,7 @@ function savePaused() {
 
 function showPausedState() {
   cancelAnimationFrame(frameRequest);
+  setTimerFields(pausedTimer);
   showClock(pausedTimer.sessionMs);
   startStopButton.textContent = `▶ ${t("CONTINUE")}`;
   startStopButton.classList.remove("running");
@@ -101,16 +114,62 @@ function showPausedState() {
   clockMain.parentElement.classList.add("paused");
 }
 
-// Pause: save the time so far as an entry, and remember what you were doing
+// Pause = take a break: save the work so far as an entry, remember what you were doing,
+// and start the break timer
 function pauseTimer() {
   const fields = { ...currentFields(), planId: running.planId || "" };
   const sessionMs = (running.sessionMs || 0) + Date.now() - running.start;
   stopTimer();
   pausedTimer = { ...fields, sessionMs, pausedAt: Date.now() };
   savePaused();
-  setTimerFields(fields);
-  showPausedState();
+  startBreak();
 }
+
+// The break timer counts the break (saved as a Break entry) and tells you when it's over
+function startBreak(minutes = prefs.breakLengthMin) {
+  // Something to go back to afterwards: the paused task, or the last thing you worked on
+  if (!pausedTimer) {
+    const last = [...store.entries].filter((entry) => entry.type !== "break").sort((a, b) => b.end - a.end)[0];
+    if (last) {
+      const { description, type, projectId, taskId, tagIds } = last;
+      pausedTimer = { description, type, projectId, taskId, tagIds, planId: "", sessionMs: 0, pausedAt: Date.now() };
+      savePaused();
+    }
+  }
+  const ownName = typeSelect.value === "break" && descriptionInput.value.trim();
+  setTimerFields({ description: ownName || t("Break"), type: "break" });
+  running = { start: Date.now(), planId: "", isBreak: true, breakEndsAt: Date.now() + minutes * 60000 };
+  saveRunning();
+  showRunningState();
+}
+
+// End the break (it's saved) and carry on with the task from before
+function backToWork() {
+  stopTimer();
+  if (pausedTimer) continueTimer();
+}
+
+// End the break and the whole session
+function stopBreak() {
+  pausedTimer = null;
+  savePaused();
+  stopTimer();
+}
+
+function checkBreakOver(now) {
+  if (!running?.isBreak || !running.breakEndsAt || running.breakNotified || now < running.breakEndsAt) return;
+  running.breakNotified = true;
+  saveRunning();
+  const tag = `break:${running.start}`;
+  if (typeof markPushSent === "function") markPushSent(tag);
+  const task = pausedTimer?.description;
+  alertUser(task ? t("Break's over! Continue with {task}?", { task }) : t("Break's over! Ready to get back to work?"), [
+    { label: t("Back to work"), primary: true, run: () => running?.isBreak && backToWork() },
+    { label: t("Not now") },
+  ], { sticky: true, tag });
+}
+
+setInterval(() => checkBreakOver(Date.now()), 5000);
 
 // Continue: a new part with the same task, project and tags; the clock adds up the session
 function continueTimer() {
@@ -139,9 +198,13 @@ function resetTimer() {
   setTimerFields({});
   startStopButton.textContent = t("START");
   startStopButton.classList.remove("running", "paused");
+  startStopButton.classList.remove("on-break");
   pauseButton.hidden = true;
   discardButton.hidden = true;
-  clockMain.parentElement.classList.remove("paused");
+  breakLeft.hidden = true;
+  clockMain.parentElement.classList.remove("paused", "on-break");
+  // A break ended some other way (discarded, computer off): you can still continue the task
+  if (pausedTimer) showPausedState();
 }
 
 // Throw away the running timer without saving it
@@ -152,6 +215,12 @@ discardButton.addEventListener("click", async () => {
 });
 
 function startTimer(planId = "") {
+  // Starting a Break yourself works like Pause (Pomodoro runs its own breaks)
+  const pomodoroOn = typeof pomo !== "undefined" && pomo.active;
+  if (typeSelect.value === "break" && !pomodoroOn) {
+    startBreak();
+    return;
+  }
   // Starting something new ends a paused session (its time is already saved)
   if (pausedTimer) {
     pausedTimer = null;
@@ -185,7 +254,9 @@ function continueEntry(entry) {
 }
 
 startStopButton.addEventListener("click", () => {
-  if (running) {
+  if (running?.isBreak) {
+    backToWork();
+  } else if (running) {
     stopTimer();
   } else if (pausedTimer) {
     continueTimer();
@@ -194,9 +265,11 @@ startStopButton.addEventListener("click", () => {
   }
 });
 
-// Pause while running; Stop while paused
+// Pause while working; Stop while on a break or paused
 pauseButton.addEventListener("click", () => {
-  if (running) {
+  if (running?.isBreak) {
+    stopBreak();
+  } else if (running) {
     pauseTimer();
   } else if (pausedTimer) {
     finishPaused();
@@ -411,7 +484,8 @@ function refreshPickers() {
 
 /* Start up */
 
-if (running && pausedTimer) {
+// A paused task only belongs with a break (left over from an old version otherwise)
+if (running && !running.isBreak && pausedTimer) {
   pausedTimer = null;
   savePaused();
 }
