@@ -3198,3 +3198,27 @@ body {
 .settings-stack .settings-card:last-child .panel {
   flex: 1;
 }
+
+/* Pause and continue */
+.pause-button {
+  padding: 9px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.pause-button[hidden] {
+  display: none;
+}
+
+.clock.paused {
+  opacity: 0.55;
+  animation: paused-blink 2s ease-in-out infinite;
+}
+
+@keyframes paused-blink {
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock.paused { animation: none; }
+}

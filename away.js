@@ -44,7 +44,7 @@ function stopBecauseAway(awaySince) {
         renderEntries();
         if (running) stopTimer();
         setTimerFields(before);
-        running = { start: before.start, planId: before.planId || "" };
+        running = { start: before.start, planId: before.planId || "", sessionMs: before.sessionMs || 0 };
         saveRunning();
         showRunningState();
         writeHeartbeat(Date.now());

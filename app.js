@@ -8,6 +8,7 @@ const clockMain = document.getElementById("clock-main");
 const clockFraction = document.getElementById("clock-fraction");
 const startStopButton = document.getElementById("start-stop");
 const discardButton = document.getElementById("discard-timer");
+const pauseButton = document.getElementById("pause-timer");
 const modeButtons = document.querySelectorAll(".mode-button");
 const timerFields = document.getElementById("timer-fields");
 const manualFields = document.getElementById("manual-fields");
@@ -31,8 +32,11 @@ const editEnd = document.getElementById("edit-end");
 const editDeleteButton = document.getElementById("edit-delete");
 const editCancelButton = document.getElementById("edit-cancel");
 
-// The running timer is saved, so it keeps going after a refresh
+// The running timer is saved, so it keeps going after a refresh.
+// sessionMs: time from earlier parts of this session (before a pause)
 let running = readStore("running", null);
+// A paused timer: its time so far is already saved as entries; Continue starts a new part
+let pausedTimer = readStore("paused", null);
 let frameRequest = null;
 let editingId = null;
 
@@ -55,18 +59,75 @@ function saveRunning() {
   }
 }
 
-function updateClock() {
-  const elapsed = Date.now() - running.start;
+function showClock(elapsed) {
   clockMain.textContent = formatDuration(elapsed);
   clockFraction.textContent = "." + String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0");
+}
+
+function updateClock() {
+  showClock((running.sessionMs || 0) + Date.now() - running.start);
   frameRequest = requestAnimationFrame(updateClock);
 }
 
 function showRunningState() {
+  cancelAnimationFrame(frameRequest);
   startStopButton.textContent = t("STOP");
   startStopButton.classList.add("running");
+  startStopButton.classList.remove("paused");
+  pauseButton.textContent = `⏸ ${t("PAUSE")}`;
+  pauseButton.hidden = false;
   discardButton.hidden = false;
+  clockMain.parentElement.classList.remove("paused");
   frameRequest = requestAnimationFrame(updateClock);
+}
+
+function savePaused() {
+  if (pausedTimer) {
+    writeStore("paused", pausedTimer);
+  } else {
+    localStorage.removeItem("paused");
+  }
+}
+
+function showPausedState() {
+  cancelAnimationFrame(frameRequest);
+  showClock(pausedTimer.sessionMs);
+  startStopButton.textContent = `▶ ${t("CONTINUE")}`;
+  startStopButton.classList.remove("running");
+  startStopButton.classList.add("paused");
+  pauseButton.textContent = `■ ${t("STOP")}`;
+  pauseButton.hidden = false;
+  discardButton.hidden = true;
+  clockMain.parentElement.classList.add("paused");
+}
+
+// Pause: save the time so far as an entry, and remember what you were doing
+function pauseTimer() {
+  const fields = { ...currentFields(), planId: running.planId || "" };
+  const sessionMs = (running.sessionMs || 0) + Date.now() - running.start;
+  stopTimer();
+  pausedTimer = { ...fields, sessionMs, pausedAt: Date.now() };
+  savePaused();
+  setTimerFields(fields);
+  showPausedState();
+}
+
+// Continue: a new part with the same task, project and tags; the clock adds up the session
+function continueTimer() {
+  const paused = pausedTimer;
+  pausedTimer = null;
+  savePaused();
+  setTimerFields(paused);
+  running = { start: Date.now(), planId: paused.planId || "", sessionMs: paused.sessionMs };
+  saveRunning();
+  showRunningState();
+}
+
+// Done for now: the paused session's time is already saved
+function finishPaused() {
+  pausedTimer = null;
+  savePaused();
+  resetTimer();
 }
 
 function resetTimer() {
@@ -77,8 +138,10 @@ function resetTimer() {
   clockFraction.textContent = ".00";
   setTimerFields({});
   startStopButton.textContent = t("START");
-  startStopButton.classList.remove("running");
+  startStopButton.classList.remove("running", "paused");
+  pauseButton.hidden = true;
   discardButton.hidden = true;
+  clockMain.parentElement.classList.remove("paused");
 }
 
 // Throw away the running timer without saving it
@@ -89,6 +152,11 @@ discardButton.addEventListener("click", async () => {
 });
 
 function startTimer(planId = "") {
+  // Starting something new ends a paused session (its time is already saved)
+  if (pausedTimer) {
+    pausedTimer = null;
+    savePaused();
+  }
   running = { start: Date.now(), planId };
   saveRunning();
   showRunningState();
@@ -119,13 +187,31 @@ function continueEntry(entry) {
 startStopButton.addEventListener("click", () => {
   if (running) {
     stopTimer();
+  } else if (pausedTimer) {
+    continueTimer();
   } else {
     startTimer();
   }
 });
 
+// Pause while running; Stop while paused
+pauseButton.addEventListener("click", () => {
+  if (running) {
+    pauseTimer();
+  } else if (pausedTimer) {
+    finishPaused();
+  }
+});
+
 for (const field of [descriptionInput, typeSelect, projectSelect, tagPicker]) {
-  field.addEventListener("change", saveRunning);
+  field.addEventListener("change", () => {
+    if (pausedTimer) {
+      pausedTimer = { ...pausedTimer, ...currentFields() };
+      savePaused();
+    } else {
+      saveRunning();
+    }
+  });
 }
 
 /* Timer or manual mode */
@@ -325,9 +411,15 @@ function refreshPickers() {
 
 /* Start up */
 
-setTimerFields(running || {});
+if (running && pausedTimer) {
+  pausedTimer = null;
+  savePaused();
+}
+setTimerFields(running || pausedTimer || {});
 setMode("timer");
 renderEntries();
 if (running) {
   showRunningState();
+} else if (pausedTimer) {
+  showPausedState();
 }

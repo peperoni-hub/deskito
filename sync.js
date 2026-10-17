@@ -8,7 +8,7 @@
 const SUPABASE_URL = "https://udhmreajsncijlxzpvkm.supabase.co";
 const SUPABASE_KEY = "sb_publishable_44nWOAwDYF5lxoXGDsAVuQ_x6SwGU4C";
 
-const SYNC_KEYS = ["entries", "projects", "tags", "plans", "deleted", "prefs", "profile", "theme", "appearance", "language", "running", "alarms", "nicknames"];
+const SYNC_KEYS = ["entries", "projects", "tags", "plans", "deleted", "prefs", "profile", "theme", "appearance", "language", "running", "paused", "alarms", "nicknames"];
 const TEXT_KEYS = ["theme", "appearance", "language"];
 
 const cloud = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -268,6 +268,21 @@ function showRemoteChanges(changed) {
     markAppearance();
   }
   if (changed.has("running")) showRemoteTimer(readLocal("running"));
+  if (changed.has("paused") || changed.has("running")) showRemotePause(readLocal("paused"));
+}
+
+// The timer was paused, continued or stopped on another device
+function showRemotePause(remote) {
+  if (running) return;
+  pausedTimer = remote;
+  if (pausedTimer) {
+    setTimerFields(pausedTimer);
+    showPausedState();
+  } else if (startStopButton.classList.contains("paused")) {
+    applyingRemote = true;
+    resetTimer();
+    applyingRemote = false;
+  }
 }
 
 // The timer was started or stopped on another device
