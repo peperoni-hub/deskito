@@ -14,7 +14,7 @@ const tagList = document.getElementById("tag-list");
 function trackedMs(projectId) {
   return store.entries
     .filter((entry) => entry.projectId === projectId)
-    .reduce((sum, entry) => sum + (entry.end - entry.start), 0);
+    .reduce((sum, entry) => sum + entryMs(entry), 0);
 }
 
 function projectsChanged() {

@@ -403,7 +403,7 @@ function renderEntries() {
   const weekStart = startOfWeek(Date.now());
   const weekMs = sorted
     .filter((entry) => entry.start >= weekStart)
-    .reduce((sum, entry) => sum + (entry.end - entry.start), 0);
+    .reduce((sum, entry) => sum + entryMs(entry), 0);
   weekTotal.textContent = sorted.length ? t("Week total {time}", { time: formatDuration(weekMs) }) : "";
 
   const days = new Map();
@@ -415,7 +415,7 @@ function renderEntries() {
 
   entryDays.replaceChildren(
     ...[...days].map(([key, dayEntries]) => {
-      const total = dayEntries.reduce((sum, entry) => sum + (entry.end - entry.start), 0);
+      const total = dayEntries.reduce((sum, entry) => sum + entryMs(entry), 0);
       return el("div", { class: "day-group" },
         el("div", { class: "day-header" },
           el("span", {}, dayLabel(key)),

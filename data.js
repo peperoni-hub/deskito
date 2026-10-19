@@ -135,6 +135,12 @@ function el(tag, props = {}, ...children) {
 
 /* Time formatting */
 
+// An entry's duration in whole seconds, exactly as its row shows it, so that adding up the
+// rows always gives the same number as the totals
+function entryMs(entry) {
+  return Math.max(0, Math.floor((entry.end - entry.start) / 1000) * 1000);
+}
+
 function formatDuration(milliseconds) {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
   const hours = Math.floor(totalSeconds / 3600);

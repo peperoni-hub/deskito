@@ -65,7 +65,7 @@ function daysInPeriod() {
   return days;
 }
 
-const msOf = (entry) => entry.end - entry.start;
+const msOf = (entry) => entryMs(entry);
 const sumMs = (entries) => entries.reduce((sum, entry) => sum + msOf(entry), 0);
 
 function hoursLabel(milliseconds) {
