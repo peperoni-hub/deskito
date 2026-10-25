@@ -74,7 +74,7 @@ function setDone(plan, done) {
     const entry = {
       id: uid(),
       description: plan.title,
-      type: plan.type === "meeting" ? "meeting" : "task",
+      type: ["meeting", "event"].includes(plan.type) ? plan.type : "task",
       projectId: plan.projectId || "",
       taskId: plan.taskId || "",
       tagIds: [],

@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Deskito">
   <meta name="description" content="Every minute in its place.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&family=Inter:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;700&family=Bodoni+Moda:wght@700;800&family=Lato:wght@400;700&family=DM+Sans:wght@400;700&family=Inter:wght@500;600;700&family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;600;700&family=Fredoka:wght@500;600&family=Quicksand:wght@500;700&family=Cormorant+Garamond:ital,wght@0,700;1,700&family=Mulish:wght@400;700&family=Lora:ital,wght@0,600;0,700;1,700&family=Source+Sans+3:wght@400;700&family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;700&family=Cinzel:wght@700&family=Raleway:wght@400;700&family=Josefin+Sans:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="theme.js"></script>
   <script src="i18n.js"></script>
@@ -148,6 +148,7 @@
               <span><i class="plan-dot plan-task"></i>Task</span>
               <span><i class="plan-dot plan-meeting"></i>Meeting</span>
               <span><i class="plan-dot plan-plan"></i>Plan</span>
+              <span><i class="plan-dot plan-event"></i>Event</span>
               <span><i class="plan-dot plan-other"></i>Other</span>
               <span><i class="mini-line legend"></i>Tracked</span>
             </div>
@@ -176,6 +177,21 @@
             <ul id="alarm-list" class="alarm-list"></ul>
             <p class="hint left">Signed in, alarms pop up even when Deskito is closed. Otherwise keep it open or minimised.</p>
           </div>
+          <div class="mini-cal notes-card" data-notes>
+            <div class="mini-header notes-header">
+              <span class="mini-month">📝 Notes</span>
+              <button type="button" class="secondary-button small notes-new">+ New note</button>
+            </div>
+            <form class="note-form" hidden>
+              <input class="text-input note-title-input" type="text" placeholder="Title" maxlength="120" required>
+              <textarea class="text-input note-body-input" rows="4" placeholder="Write your note…"></textarea>
+              <div class="note-form-actions">
+                <button type="button" class="secondary-button small note-cancel">Cancel</button>
+                <button type="submit" class="start-button small">SAVE</button>
+              </div>
+            </form>
+            <ul class="note-list"></ul>
+          </div>
         </aside>
       </div>
 
@@ -198,6 +214,22 @@
         </div>
         <p class="cal-hint">Click an empty spot in the week to plan something at that time.</p>
         <div id="cal-body" class="cal-body"></div>
+
+        <section class="notes-section" data-notes>
+          <div class="notes-header">
+            <h2 class="page-title section-title">📝 Notes</h2>
+            <button type="button" class="secondary-button small notes-new">+ New note</button>
+          </div>
+          <form class="note-form panel" hidden>
+            <input class="text-input note-title-input" type="text" placeholder="Title" maxlength="120" required>
+            <textarea class="text-input note-body-input" rows="6" placeholder="Write your note…"></textarea>
+            <div class="note-form-actions">
+              <button type="button" class="secondary-button small note-cancel">Cancel</button>
+              <button type="submit" class="start-button small">SAVE</button>
+            </div>
+          </form>
+          <ul class="note-list note-grid"></ul>
+        </section>
       </div>
 
       <div class="view" data-view="reports" hidden>
@@ -352,17 +384,35 @@
 
               <p class="field-label">Theme</p>
               <div class="theme-options">
-                <button type="button" class="theme-option" data-theme-choice="feminine">
+                <button type="button" class="theme-option" data-theme-choice="feminine" aria-label="Pink and plum">
                   <span class="swatches"><i style="background:#fdf6f4"></i><i style="background:#d77a93"></i><i style="background:#a14e67"></i></span>
-                  Feminine
                 </button>
-                <button type="button" class="theme-option" data-theme-choice="old-money">
+                <button type="button" class="theme-option" data-theme-choice="old-money" aria-label="Navy and gold">
                   <span class="swatches"><i style="background:#14213a"></i><i style="background:#b89b5e"></i><i style="background:#6e1f2b"></i></span>
-                  Old money
                 </button>
-                <button type="button" class="theme-option" data-theme-choice="neutral">
+                <button type="button" class="theme-option" data-theme-choice="neutral" aria-label="Olive">
                   <span class="swatches"><i style="background:#f3f1ea"></i><i style="background:#6b7d47"></i><i style="background:#4b5a32"></i></span>
-                  Neutral
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="noir" aria-label="Black and red">
+                  <span class="swatches"><i style="background:#0b0b0b"></i><i style="background:#d0021b"></i><i style="background:#f6f4f4"></i></span>
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="summer" aria-label="Pastel yellow and blue with flowers">
+                  <span class="swatches"><i style="background:#fff3b8"></i><i style="background:#a9d4ef"></i><i style="background:#f6c945"></i></span>
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="cherry" aria-label="Cherry red and beige">
+                  <span class="swatches"><i style="background:#f4ebdd"></i><i style="background:#b0172b"></i><i style="background:#8e1020"></i></span>
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="cashmere" aria-label="Cashmere blue and cherry red">
+                  <span class="swatches"><i style="background:#a5b8cd"></i><i style="background:#b3122e"></i><i style="background:#eef2f7"></i></span>
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="sunset" aria-label="Orange and dark blue">
+                  <span class="swatches"><i style="background:#ff8000"></i><i style="background:#222f3b"></i><i style="background:#f3f5f7"></i></span>
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="jester" aria-label="Jester red and bat's cloak">
+                  <span class="swatches"><i style="background:#ab0f2c"></i><i style="background:#1d1617"></i><i style="background:#f5f0f0"></i></span>
+                </button>
+                <button type="button" class="theme-option" data-theme-choice="lavender" aria-label="Cream, plum and lavender">
+                  <span class="swatches"><i style="background:#fdf1e2"></i><i style="background:#655a7c"></i><i style="background:#ab92bf"></i></span>
                 </button>
               </div>
 
@@ -705,6 +755,7 @@
   <script src="lang/events.js"></script>
   <script src="lang/reminders.js"></script>
   <script src="lang/notifications.js"></script>
+  <script src="lang/notes.js"></script>
   <script>
     translatePage();
     fillLanguageSelects();
@@ -719,6 +770,7 @@
   <script src="calendar.js"></script>
   <script src="events.js"></script>
   <script src="reminders.js"></script>
+  <script src="notes.js"></script>
   <script src="away.js"></script>
   <script src="reports.js"></script>
   <script src="icons.js"></script>

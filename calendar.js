@@ -1,6 +1,6 @@
 // Calendar page (week and month) and the mini calendar on the Time Tracker page
 
-const PLAN_TYPES = { task: "Task", meeting: "Meeting", plan: "Plan", other: "Other" };
+const PLAN_TYPES = { task: "Task", meeting: "Meeting", event: "Event", plan: "Plan", other: "Other" };
 const HOUR_HEIGHT = 48;
 
 const calTitle = document.getElementById("cal-title");
@@ -500,7 +500,7 @@ planTimerButton.addEventListener("click", () => {
   showView("tracker");
   continueEntry({
     description: plan.title,
-    type: plan.type === "meeting" ? "meeting" : "task",
+    type: ["meeting", "event"].includes(plan.type) ? plan.type : "task",
     projectId: plan.projectId,
     taskId: plan.taskId,
     tagIds: [],

@@ -16,7 +16,7 @@ function writeStore(key, value) {
 
 // For syncing between devices: remember when each item last changed, and which items were
 // deleted, so two devices can be merged without losing or bringing back anything
-const LIST_KEYS = ["entries", "projects", "tags", "plans", "alarms"];
+const LIST_KEYS = ["entries", "projects", "tags", "plans", "alarms", "notes"];
 
 function withoutStamp(item) {
   return JSON.stringify({ ...item, updatedAt: undefined });
@@ -48,6 +48,7 @@ const ENTRY_TYPES = {
   task: "Task",
   project: "Project work",
   meeting: "Meeting",
+  event: "Event",
   break: "Break",
 };
 
@@ -70,6 +71,7 @@ const store = {
   tags: readStore("tags", []),
   plans: readStore("plans", []),
   alarms: readStore("alarms", []),
+  notes: readStore("notes", []),
 };
 
 const prefs = {
@@ -295,6 +297,10 @@ function timeRange(dateValue, startValue, endValue) {
 
 function saveAlarms() {
   writeStore("alarms", store.alarms);
+}
+
+function saveNotes() {
+  writeStore("notes", store.notes);
 }
 
 /* Event times: only the start day is required. No times = all day; no end = no set end. */

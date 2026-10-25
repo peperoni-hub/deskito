@@ -28,6 +28,67 @@ const ICON_PALETTES = {
   },
 };
 
+// The newer themes start from a similar palette and change the main colours
+const iconTheme = (base, colors) => ({ ...ICON_PALETTES[base], ...colors });
+Object.assign(ICON_PALETTES, {
+  noir: iconTheme("neutral", {
+    ink: "#161414", glass: "#fff", sand: "#d0021b", lines: "#d0021b",
+    bg: { meeting: "#f1eded", task: "#fbeaec", project: "#f3eeee", date: "#fde6e8", break: "#f4f1f1" },
+    blocks: ["#d0021b", "#3a3a3a", "#8c8c8c"],
+    briefcase: "#3a3a3a", handle: "#161414", alert: "#d0021b", screen: "#f2c6cb", board: "#3a3a3a",
+    blanket: "#d0021b", blush: "#f5c2c7",
+    night: { bg: "#121212", ink: "#f2eded", glass: "#2a2a2a", sand: "#ff3b4a", moon: "#f2eded", z: "#ff8a8f" },
+  }),
+  summer: iconTheme("feminine", {
+    ink: "#2f5f86", glass: "#fff", sand: "#f6c945", lines: "#5aa9d6", sweat: "#a9d4ef",
+    bg: { meeting: "#e3f2fb", task: "#fff6cc", project: "#eef7fd", date: "#fde8ef", break: "#fff9dc" },
+    blocks: ["#f6c945", "#5aa9d6", "#f28fad"],
+    briefcase: "#e8b923", handle: "#a07c12", alert: "#f28fad", screen: "#cfe8f7", board: "#5aa9d6",
+    blanket: "#a9d4ef", blush: "#f8c8d6",
+    night: { bg: "#22304a", ink: "#f4f0d8", glass: "#2f3d58", sand: "#f5d76e", moon: "#f5d76e", z: "#9fd0f0" },
+  }),
+  cherry: iconTheme("old-money", {
+    ink: "#5a1018", glass: "#fffaf2", sand: "#c9a27c", lines: "#b0172b",
+    bg: { meeting: "#f1e5d6", task: "#f7e9e0", project: "#efe4d4", date: "#f8e3e3", break: "#efe6d8" },
+    blocks: ["#b0172b", "#c9a27c", "#6f4e37"],
+    briefcase: "#6f4e37", handle: "#4a3020", alert: "#b0172b", screen: "#f0d9c4", board: "#8e1020",
+    blanket: "#b0172b",
+    night: { bg: "#2a1815", ink: "#f1e4d2", glass: "#3b2a25", sand: "#e9cfae", moon: "#e9cfae", z: "#f08b97" },
+  }),
+  cashmere: iconTheme("old-money", {
+    ink: "#22304a", glass: "#fff", sand: "#b3122e", lines: "#8aa2bf", sweat: "#a5b8cd",
+    bg: { meeting: "#e3eaf3", task: "#f6e4e8", project: "#e8eef6", date: "#f8e1e5", break: "#eef2f7" },
+    blocks: ["#a5b8cd", "#b3122e", "#5f7fa6"],
+    briefcase: "#5f7fa6", handle: "#3f5677", alert: "#b3122e", screen: "#d6e0ec", board: "#b3122e",
+    blanket: "#a5b8cd",
+    night: { bg: "#1c2838", ink: "#e9eef5", glass: "#2a384a", sand: "#f0566e", moon: "#a5b8cd", z: "#a5b8cd" },
+  }),
+  sunset: iconTheme("neutral", {
+    ink: "#222f3b", glass: "#fff", sand: "#ff8000", lines: "#ff8000", sweat: "#8fb3d1",
+    bg: { meeting: "#e7ecf1", task: "#fff0e0", project: "#eef1f4", date: "#ffe9d6", break: "#f3f5f7" },
+    blocks: ["#ff8000", "#3d5a73", "#ffb14d"],
+    briefcase: "#3d5a73", handle: "#222f3b", alert: "#ff8000", screen: "#ffd2a3", board: "#222f3b",
+    blanket: "#ff8000",
+    night: { bg: "#222f3b", ink: "#eef2f5", glass: "#2c3a48", sand: "#ff8000", moon: "#ffb870", z: "#ff9a33" },
+  }),
+  jester: iconTheme("old-money", {
+    ink: "#1d1617", glass: "#fff", sand: "#ab0f2c", lines: "#ab0f2c", sweat: "#9fb3be",
+    bg: { meeting: "#efe6e7", task: "#f7e4e8", project: "#f2ecec", date: "#f8e0e5", break: "#f5f0f0" },
+    blocks: ["#ab0f2c", "#4a3b3d", "#9c8a8c"],
+    briefcase: "#4a3b3d", handle: "#1d1617", alert: "#ab0f2c", screen: "#ecc7cf", board: "#ab0f2c",
+    blanket: "#ab0f2c",
+    night: { bg: "#1d1617", ink: "#f2e8e9", glass: "#3a2d2f", sand: "#e8475f", moon: "#f2e8e9", z: "#f08a9b" },
+  }),
+  lavender: iconTheme("feminine", {
+    ink: "#554b6b", glass: "#fffaf3", sand: "#ab92bf", lines: "#655a7c", sweat: "#b9cde0",
+    bg: { meeting: "#ece5f2", task: "#f6ecf6", project: "#f1ebf6", date: "#f8e7ee", break: "#fdf1e2" },
+    blocks: ["#ab92bf", "#655a7c", "#e0a3b8"],
+    briefcase: "#8a72a3", handle: "#554b6b", alert: "#ab92bf", screen: "#e9dff1", board: "#655a7c",
+    blanket: "#ab92bf", blush: "#efcdd8",
+    night: { bg: "#2a2438", ink: "#fdf1e2", glass: "#3a3348", sand: "#ab92bf", moon: "#e3d4ef", z: "#c7b3d8" },
+  }),
+});
+
 function iconPalette() {
   return ICON_PALETTES[document.documentElement.dataset.theme] || ICON_PALETTES.neutral;
 }
