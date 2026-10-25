@@ -60,7 +60,7 @@ for (const input of document.querySelectorAll("[data-pref]")) {
 
 /* Backup and restore everything (also used to move data to another browser) */
 
-const BACKUP_KEYS = ["entries", "projects", "tags", "plans", "prefs", "profile", "theme", "appearance", "alarms", "nicknames", "notes"];
+const BACKUP_KEYS = ["entries", "projects", "tags", "plans", "prefs", "profile", "theme", "appearance", "alarms", "nicknames", "notes", "shareSettings"];
 const backupButton = document.getElementById("backup-download");
 const restoreInput = document.getElementById("backup-restore");
 

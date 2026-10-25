@@ -186,6 +186,7 @@
             <form class="note-form" hidden>
               <input class="text-input note-title-input" type="text" placeholder="Title" maxlength="120" required>
               <textarea class="text-input note-body-input" rows="4" placeholder="Write your note…"></textarea>
+              <div class="note-share"></div>
               <div class="note-form-actions">
                 <button type="button" class="secondary-button small note-cancel">Cancel</button>
                 <button type="submit" class="start-button small">SAVE</button>
@@ -229,12 +230,18 @@
           <form class="note-form panel" hidden>
             <input class="text-input note-title-input" type="text" placeholder="Title" maxlength="120" required>
             <textarea class="text-input note-body-input" rows="6" placeholder="Write your note…"></textarea>
+            <div class="note-share"></div>
             <div class="note-form-actions">
               <button type="button" class="secondary-button small note-cancel">Cancel</button>
               <button type="submit" class="start-button small">SAVE</button>
             </div>
           </form>
           <ul class="note-list note-grid"></ul>
+        </section>
+
+        <section id="shared-notes-section" class="notes-section" hidden>
+          <h2 class="page-title section-title">Shared with you</h2>
+          <ul id="shared-note-list" class="note-list note-grid"></ul>
         </section>
       </div>
 

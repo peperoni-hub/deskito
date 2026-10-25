@@ -80,12 +80,51 @@ async function loadSharedCalendars() {
           console.warn("Deskito sharing: can't open a shared calendar", problem);
         }
       }
-      sharedCalendars.push({ ownerId: share.owner_id, name: displayName(share.owner_email, calendar.name || share.owner_email), realName: calendar.name || share.owner_email, plans: calendar.plans || [] });
+      sharedCalendars.push({ ownerId: share.owner_id, name: displayName(share.owner_email, calendar.name || share.owner_email), realName: calendar.name || share.owner_email, plans: calendar.plans || [], notes: calendar.notes || [] });
     }
   }
-  calSharedRow.hidden = sharedCalendars.length === 0;
+  calSharedRow.hidden = !sharedCalendars.some((calendar) => calendar.plans.length);
   renderCalendar();
   renderMini();
+  if (typeof renderSharedNotes === "function") renderSharedNotes();
+  if (typeof renderNotes === "function") renderNotes();
+}
+
+/* What you share with each person: your calendar, and all or some of your notes */
+
+function shareSettings() {
+  return readStore("shareSettings", {});
+}
+
+function settingsFor(email) {
+  return { calendar: true, allNotes: false, ...shareSettings()[email.toLowerCase()] };
+}
+
+function setShareSetting(email, key, value) {
+  const all = shareSettings();
+  all[email.toLowerCase()] = { ...settingsFor(email), [key]: value };
+  writeStore("shareSettings", all);
+  if (typeof renderNotes === "function") renderNotes();
+  publishSharedCalendars();
+}
+
+// People you share with (for the "Share with" choice on a note)
+function sharePeople() {
+  if (!account) return [];
+  return shares
+    .filter((share) => share.owner_id === account.id)
+    .map((share) => ({ email: share.viewer_email.toLowerCase(), name: displayName(share.viewer_email) }));
+}
+
+function noteSharedWith(note, email) {
+  const list = note.sharedWith || [];
+  return list.includes("all") || list.includes(email.toLowerCase()) || settingsFor(email).allNotes;
+}
+
+function notesFor(email) {
+  return store.notes
+    .filter((note) => noteSharedWith(note, email))
+    .map(({ id, title, body, createdAt, edits }) => ({ id, title, body, createdAt, edits }));
 }
 
 // Put an up-to-date locked copy of your plans out for each person you share with
@@ -96,13 +135,19 @@ async function publishSharedCalendars() {
   const mine = shares.filter((share) => share.owner_id === account.id && share.status === "accepted" && share.viewer_public_key);
   const name = readLocal("profile")?.name || account.email;
   const plans = store.plans.map(({ id, title, type, otherLabel, start, end, notes, color, done, allDay, noEnd }) => ({ id, title, type, otherLabel, start, end, notes, color, done, allDay, noEnd }));
-  const payload = JSON.stringify({ name, plans });
 
+  // Each person gets their own copy: your calendar if you share it with them, and only the notes meant for them
   for (const share of mine) {
+    const content = {
+      name,
+      plans: settingsFor(share.viewer_email).calendar ? plans : [],
+      notes: notesFor(share.viewer_email),
+    };
+    const payload = JSON.stringify(content);
     if (lastPublished[share.id] === payload) continue;
     const lock = await sharedLock(myKeyPair.privateKey, share.viewer_public_key);
     const { error } = await cloud.from("deskito_data").upsert(
-      { user_id: account.id, key: `share:${share.id}`, value: { locked: await lockJson(lock, { name, plans }) }, updated_at: new Date().toISOString() },
+      { user_id: account.id, key: `share:${share.id}`, value: { locked: await lockJson(lock, content) }, updated_at: new Date().toISOString() },
       { onConflict: "user_id,key" }
     );
     if (!error) lastPublished[share.id] = payload;
@@ -181,11 +226,26 @@ function renderShares() {
   const nobody = () => el("p", { class: "mini-empty" }, t("Nobody yet."));
   nicknameBoxShown = new Set();
 
+  // What each person gets from you
+  const shareSwitch = (share, key, label) => {
+    const settings = settingsFor(share.viewer_email);
+    return el("label", { class: "share-switch" },
+      el("input", { type: "checkbox", checked: settings[key], onchange: (event) => setShareSetting(share.viewer_email, key, event.target.checked) }),
+      label
+    );
+  };
+
   shareLists.replaceChildren(
-    el("p", { class: "field-label" }, t("You share your calendar with")),
+    el("p", { class: "field-label" }, t("You share with")),
     ...(mine.length ? mine.map((share) =>
-      shareRow(share.viewer_email, share.status,
-        smallButton(t("Stop sharing"), () => stopSharing(share), true))
+      el("div", { class: "share-person" },
+        shareRow(share.viewer_email, share.status,
+          smallButton(t("Stop sharing"), () => stopSharing(share), true)),
+        el("div", { class: "share-switches" },
+          shareSwitch(share, "calendar", t("Calendar")),
+          shareSwitch(share, "allNotes", t("All my notes"))
+        )
+      )
     ) : [nobody()]),
     el("p", { class: "field-label" }, t("Shared with you")),
     ...(withMe.length ? withMe.map((share) =>
@@ -242,7 +302,7 @@ async function removeShare(share, ask = false) {
 }
 
 async function stopSharing(share) {
-  if (!await askConfirm(t("Stop sharing your calendar with {email}?", { email: share.viewer_email }), t("Stop sharing"))) return;
+  if (!await askConfirm(t("Stop sharing with {email}?", { email: share.viewer_email }), t("Stop sharing"))) return;
   await cloud.from("deskito_data").delete().eq("user_id", account.id).eq("key", `share:${share.id}`);
   await cloud.from("deskito_shares").delete().eq("id", share.id);
   refreshSharing(true);

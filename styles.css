@@ -3896,3 +3896,60 @@ body {
 .note-empty {
   list-style: none;
 }
+
+/* Sharing notes */
+.share-person {
+  display: grid;
+  gap: 4px;
+}
+
+.share-switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.share-person .share-switches {
+  padding-left: 4px;
+}
+
+.share-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.share-switch input:disabled + * ,
+.share-switch:has(input:disabled) {
+  opacity: 0.5;
+}
+
+.note-share {
+  display: grid;
+  gap: 6px;
+}
+
+.note-share .field-label {
+  margin: 0;
+}
+
+.note-shared-chip {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.note-from {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.shared-note {
+  background: color-mix(in srgb, var(--plan-meeting) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--plan-meeting) 22%, var(--border));
+}
