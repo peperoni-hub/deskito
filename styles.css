@@ -2854,6 +2854,7 @@ body {
 
   .nav-item[data-view="tracker"]::before { content: "⏱"; }
   .nav-item[data-view="calendar"]::before { content: "📅"; }
+  .nav-item[data-view="notes"]::before { content: "📝"; }
   .nav-item[data-view="reports"]::before { content: "📊"; }
   .nav-item[data-view="projects"]::before { content: "📁"; }
   .nav-item[data-view="settings"]::before { content: "⚙"; }

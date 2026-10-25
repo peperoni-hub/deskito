@@ -1,6 +1,6 @@
 // Sticky notes: a title and text, with when each note was added and every time it was edited.
-// The same notes show in two places (under the alarms, and under the calendar); each place
-// is marked with data-notes in index.html.
+// The same notes show in two places (a small card under the alarms, and the Notes page);
+// each place is marked with data-notes in index.html.
 
 const noteWidgets = [...document.querySelectorAll("[data-notes]")];
 
@@ -112,5 +112,8 @@ for (const widget of noteWidgets) {
     saveNoteForm(widget);
   });
 }
+
+// From the small card on the home page to the Notes page
+document.getElementById("notes-open").addEventListener("click", () => showView("notes"));
 
 renderNotes();
