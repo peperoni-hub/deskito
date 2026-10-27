@@ -2,7 +2,7 @@
 
 **Every minute in its place.**
 
-Deskito is a free time tracker for your work, studies and plans. Start a timer, plan your week in the calendar, take breaks, and see where your time went.
+Deskito is a free time tracker for your work, studies and plans. Start a timer, plan your week in the calendar, keep notes, take breaks, and see where your time went.
 
 👉 **Open it:** https://peperoni-hub.github.io/deskito/
 
@@ -10,10 +10,11 @@ It works in any modern browser, on your computer and your phone, also offline. N
 
 ## What it can do
 
-- **Timer**: start, pause, continue and stop, with a description, type, project and tags. Only one timer runs at a time.
-- **Breaks**: Pause starts a break timer and tells you when the break is over, with a button to go back to what you were doing.
-- **Your time**: every entry with its start, end and duration, grouped by day with daily and weekly totals. Add or edit entries by hand.
-- **Calendar**: plan events for one day or several, with or without times. See plans and tracked time side by side.
+- **Timer**: start, pause, continue and stop, with a description, type (task, project work, meeting, event or break), project and tags. Only one timer runs at a time.
+- **Breaks**: Pause starts a break timer that counts down your break and tells you when it's over, with a button to go back to what you were doing. Breaks are saved too, so you can see them in your reports.
+- **Your time**: every entry with its start, end and duration, grouped by day with daily and weekly totals that always match the rows. Add or edit entries by hand.
+- **Calendar**: plan tasks, meetings, events and more, for one day or several, with or without times. See plans and tracked time side by side.
+- **Notes**: sticky notes with a bold title and your text, on their own page and as a small card on the home page. Every note remembers when it was added and each time it was edited.
 - **Upcoming**: your next events on the home page. Tick them off when they're done and they move into your timeline.
 - **Reminders and alarms**: reminders before events (10 minutes to 1 day), alarms that repeat, and an option to start the timer automatically when an event begins.
 - **Pomodoro**: focus and break rounds that track themselves.
@@ -21,13 +22,15 @@ It works in any modern browser, on your computer and your phone, also offline. N
 - **Projects and tags** to organise your work.
 - **Stops by itself**: if your computer turns off or goes to sleep, the timer stops at that moment.
 - **Accounts and sync**: use Deskito on all your devices.
-- **Calendar sharing**: share your calendar with people you choose, and give them nicknames.
-- **Three themes**, light and dark mode, and **12 languages**: English, Bosnian, Croatian, Serbian, Turkish, German, French, Italian, Chinese, Japanese, Korean and Arabic.
+- **Sharing**: share your calendar, all your notes, or only the notes you choose, with people you pick. They can see but not change anything, and you can give them nicknames.
+- **10 colour themes**, from soft pastels with little flowers to black and red, each with its own fonts and a light and dark mode.
+- **12 languages**: English, Bosnian, Croatian, Serbian, Turkish, German, French, Italian, Chinese, Japanese, Korean and Arabic.
 
 ## Your privacy
 
 - **Without an account**, everything stays in your own browser. Nothing is sent anywhere.
 - **With an account**, your data is **locked on your device before it's synced** (end-to-end encrypted), so nobody else can read it, not even Deskito.
+- **What you share** (your calendar or notes) is locked too, in a separate copy that only you and that person can open.
 - If you allow notifications, only the text and time of your upcoming reminders and alarms are stored unlocked, so they can reach you while Deskito is closed.
 - No ads, no tracking, no selling of data.
 
