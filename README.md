@@ -6,6 +6,8 @@ Deskito is a free time tracker for your work, studies and plans. Start a timer, 
 
 👉 **Open it:** https://peperoni-hub.github.io/deskito/
 
+![Deskito in its four colour themes](screenshot.jpg)
+
 It works in any modern browser, on your computer and your phone, also offline. No account needed to get started.
 
 ## What it can do
