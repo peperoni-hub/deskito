@@ -1,0 +1,13 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+
+# Dependencies and logs
+node_modules/
+*.log
+
+# Editor settings
+.vscode/
